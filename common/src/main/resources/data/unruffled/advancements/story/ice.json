@@ -1,0 +1,37 @@
+{
+  "parent": "unruffled:story/iron_bolster",
+  "criteria": {
+    "ice": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "minecraft:ice"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.story.ice.description"
+    },
+    "frame": "task",
+    "hidden": false,
+    "icon": {
+      "item": "minecraft:ice"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.story.ice.title"
+    }
+  },
+  "requirements": [
+    [
+      "ice"
+    ]
+  ]
+}

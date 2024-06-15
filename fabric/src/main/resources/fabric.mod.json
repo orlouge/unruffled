@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "id": "unruffled",
+  "version": "${version}",
+  "name": "Unruffled",
+  "description": "",
+  "authors": [
+    "orlouge"
+  ],
+  "contact": {
+    "homepage": "https://github.com/orlouge/unruffled",
+    "sources": "https://github.com/orlouge/unruffled"
+  },
+  "license": "Insert License Here",
+  "icon": "assets/unruffled/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "io.github.orlouge.unruffled.fabric.UnruffledFabric"
+    ],
+    "client": [
+      "io.github.orlouge.unruffled.fabric.UnruffedFabricClient"
+    ]
+  },
+  "mixins": [
+    "unruffled.mixins.json",
+    "unruffled-common.mixins.json"
+  ],
+  "depends": {
+    "fabric": "*",
+    "minecraft": ">=1.20.1"
+  }
+}

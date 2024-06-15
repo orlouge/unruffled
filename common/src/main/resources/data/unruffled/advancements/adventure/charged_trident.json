@@ -1,0 +1,30 @@
+{
+  "parent": "minecraft:adventure/throw_trident",
+  "criteria": {
+    "shot_trident": {
+      "conditions": {},
+      "trigger": "unruffled:charged_trident"
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.adventure.charged_trident.description"
+    },
+    "frame": "task",
+    "hidden": false,
+    "icon": {
+      "item": "unruffled:charged_trident",
+      "nbt": "{Damage:0}"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.adventure.charged_trident.title"
+    }
+  },
+  "requirements": [
+    [
+      "shot_trident"
+    ]
+  ]
+}

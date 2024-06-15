@@ -1,0 +1,29 @@
+{
+  "parent": "unruffled:adventure/bundle",
+  "criteria": {
+    "heavy_inventory": {
+      "conditions": {},
+      "trigger": "unruffled:heavy_inventory"
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.adventure.heavy_inventory.description"
+    },
+    "frame": "task",
+    "hidden": false,
+    "icon": {
+      "item": "minecraft:anvil"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.adventure.heavy_inventory.title"
+    }
+  },
+  "requirements": [
+    [
+      "heavy_inventory"
+    ]
+  ]
+}

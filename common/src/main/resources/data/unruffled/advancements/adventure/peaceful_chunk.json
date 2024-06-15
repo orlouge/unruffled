@@ -1,0 +1,29 @@
+{
+  "parent": "minecraft:adventure/sleep_in_bed",
+  "criteria": {
+    "peaceful_chunk": {
+      "conditions": {},
+      "trigger": "unruffled:peaceful_chunk"
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.adventure.peaceful_chunk.description"
+    },
+    "frame": "task",
+    "hidden": false,
+    "icon": {
+      "item": "minecraft:lime_bed"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.adventure.peaceful_chunk.title"
+    }
+  },
+  "requirements": [
+    [
+      "peaceful_chunk"
+    ]
+  ]
+}

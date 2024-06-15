@@ -1,0 +1,22 @@
+{
+  "parent": "minecraft:story/mine_diamond",
+  "criteria": {
+    "enchanted_item": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.story.enchant_item.description"
+    },
+    "hidden": true,
+    "icon": {
+      "item": "minecraft:enchanted_book"
+    },
+    "show_toast": false,
+    "title": {
+      "translate": "advancements.story.enchant_item.title"
+    }
+  }
+}
