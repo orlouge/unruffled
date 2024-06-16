@@ -34,6 +34,7 @@
     "hunger.ServerPlayerEntityMixin",
     "mobs.EvokerEntityMixin",
     "mobs.HostileEntityMixin",
+    "mobs.PatrolSpawnerMixin",
     "mobs.PhantomSpawnerMixin",
     "mobs.RaiderEntityMixin",
     "mobs.SpawnRestrictionMixin",

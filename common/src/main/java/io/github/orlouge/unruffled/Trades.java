@@ -266,24 +266,24 @@ public class Trades {
             Map.entry(VillagerProfession.LIBRARIAN, List.of(
                     new TradeOffers.Factory[] {},
                     new TradeOffers.Factory[] {
+                            new TradeOffers.SellItemFactory(Items.BOOK, 1, 4, 12, 1),
                             new TypeAwareBuyNbtItemFactory(CustomItems.ANCIENT_CODEX, setCodexBasedOnBiome(1), 1, 64, 1, 10),
-                            new TypeAwareBuyNbtItemFactory(CustomItems.ANCIENT_CODEX, setCodexBasedOnBiome(2), 1, 64, 1, 10),
                     },
                     new TradeOffers.Factory[] {
-                            new TypeAwareBuyNbtItemFactory(CustomItems.ANCIENT_CODEX, setCodexBasedOnBiome(3), 1, 64, 1, 10),
-                            new TypeAwareBuyNbtItemFactory(CustomItems.ANCIENT_CODEX, setCodexBasedOnBiome(4), 1, 64, 1, 10),
+                            new TypeAwareBuyNbtItemFactory(CustomItems.ANCIENT_CODEX, setCodexBasedOnBiome(2), 1, 64, 1, 30),
+                            new TypeAwareBuyNbtItemFactory(CustomItems.ANCIENT_CODEX, setCodexBasedOnBiome(3), 1, 64, 1, 30),
                     },
                     new TradeOffers.Factory[] {
-                            new TypeAwareBuyNbtItemFactory(CustomItems.ANCIENT_CODEX, setCodexBasedOnBiome(5), 1, 64, 1, 10),
-                            new TypeAwareBuyNbtItemFactory(CustomItems.ANCIENT_CODEX, setCodexBasedOnBiome(6), 1, 64, 1, 10),
+                            new TypeAwareBuyNbtItemFactory(CustomItems.ANCIENT_CODEX, setCodexBasedOnBiome(4), 1, 64, 1, 40),
+                            new TypeAwareBuyNbtItemFactory(CustomItems.ANCIENT_CODEX, setCodexBasedOnBiome(5), 1, 64, 1, 40),
                     },
                     new TradeOffers.Factory[] {
-                            new TypeAwareBuyNbtItemFactory(CustomItems.ANCIENT_CODEX, setCodexBasedOnBiome(7), 1, 64, 1, 10),
-                            new TypeAwareBuyNbtItemFactory(CustomItems.ANCIENT_CODEX, setCodexBasedOnBiome(8), 1, 64, 1, 10),
+                            new TypeAwareBuyNbtItemFactory(CustomItems.ANCIENT_CODEX, setCodexBasedOnBiome(6), 1, 64, 1, 50),
+                            new TypeAwareBuyNbtItemFactory(CustomItems.ANCIENT_CODEX, setCodexBasedOnBiome(7), 1, 64, 1, 50),
                     },
                     new TradeOffers.Factory[] {
-                            new TypeAwareBuyNbtItemFactory(CustomItems.ANCIENT_CODEX, setCodexBasedOnBiome(9), 1, 64, 1, 10),
-                            new TypeAwareBuyNbtItemFactory(CustomItems.ANCIENT_CODEX, setCodexBasedOnBiome(10), 1, 64, 1, 10),
+                            new TypeAwareBuyNbtItemFactory(CustomItems.ANCIENT_CODEX, setCodexBasedOnBiome(8), 1, 64, 1, 125),
+                            new TypeAwareBuyNbtItemFactory(CustomItems.ANCIENT_CODEX, setCodexBasedOnBiome(9), 1, 64, 1, 125),
                     }
             )),
             Map.entry(VillagerProfession.MASON, List.of(

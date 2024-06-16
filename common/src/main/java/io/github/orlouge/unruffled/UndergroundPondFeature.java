@@ -90,8 +90,6 @@ public class UndergroundPondFeature extends Feature<DefaultFeatureConfig> {
                         if (airY <= 0) {
                             origin = origin.add(0, airY - 1, 0);
                             continue movedown;
-                        } else {
-                            break movedown;
                         }
                     }
                 }

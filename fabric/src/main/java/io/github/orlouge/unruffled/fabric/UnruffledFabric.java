@@ -65,6 +65,8 @@ public class UnruffledFabric implements ModInitializer {
             if (source.isBuiltin()) {
                 if (id.equals(LootTables.PIGLIN_BARTERING_GAMEPLAY)) {
                     return lootManager.getLootTable(new Identifier(UnruffledMod.MOD_ID, "gameplay/piglin_bartering"));
+                } else if (id.equals(LootTables.FISHING_TREASURE_GAMEPLAY)) {
+                    return lootManager.getLootTable(new Identifier(UnruffledMod.MOD_ID, "gameplay/fishing/treasure"));
                 } else if (id.equals(LootTables.END_CITY_TREASURE_CHEST)) {
                     return lootManager.getLootTable(new Identifier(UnruffledMod.MOD_ID, "chests/end_city_treasure"));
                 } else if (id.equals(new Identifier(Identifier.DEFAULT_NAMESPACE, "entities/iron_golem"))) {

@@ -18,7 +18,7 @@ public class CustomItems {
     public static final Item MAGNETIC_TRIDENT = new TridentItem((new Item.Settings()).maxDamage(250));
     public static final Item PIERCING_ARROW = new ArrowItem(new Item.Settings());
     public static final Item IGNITING_ARROW = new ArrowItem(new Item.Settings());
-    public static final Item ANCIENT_CODEX = new AncientCodexItem((new Item.Settings()).maxCount(1).rarity(Rarity.UNCOMMON));
+    public static final Item ANCIENT_CODEX = new AncientCodexItem((new Item.Settings()).maxCount(16).rarity(Rarity.UNCOMMON));
     public static final Item EVIL_TOTEM = new Item((new Item.Settings()).maxCount(1).rarity(Rarity.UNCOMMON));
     public static final Map<String, Item> TRIDENTS = Map.of(
             "charged", CustomItems.CHARGED_TRIDENT,
