@@ -14,6 +14,7 @@ import net.minecraft.item.Items;
 import net.minecraft.loot.LootTables;
 import net.minecraft.potion.Potions;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.Identifier;
@@ -93,6 +94,11 @@ public class UnruffledMod {
                 ext.addStaminaIfCanAttack(-0.02f, player);
             }
         });
+        for (Item item : Registries.ITEM.stream().toList()) {
+            if (item.isFood() && item.getMaxCount() > 16) {
+                ((ItemAccessor) item).setMaxCount(16);
+            }
+        }
         ((ItemAccessor) Items.POTION).setMaxCount(16);
         //((ToolMaterialsAccessor) (Object) ToolMaterials.GOLD).setItemDurability(200);
     }

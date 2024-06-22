@@ -6,6 +6,7 @@ import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.damage.DamageTypes;
 import net.minecraft.item.ArmorItem;
 import net.minecraft.item.ArmorMaterials;
 import net.minecraft.item.ItemStack;
@@ -73,7 +74,11 @@ public class EnchantmentHelperMixin {
             if (UnruffledMod.DISABLED_ENCHANTMENTS.contains(Enchantments.PROTECTION)) {
                 for (ItemStack item : equipment) {
                     if (item.getItem().isDamageable() && item.getItem().isDamageable()) {
-                        protection.add(2);
+                        if (source.isOf(DamageTypes.WITHER) && item.getItem() instanceof ArmorItem armor && armor.getMaterial() == ArmorMaterials.NETHERITE) {
+                            protection.add(6);
+                        } else {
+                            protection.add(2);
+                        }
                     }
                 }
             }

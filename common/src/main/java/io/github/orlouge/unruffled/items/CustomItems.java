@@ -9,7 +9,7 @@ import java.util.Map;
 
 public class CustomItems {
     public static final Item GOLDEN_BERRIES = new Item((new Item.Settings()).rarity(Rarity.RARE).food(
-            (new FoodComponent.Builder()).hunger(2).saturationModifier(0.1F).statusEffect(new StatusEffectInstance(StatusEffects.INSTANT_HEALTH, 1, 1), 1.0F).statusEffect(new StatusEffectInstance(StatusEffects.GLOWING, 600, 0), 1.0F).alwaysEdible().build()
+            (new FoodComponent.Builder()).hunger(2).snack().saturationModifier(0.1F).statusEffect(new StatusEffectInstance(StatusEffects.INSTANT_HEALTH, 1, 1), 1.0F).statusEffect(new StatusEffectInstance(StatusEffects.GLOWING, 600, 0), 1.0F).alwaysEdible().build()
     ));
     public static final Item IRON_BOLSTER = new BolsterItem(1.5f, -3, ToolMaterials.IRON, new Item.Settings());
     public static final Item DIAMOND_BOLSTER = new BolsterItem(1.5f, -3, ToolMaterials.DIAMOND, new Item.Settings());

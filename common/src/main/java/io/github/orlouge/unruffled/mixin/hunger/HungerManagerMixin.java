@@ -14,25 +14,31 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(HungerManager.class)
-public class HungerManagerMixin implements ExtendedHungerManager {
+public abstract class HungerManagerMixin implements ExtendedHungerManager {
     @Shadow private int foodLevel;
     @Shadow private int foodTickTimer;
     @Shadow private int prevFoodLevel;
     @Shadow private float saturationLevel;
     @Shadow private float exhaustion;
+
+    @Shadow public abstract void add(int food, float saturationModifier);
+
     private int inventoryWeightTimer = 100;
     private float inventoryWeight = 1f;
     private float stamina = 1f;
     private float lastStamina = 0f;
     private float lastStaminaRegeneration = 1f;
     private float foodToConsume = 0f;
+    private float foodCooldown = 0f;
     private Vec3d averagePos = null;
 
     @Inject(method = "update", at = @At("HEAD"), cancellable = true)
     public void onUpdate(PlayerEntity player, CallbackInfo ci) {
+        foodCooldown = Math.max(0f, foodCooldown - 0.001f);
         Vec3d playerPos = player.getPos(), travelAmount = new Vec3d(0, 0, 0);
         if (this.averagePos == null) {
             this.averagePos = playerPos;
@@ -105,6 +111,15 @@ public class HungerManagerMixin implements ExtendedHungerManager {
             this.lastStaminaRegeneration = staminaRegeneration;
         }
         ci.cancel();
+    }
+
+    @Redirect(method = "eat", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/HungerManager;add(IF)V"))
+    public void addFoodWithCooldown(HungerManager instance, int food, float saturationModifier) {
+        food = Math.round(food * (1f - foodCooldown));
+        this.add(food, Math.round(saturationModifier * (1f - foodCooldown)));
+        if (food > 0) {
+            foodCooldown = Math.min(0.9f, foodCooldown + 0.2f);
+        }
     }
 
     @Inject(method = "writeNbt", at = @At("RETURN"))

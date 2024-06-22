@@ -16,6 +16,10 @@ public abstract class ToolMaterialsAccessor {
 
     @Inject(method = "<init>", at = @At("RETURN"))
     public void modifyInitDurability(String string, int i, int miningLevel, int itemDurability, float miningSpeed, float attackDamage, int enchantability, Supplier repairIngredient, CallbackInfo ci) {
-        if (string.equals("GOLD")) this.setItemDurability(200);
+        if (string.equals("GOLD")) {
+            this.setItemDurability(200);
+        } else {
+            this.setItemDurability(itemDurability * 2);
+        }
     }
 }
