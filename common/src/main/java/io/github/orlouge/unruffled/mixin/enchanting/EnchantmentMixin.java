@@ -1,6 +1,7 @@
 package io.github.orlouge.unruffled.mixin.enchanting;
 
 import io.github.orlouge.unruffled.UnruffledMod;
+import io.github.orlouge.unruffled.items.CustomItems;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
@@ -12,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class EnchantmentMixin {
     @Inject(method = "isAcceptableItem", at = @At("HEAD"), cancellable = true)
     public void disableEnchantmentsRandomLoot(ItemStack stack, CallbackInfoReturnable<Boolean> cir) {
-        if (UnruffledMod.DISABLED_ENCHANTMENTS.contains((Enchantment) (Object) this)) {
+        if (CustomItems.isDisabled((Enchantment) (Object) this, stack)) {
             cir.setReturnValue(false);
             cir.cancel();
         }

@@ -69,7 +69,8 @@ public class Trades {
             new TradeOffers.SellItemFactory(Items.AMETHYST_SHARD, 1, 5, 12, 1),
             new TradeOffers.SellItemFactory(Items.PHANTOM_MEMBRANE, 4, 1, 4, 1),
             new TradeOffers.SellItemFactory(Items.RECOVERY_COMPASS, 16, 1, 1, 1),
-            new TradeOffers.SellItemFactory(Items.ENDER_EYE, 1, 1, 12, 1)
+            new TradeOffers.SellItemFactory(Items.ENDER_EYE, 1, 1, 12, 1),
+            new SellNbtItemFactory(CustomItems.SACRED_SWORD, ItemEnchantmentsHelper::setItemEnchantments, 32, 1, 1, 10),
     };
     public static final TradeOffers.Factory[] WANDERING_TRADER_POTIONS = new TradeOffers.Factory[] {
             new SellNbtItemFactory(Items.SPLASH_POTION, stack -> PotionUtil.setPotion(stack, Potions.STRONG_HEALING), 1, 1, 16, 1),

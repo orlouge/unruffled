@@ -60,7 +60,9 @@ public class UnruffledMod {
             CustomItems.DIAMOND_BOLSTER, Map.of(Enchantments.SILK_TOUCH, 1),
             CustomItems.NETHERITE_BOLSTER, Map.of(Enchantments.SILK_TOUCH, 1),
             CustomItems.CHARGED_TRIDENT, Map.of(Enchantments.CHANNELING, 1),
-            CustomItems.MAGNETIC_TRIDENT, Map.of(Enchantments.LOYALTY, 3)
+            CustomItems.MAGNETIC_TRIDENT, Map.of(Enchantments.LOYALTY, 3),
+            CustomItems.BLAZING_SWORD, Map.of(Enchantments.FIRE_ASPECT, 2),
+            CustomItems.SACRED_SWORD, Map.of(Enchantments.SMITE, 4)
     );
 
     public static final List<BrewingPotionRecipe> POTION_RECIPES = List.of(

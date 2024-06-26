@@ -21,7 +21,8 @@ public interface ExtendedHungerManager {
 
     static boolean canAttack(PlayerEntity player, float stamina) {
         if (player.getHungerManager() instanceof ExtendedHungerManager ext) {
-            return stamina > ext.getAttackExhaustion(player, player.getAttackCooldownProgress(0.5f)) * ext.getStaminaDepletionRate();
+            float cooldown = player.getAttackCooldownProgress(0.5f);
+            return cooldown >= 1f || stamina > ext.getAttackExhaustion(player, cooldown) * ext.getStaminaDepletionRate();
         }
         return true;
     }

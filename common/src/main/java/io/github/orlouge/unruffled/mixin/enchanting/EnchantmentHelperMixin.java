@@ -1,6 +1,7 @@
 package io.github.orlouge.unruffled.mixin.enchanting;
 
 import io.github.orlouge.unruffled.UnruffledMod;
+import io.github.orlouge.unruffled.items.CustomItems;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
@@ -22,10 +23,10 @@ import java.util.Map;
 @Mixin(EnchantmentHelper.class)
 public class EnchantmentHelperMixin {
     @ModifyVariable(method = "set", at = @At("LOAD"), argsOnly = true)
-    private static Map<Enchantment, Integer> removeDisabledEnchantments(Map<Enchantment, Integer> enchantments) {
+    private static Map<Enchantment, Integer> removeDisabledEnchantments(Map<Enchantment, Integer> enchantments, Map<Enchantment, Integer> enchantments2, ItemStack stack) {
         Map<Enchantment, Integer> newEnchantments = new LinkedHashMap<>();
         for (Map.Entry<Enchantment, Integer> entry : enchantments.entrySet()) {
-            if (!UnruffledMod.DISABLED_ENCHANTMENTS.contains(entry.getKey())) {
+            if (!CustomItems.isDisabled(entry.getKey(), stack)) {
                 newEnchantments.put(entry.getKey(), entry.getValue());
             }
         }

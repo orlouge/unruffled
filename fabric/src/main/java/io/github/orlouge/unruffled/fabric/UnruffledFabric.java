@@ -46,15 +46,22 @@ public class UnruffledFabric implements ModInitializer {
         Registry.register(Registries.ITEM, new Identifier(UnruffledMod.MOD_ID, "igniting_arrow"), CustomItems.IGNITING_ARROW);
         Registry.register(Registries.ITEM, new Identifier(UnruffledMod.MOD_ID, "ancient_codex"), CustomItems.ANCIENT_CODEX);
         Registry.register(Registries.ITEM, new Identifier(UnruffledMod.MOD_ID, "evil_totem"), CustomItems.EVIL_TOTEM);
+        Registry.register(Registries.ITEM, new Identifier(UnruffledMod.MOD_ID, "blazing_sword"), CustomItems.BLAZING_SWORD);
+        Registry.register(Registries.ITEM, new Identifier(UnruffledMod.MOD_ID, "sacred_sword"), CustomItems.SACRED_SWORD);
 
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.TOOLS).register(content -> {
             content.add(ItemEnchantmentsHelper.createWithItemEnchantments(CustomItems.IRON_BOLSTER));
             content.add(ItemEnchantmentsHelper.createWithItemEnchantments(CustomItems.DIAMOND_BOLSTER));
             content.add(ItemEnchantmentsHelper.createWithItemEnchantments(CustomItems.NETHERITE_BOLSTER));
+        });
+
+        ItemGroupEvents.modifyEntriesEvent(ItemGroups.COMBAT).register(content -> {
             content.add(ItemEnchantmentsHelper.createWithItemEnchantments(CustomItems.CHARGED_TRIDENT));
             content.add(ItemEnchantmentsHelper.createWithItemEnchantments(CustomItems.MAGNETIC_TRIDENT));
             content.add(ItemEnchantmentsHelper.createWithItemEnchantments(CustomItems.PIERCING_ARROW));
             content.add(ItemEnchantmentsHelper.createWithItemEnchantments(CustomItems.IGNITING_ARROW));
+            content.add(ItemEnchantmentsHelper.createWithItemEnchantments(CustomItems.BLAZING_SWORD));
+            content.add(ItemEnchantmentsHelper.createWithItemEnchantments(CustomItems.SACRED_SWORD));
         });
 
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.FOOD_AND_DRINK).register(content -> {

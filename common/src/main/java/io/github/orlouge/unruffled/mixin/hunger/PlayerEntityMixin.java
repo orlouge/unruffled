@@ -32,6 +32,8 @@ public abstract class PlayerEntityMixin extends LivingEntity {
 
     @Shadow public abstract HungerManager getHungerManager();
 
+    @Shadow public abstract float getAttackCooldownProgress(float baseTime);
+
     @Inject(method = "attack", at = @At("HEAD"), cancellable = true)
     public void onAttackHead(Entity target, CallbackInfo ci) {
         attackExhaustion = 0.1f;
@@ -43,7 +45,7 @@ public abstract class PlayerEntityMixin extends LivingEntity {
             } else {
                 stamina = extendedHungerManager.getStamina();
             }
-            if (stamina < attackExhaustion * extendedHungerManager.getStaminaDepletionRate()) {
+            if (this.getAttackCooldownProgress(0.5f) < 1f && stamina < attackExhaustion * extendedHungerManager.getStaminaDepletionRate()) {
                 ci.cancel();
             }
         }
