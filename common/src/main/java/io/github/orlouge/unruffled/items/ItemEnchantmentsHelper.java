@@ -1,5 +1,6 @@
 package io.github.orlouge.unruffled.items;
 
+import io.github.orlouge.unruffled.Config;
 import io.github.orlouge.unruffled.UnruffledMod;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.Item;
@@ -13,10 +14,10 @@ public class ItemEnchantmentsHelper {
     }
 
     public static boolean hasItemEnchantments(ItemStack stack) {
-        return UnruffledMod.ITEM_ENCHANTMENTS.containsKey(stack.getItem());
+        return Config.INSTANCE.get().itemEnchantments.containsKey(stack.getItem());
     }
     public static ItemStack setItemEnchantments(ItemStack stack) {
-        Map<Enchantment, Integer> enchantments = UnruffledMod.ITEM_ENCHANTMENTS.get(stack.getItem());
+        Map<Enchantment, Integer> enchantments = Config.INSTANCE.get().itemEnchantments.get(stack.getItem());
         if (enchantments == null) return stack;
         for (Map.Entry<Enchantment, Integer> entry : enchantments.entrySet()) {
             stack.addEnchantment(entry.getKey(), entry.getValue());

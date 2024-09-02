@@ -1,5 +1,6 @@
 package io.github.orlouge.unruffled.mixin.enchanting;
 
+import io.github.orlouge.unruffled.Config;
 import io.github.orlouge.unruffled.UnruffledMod;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.ItemGroups;
@@ -14,11 +15,11 @@ import java.util.stream.Stream;
 public abstract class ItemGroupsMixin {
     @Redirect(method = "addMaxLevelEnchantedBooks", at = @At(value = "INVOKE", target = "Ljava/util/stream/Stream;filter(Ljava/util/function/Predicate;)Ljava/util/stream/Stream;"))
     private static Stream<Enchantment> filterMaxLevelDisabledEnchantments(Stream<Enchantment> stream, Predicate<? super Enchantment> predicate) {
-        return stream.filter(ench -> predicate.test(ench) && !UnruffledMod.DISABLED_ENCHANTMENTS.contains(ench));
+        return stream.filter(ench -> predicate.test(ench) && !Config.INSTANCE.get().disabledEnchantments.contains(ench));
     }
 
     @Redirect(method = "addAllLevelEnchantedBooks", at = @At(value = "INVOKE", target = "Ljava/util/stream/Stream;filter(Ljava/util/function/Predicate;)Ljava/util/stream/Stream;"))
     private static Stream<Enchantment> filterAllLevelDisabledEnchantments(Stream<Enchantment> stream, Predicate<? super Enchantment> predicate) {
-        return stream.filter(ench -> predicate.test(ench) && !UnruffledMod.DISABLED_ENCHANTMENTS.contains(ench));
+        return stream.filter(ench -> predicate.test(ench) && !Config.INSTANCE.get().disabledEnchantments.contains(ench));
     }
 }

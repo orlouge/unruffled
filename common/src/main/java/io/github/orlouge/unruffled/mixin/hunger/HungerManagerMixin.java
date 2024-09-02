@@ -1,5 +1,6 @@
 package io.github.orlouge.unruffled.mixin.hunger;
 
+import io.github.orlouge.unruffled.Config;
 import io.github.orlouge.unruffled.UnruffledMod;
 import io.github.orlouge.unruffled.Packets;
 import io.github.orlouge.unruffled.interfaces.ExtendedHungerManager;
@@ -104,7 +105,7 @@ public abstract class HungerManagerMixin implements ExtendedHungerManager {
         if ((this.stamina != this.lastStamina || staminaRegeneration != this.lastStaminaRegeneration) && player instanceof ServerPlayerEntity serverPlayer) {
             new Packets.ExtendedHungerUpdate(
                     this.stamina,
-                    staminaRegeneration / 0.0028f,
+                    staminaRegeneration / Config.INSTANCE.get().hungerConfig.staminaRegenerationRate(),
                     (staminaHungerMultiplier - 0.2f) / 3.8f
             ).sendToPlayer(serverPlayer);
             this.lastStamina = this.stamina;
@@ -118,7 +119,7 @@ public abstract class HungerManagerMixin implements ExtendedHungerManager {
         food = Math.round(food * (1f - foodCooldown));
         this.add(food, Math.round(saturationModifier * (1f - foodCooldown)));
         if (food > 0) {
-            foodCooldown = Math.min(0.9f, foodCooldown + 0.2f);
+            foodCooldown = Math.min(0.9f, foodCooldown + Config.INSTANCE.get().hungerConfig.eatCooldownFactor());
         }
     }
 

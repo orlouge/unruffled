@@ -1,5 +1,6 @@
 package io.github.orlouge.unruffled.items;
 
+import io.github.orlouge.unruffled.Config;
 import io.github.orlouge.unruffled.UnruffledMod;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.Enchantments;
@@ -32,6 +33,6 @@ public class CustomItems {
     );
 
     public static boolean isDisabled(Enchantment enchantment, ItemStack stack) {
-        return UnruffledMod.DISABLED_ENCHANTMENTS.contains(enchantment) && !(UnruffledMod.ITEM_ENCHANTMENTS.getOrDefault(stack.getItem(), Collections.emptyMap()).containsKey(enchantment));
+        return Config.INSTANCE.get().disabledEnchantments.contains(enchantment) && !(Config.INSTANCE.get().itemEnchantments.getOrDefault(stack.getItem(), Collections.emptyMap()).containsKey(enchantment));
     }
 }

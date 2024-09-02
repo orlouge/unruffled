@@ -44,18 +44,18 @@ public class UnruffledMod {
             new ConfiguredFeature<>(UNDERGROUND_POND_FEATURE, new DefaultFeatureConfig());
 
 
-    public static final Set<Enchantment> UNOBTAINABLE_ENCHANTMENTS = Registries.ENCHANTMENT.getEntrySet().stream().filter(
+    public static final Set<Enchantment> DEFAULT_UNOBTAINABLE_ENCHANTMENTS = Registries.ENCHANTMENT.getEntrySet().stream().filter(
             entry -> !entry.getValue().isCursed() && entry.getKey().getValue().getNamespace().equals("minecraft")
     ).map(Map.Entry::getValue).collect(Collectors.toSet());
 
-    public static final Set<Enchantment> DISABLED_ENCHANTMENTS = Set.of(
+    public static final Set<Enchantment> DEFAULT_DISABLED_ENCHANTMENTS = Set.of(
             Enchantments.PROTECTION, Enchantments.FIRE_PROTECTION, Enchantments.PROJECTILE_PROTECTION, Enchantments.BLAST_PROTECTION,
             Enchantments.FEATHER_FALLING, Enchantments.MENDING, Enchantments.EFFICIENCY, Enchantments.UNBREAKING,
             Enchantments.SHARPNESS, Enchantments.SMITE, Enchantments.BANE_OF_ARTHROPODS,
             Enchantments.QUICK_CHARGE, Enchantments.POWER, Enchantments.IMPALING
     );
 
-    public static final Map<Item, Map<Enchantment, Integer>> ITEM_ENCHANTMENTS = Map.of(
+    public static final Map<Item, Map<Enchantment, Integer>> DEFAULT_ITEM_ENCHANTMENTS = Map.of(
             CustomItems.IRON_BOLSTER, Map.of(Enchantments.SILK_TOUCH, 1),
             CustomItems.DIAMOND_BOLSTER, Map.of(Enchantments.SILK_TOUCH, 1),
             CustomItems.NETHERITE_BOLSTER, Map.of(Enchantments.SILK_TOUCH, 1),
@@ -69,7 +69,7 @@ public class UnruffledMod {
             new BrewingPotionRecipe(Potions.MUNDANE, Items.FERMENTED_SPIDER_EYE, Potions.AWKWARD)
     );
 
-    public static Map<Identifier, List<Integer>> LOOT_CODICES_ADD = Map.ofEntries(
+    public static Map<Identifier, List<Integer>> DEFAULT_LOOT_CODICES_ADD = Map.ofEntries(
             Map.entry(LootTables.BURIED_TREASURE_CHEST, List.of(1, 4, 8, 6)),
             Map.entry(LootTables.SHIPWRECK_MAP_CHEST, List.of(2, 5, 10)),
             Map.entry(LootTables.UNDERWATER_RUIN_BIG_CHEST, List.of(3, 7, 9)),
@@ -84,13 +84,14 @@ public class UnruffledMod {
             Map.entry(LootTables.JUNGLE_TEMPLE_CHEST, List.of(41, 45, 47, 48))
     );
 
-    public static Map<Identifier, List<Integer>> LOOT_CODICES_MODIFY = Map.ofEntries(
+    public static Map<Identifier, List<Integer>> DEFAULT_LOOT_CODICES_MODIFY = Map.ofEntries(
             Map.entry(LootTables.DESERT_PYRAMID_ARCHAEOLOGY, List.of(32, 37, 40)),
             Map.entry(LootTables.TRAIL_RUINS_COMMON_ARCHAEOLOGY, List.of(43, 46, 49)),
             Map.entry(LootTables.TRAIL_RUINS_RARE_ARCHAEOLOGY, List.of(42, 44, 50))
     );
 
     public static void init() {
+        Config.getInstance();
         Packets.AttackMiss.register(player -> {
             if (player.getHungerManager() instanceof ExtendedHungerManager ext) {
                 ext.addStaminaIfCanAttack(-0.02f, player);

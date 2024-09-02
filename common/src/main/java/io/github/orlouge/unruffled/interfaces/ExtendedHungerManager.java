@@ -1,5 +1,6 @@
 package io.github.orlouge.unruffled.interfaces;
 
+import io.github.orlouge.unruffled.Config;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -16,30 +17,30 @@ public interface ExtendedHungerManager {
     default float getAttackExhaustion(PlayerEntity player, float cooldownProgress) {
         double attackSpeed = player.getAttributeValue(EntityAttributes.GENERIC_ATTACK_SPEED);
         cooldownProgress *= cooldownProgress;
-        return (float) Math.min(6f, Math.max(0.02, 20 * getStaminaRegenerationRate(20f) / (cooldownProgress * attackSpeed * getStaminaDepletionRate())));
+        return (float) Math.min(6f, Math.max(0.02, Config.INSTANCE.get().hungerConfig.attackExhaustionFactor() *  20 * getStaminaRegenerationRate(20f) / (cooldownProgress * attackSpeed * getStaminaDepletionRate())));
     }
 
     static boolean canAttack(PlayerEntity player, float stamina) {
         if (player.getHungerManager() instanceof ExtendedHungerManager ext) {
             float cooldown = player.getAttackCooldownProgress(0.5f);
-            return cooldown >= 1f || stamina > ext.getAttackExhaustion(player, cooldown) * ext.getStaminaDepletionRate();
+            return (cooldown >= 1f && Config.INSTANCE.get().hungerConfig.attackAlwaysAllowInTime()) || stamina > ext.getAttackExhaustion(player, cooldown) * ext.getStaminaDepletionRate();
         }
         return true;
     }
 
     default float getStaminaRegenerationRate(float foodLevel) {
-        return Math.max(2, Math.min(10 / this.getWeight(), Math.min(foodLevel + 2, 10))) * 0.00028f;
+        return Math.max(2, Math.min(10 / this.getWeight(), Math.min(foodLevel + 2, 10))) * Config.INSTANCE.get().hungerConfig.staminaRegenerationRate();
     }
 
     float getStamina();
 
     default float getStaminaDepletionRate() {
-        return 0.5f;
+        return Config.INSTANCE.get().hungerConfig.staminaDepletionRate();
     }
 
     default float getStaminaHungerMultiplier(Vec3d travelAmount) {
-        float travelPenalty = Math.min((float) travelAmount.length() / 300, 2.8f);
-        return 0.2f + travelPenalty;
+        float travelPenalty = Math.min((float) travelAmount.length() * Config.INSTANCE.get().hungerConfig.travelPenaltyFactor(), Config.INSTANCE.get().hungerConfig.maxTravelPenalty());
+        return Config.INSTANCE.get().hungerConfig.hungerDepletionRate() + travelPenalty;
     }
 
     void addStamina(float diff);
@@ -68,7 +69,7 @@ public interface ExtendedHungerManager {
             Inventory inv2 = player.getEnderChestInventory();
             weight += getInventoryWeight(inv2).getLeft() / inv2.size();
         }
-        return Math.max(1f, weight * weight);
+        return Math.max(1f, weight * weight * Config.INSTANCE.get().hungerConfig.inventoryWeightPenaltyFactor());
     }
 
     private static Pair<Float, Boolean> getInventoryWeight(Inventory inventory) {

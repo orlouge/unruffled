@@ -1,5 +1,6 @@
 package io.github.orlouge.unruffled.mixin.tools;
 
+import io.github.orlouge.unruffled.Config;
 import io.github.orlouge.unruffled.UnruffledMod;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.Entity;
@@ -14,7 +15,7 @@ public class BowItemMixin {
     @ModifyArg(method = "onStoppedUsing", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;spawnEntity(Lnet/minecraft/entity/Entity;)Z"))
     public Entity modifyArrowProperties(Entity par1) {
         PersistentProjectileEntity arrowEntity = (PersistentProjectileEntity) par1;
-        if (UnruffledMod.DISABLED_ENCHANTMENTS.contains(Enchantments.POWER)) {
+        if (Config.INSTANCE.get().disabledEnchantments.contains(Enchantments.POWER)) {
             arrowEntity.setDamage(arrowEntity.getDamage() + 2.);
         }
         return arrowEntity;

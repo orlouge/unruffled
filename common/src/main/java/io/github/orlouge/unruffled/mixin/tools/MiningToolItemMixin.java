@@ -1,5 +1,6 @@
 package io.github.orlouge.unruffled.mixin.tools;
 
+import io.github.orlouge.unruffled.Config;
 import io.github.orlouge.unruffled.UnruffledMod;
 import net.minecraft.block.BlockState;
 import net.minecraft.enchantment.Enchantments;
@@ -14,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class MiningToolItemMixin {
     @Inject(method = "getMiningSpeedMultiplier", cancellable = true, at = @At("RETURN"))
     public void increaseMiningSpeedMultiplier(ItemStack stack, BlockState state, CallbackInfoReturnable<Float> cir) {
-        if (UnruffledMod.DISABLED_ENCHANTMENTS.contains(Enchantments.EFFICIENCY)) {
+        if (Config.INSTANCE.get().disabledEnchantments.contains(Enchantments.EFFICIENCY)) {
             float mul = cir.getReturnValue();
             cir.setReturnValue(Math.max(mul * mul / 2, mul));
         }

@@ -1,5 +1,6 @@
 package io.github.orlouge.unruffled.utils;
 
+import io.github.orlouge.unruffled.Config;
 import io.github.orlouge.unruffled.UnruffledMod;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
@@ -72,11 +73,11 @@ public class PeacefulChunks extends PersistentState {
     }
 
     public boolean isPeaceful(ChunkPos pos) {
-        return this.chunkPlayerMap.getOrDefault(pos, Collections.emptySet()).size() > 0;
+        return Config.INSTANCE.get().peacefulChunks && !this.chunkPlayerMap.getOrDefault(pos, Collections.emptySet()).isEmpty();
     }
 
     public Set<UUID> peacefulChunkBedOwners(ChunkPos pos) {
-        return this.chunkPlayerMap.getOrDefault(pos, Collections.emptySet());
+        return Config.INSTANCE.get().peacefulChunks ? this.chunkPlayerMap.getOrDefault(pos, Collections.emptySet()) : Collections.emptySet();
     }
 
     public static PeacefulChunks get(PersistentStateManager persistentStateManager) {

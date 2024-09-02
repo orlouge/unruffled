@@ -1,5 +1,6 @@
 package io.github.orlouge.unruffled.mixin.enchanting;
 
+import io.github.orlouge.unruffled.Config;
 import io.github.orlouge.unruffled.UnruffledMod;
 import io.github.orlouge.unruffled.items.CustomItems;
 import net.minecraft.enchantment.Enchantment;
@@ -36,7 +37,7 @@ public class EnchantmentHelperMixin {
     @ModifyVariable(method = "getProtectionAmount", at = @At("STORE"))
     private static MutableInt replaceProtectionEnchantments(MutableInt protection, Iterable<ItemStack> equipment, DamageSource source) {
         if (source.isIn(DamageTypeTags.IS_FIRE)) {
-            if (UnruffledMod.DISABLED_ENCHANTMENTS.contains(Enchantments.FIRE_PROTECTION)) {
+            if (Config.INSTANCE.get().disabledEnchantments.contains(Enchantments.FIRE_PROTECTION)) {
                 for (ItemStack item : equipment) {
                     if (item.getItem() instanceof ArmorItem armor) {
                         if (armor.getMaterial() == ArmorMaterials.DIAMOND) {
@@ -48,7 +49,7 @@ public class EnchantmentHelperMixin {
                 }
             }
         } else if (source.isIn(DamageTypeTags.IS_EXPLOSION)) {
-            if (UnruffledMod.DISABLED_ENCHANTMENTS.contains(Enchantments.BLAST_PROTECTION)) {
+            if (Config.INSTANCE.get().disabledEnchantments.contains(Enchantments.BLAST_PROTECTION)) {
                 for (ItemStack item : equipment) {
                     if (item.getItem() instanceof ArmorItem armor) {
                         if (armor.getMaterial() == ArmorMaterials.DIAMOND) {
@@ -60,7 +61,7 @@ public class EnchantmentHelperMixin {
                 }
             }
         } else if (source.isIn(DamageTypeTags.IS_FALL)) {
-            if (UnruffledMod.DISABLED_ENCHANTMENTS.contains(Enchantments.FEATHER_FALLING)) {
+            if (Config.INSTANCE.get().disabledEnchantments.contains(Enchantments.FEATHER_FALLING)) {
                 for (ItemStack item : equipment) {
                     if (item.getItem() instanceof ArmorItem armor && armor.getSlotType() == EquipmentSlot.FEET) {
                         if (armor.getMaterial() == ArmorMaterials.LEATHER) {
@@ -72,7 +73,7 @@ public class EnchantmentHelperMixin {
                 }
             }
         } else if (!source.isIn(DamageTypeTags.BYPASSES_INVULNERABILITY)) {
-            if (UnruffledMod.DISABLED_ENCHANTMENTS.contains(Enchantments.PROTECTION)) {
+            if (Config.INSTANCE.get().disabledEnchantments.contains(Enchantments.PROTECTION)) {
                 for (ItemStack item : equipment) {
                     if (item.getItem().isDamageable() && item.getItem().isDamageable()) {
                         if (source.isOf(DamageTypes.WITHER) && item.getItem() instanceof ArmorItem armor && armor.getMaterial() == ArmorMaterials.NETHERITE) {

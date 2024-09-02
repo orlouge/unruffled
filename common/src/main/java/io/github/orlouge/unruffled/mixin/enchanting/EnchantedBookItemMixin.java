@@ -1,5 +1,6 @@
 package io.github.orlouge.unruffled.mixin.enchanting;
 
+import io.github.orlouge.unruffled.Config;
 import io.github.orlouge.unruffled.UnruffledMod;
 import net.minecraft.enchantment.EnchantmentLevelEntry;
 import net.minecraft.item.EnchantedBookItem;
@@ -14,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class EnchantedBookItemMixin {
     @Inject(method = "addEnchantment", at = @At("HEAD"), cancellable = true)
     private static void disableEnchantments(ItemStack stack, EnchantmentLevelEntry entry, CallbackInfo ci) {
-        if (UnruffledMod.DISABLED_ENCHANTMENTS.contains(entry.enchantment)) ci.cancel();
+        if (Config.INSTANCE.get().disabledEnchantments.contains(entry.enchantment)) ci.cancel();
     }
 
     @Inject(method = "hasGlint", at = @At("RETURN"), cancellable = true)

@@ -1,5 +1,6 @@
 package io.github.orlouge.unruffled.mixin.enchanting;
 
+import io.github.orlouge.unruffled.Config;
 import io.github.orlouge.unruffled.UnruffledMod;
 import io.github.orlouge.unruffled.items.CustomItems;
 import net.minecraft.enchantment.Enchantment;
@@ -21,7 +22,7 @@ public class EnchantmentMixin {
 
     @Inject(method = "isAvailableForRandomSelection", at = @At("HEAD"), cancellable = true)
     public void disableEnchantmentsRandomSelection(CallbackInfoReturnable<Boolean> cir) {
-        if (UnruffledMod.UNOBTAINABLE_ENCHANTMENTS.contains((Enchantment) (Object) this)) {
+        if (Config.INSTANCE.get().unobtainableEnchantments.contains((Enchantment) (Object) this)) {
             cir.setReturnValue(false);
             cir.cancel();
         }
@@ -29,7 +30,7 @@ public class EnchantmentMixin {
 
     @Inject(method = "isAvailableForEnchantedBookOffer", at = @At("HEAD"), cancellable = true)
     public void disableEnchantmentsBookOffer(CallbackInfoReturnable<Boolean> cir) {
-        if (UnruffledMod.UNOBTAINABLE_ENCHANTMENTS.contains((Enchantment) (Object) this)) {
+        if (Config.INSTANCE.get().unobtainableEnchantments.contains((Enchantment) (Object) this)) {
             cir.setReturnValue(false);
             cir.cancel();
         }

@@ -1,5 +1,6 @@
 package io.github.orlouge.unruffled.fabric;
 
+import io.github.orlouge.unruffled.Config;
 import io.github.orlouge.unruffled.UnruffledMod;
 import io.github.orlouge.unruffled.fabric.mixin.BrewingRecipeRegistryAccessor;
 import io.github.orlouge.unruffled.items.AncientCodexItem;
@@ -97,16 +98,16 @@ public class UnruffledFabric implements ModInitializer {
 
         LootTableEvents.MODIFY.register((resourceManager, lootManager, id, tableBuilder, source) -> {
             if (source.isBuiltin()) {
-                if (UnruffledMod.LOOT_CODICES_ADD.containsKey(id)) {
-                    List<LootPoolEntry> entries = UnruffledMod.LOOT_CODICES_ADD.get(id).stream().map(
+                if (Config.INSTANCE.get().lootCodicesAdd.containsKey(id)) {
+                    List<LootPoolEntry> entries = Config.INSTANCE.get().lootCodicesAdd.get(id).stream().map(
                             number -> ItemEntry.builder(CustomItems.ANCIENT_CODEX).apply(
                                     SetNbtLootFunction.builder(AncientCodexItem.getNumberNbt(number))
                             ).build()
                     ).toList();
                     LootPool.Builder poolBuilder = LootPool.builder().with(entries).rolls(UniformLootNumberProvider.create(0, 1));
                     tableBuilder.pool(poolBuilder);
-                } else if (UnruffledMod.LOOT_CODICES_MODIFY.containsKey(id)) {
-                    List<LootPoolEntry> entries = UnruffledMod.LOOT_CODICES_MODIFY.get(id).stream().map(
+                } else if (Config.INSTANCE.get().lootCodicesModify.containsKey(id)) {
+                    List<LootPoolEntry> entries = Config.INSTANCE.get().lootCodicesModify.get(id).stream().map(
                             number -> ItemEntry.builder(CustomItems.ANCIENT_CODEX).apply(
                                     SetNbtLootFunction.builder(AncientCodexItem.getNumberNbt(number))
                             ).build()
@@ -118,7 +119,9 @@ public class UnruffledFabric implements ModInitializer {
             }
         });
 
-        EntitySleepEvents.ALLOW_SLEEP_TIME.register((player, pos, isNight) -> !isNight || (player.getWorld().getLunarTime() < 16000 /*player.getWorld().getAmbientDarkness() < 11*/  && !player.getWorld().isThundering()) ? ActionResult.FAIL : ActionResult.SUCCESS);
+        if (Config.INSTANCE.get().sleepTime >= 0) {
+            EntitySleepEvents.ALLOW_SLEEP_TIME.register((player, pos, isNight) -> !isNight || (player.getWorld().getLunarTime() < Config.INSTANCE.get().sleepTime /*player.getWorld().getAmbientDarkness() < 11*/ && !player.getWorld().isThundering()) ? ActionResult.FAIL : ActionResult.SUCCESS);
+        }
 
         for (BrewingPotionRecipe brewingPotionRecipe : UnruffledMod.POTION_RECIPES) {
             BrewingRecipeRegistryAccessor.registerPotionRecipe(brewingPotionRecipe.input(), brewingPotionRecipe.ingredient(), brewingPotionRecipe.output());
