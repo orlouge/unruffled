@@ -6,7 +6,7 @@ import io.github.orlouge.unruffled.fabric.mixin.BrewingRecipeRegistryAccessor;
 import io.github.orlouge.unruffled.items.AncientCodexItem;
 import io.github.orlouge.unruffled.items.CustomItems;
 import io.github.orlouge.unruffled.items.ItemEnchantmentsHelper;
-import io.github.orlouge.unruffled.utils.BrewingPotionRecipe;
+import io.github.orlouge.unruffled.potions.BrewingPotionRecipe;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
 import net.fabricmc.fabric.api.biome.v1.BiomeSelectors;
@@ -36,6 +36,10 @@ public class UnruffledFabric implements ModInitializer {
     @Override
     public void onInitialize() {
         Registry.register(Registries.FEATURE, new Identifier(UnruffledMod.MOD_ID, "underground_pond"), UnruffledMod.UNDERGROUND_POND_FEATURE);
+        Registry.register(Registries.FEATURE, new Identifier(UnruffledMod.MOD_ID, "underground_cabin"), UnruffledMod.UNDERGROUND_CABIN_FEATURE);
+
+        Registry.register(Registries.STATUS_EFFECT, new Identifier(UnruffledMod.MOD_ID, "teleportation"), UnruffledMod.TELEPORTATION_EFFECT);
+        Registry.register(Registries.POTION, new Identifier(UnruffledMod.MOD_ID, "teleportation"), UnruffledMod.TELEPORTATION_POTION);
 
         Registry.register(Registries.ITEM, new Identifier(UnruffledMod.MOD_ID, "golden_berries"), CustomItems.GOLDEN_BERRIES);
         Registry.register(Registries.ITEM, new Identifier(UnruffledMod.MOD_ID, "iron_bolster"), CustomItems.IRON_BOLSTER);
@@ -139,6 +143,10 @@ public class UnruffledFabric implements ModInitializer {
         BiomeModifications.addFeature(
                 BiomeSelectors.foundInOverworld(), GenerationStep.Feature.LAKES,
                 RegistryKey.of(RegistryKeys.PLACED_FEATURE, new Identifier(UnruffledMod.MOD_ID, "underground_pond"))
+        );
+        BiomeModifications.addFeature(
+                BiomeSelectors.foundInOverworld(), GenerationStep.Feature.LAKES,
+                RegistryKey.of(RegistryKeys.PLACED_FEATURE, new Identifier(UnruffledMod.MOD_ID, "underground_cabin"))
         );
         BiomeModifications.addFeature(
                 BiomeSelectors.tag(BiomeTags.IS_OCEAN), GenerationStep.Feature.UNDERGROUND_ORES,

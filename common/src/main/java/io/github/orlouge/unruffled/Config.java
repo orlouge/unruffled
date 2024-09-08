@@ -32,9 +32,13 @@ public class Config {
 
     public static final String CONFIG_FNAME = Platform.getConfigDirectory() + "/" + UnruffledMod.MOD_ID + ".json";
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-    private static Config instance = null;
+    private static boolean loaded = false;
 
-    public static Config read() {
+    public static boolean isLoaded() {
+        return loaded;
+    }
+
+    private static Config read() {
         File file = new File(CONFIG_FNAME);
         Config defaultConfig = new Config();
         if (file.isFile()) {
@@ -53,6 +57,7 @@ public class Config {
                 e.printStackTrace();
             }
         }
+        loaded = true;
         return defaultConfig;
     }
 
@@ -75,13 +80,6 @@ public class Config {
         this.lootCodicesModify = lootCodicesModify;
         this.peacefulChunks = peacefulChunks;
         this.sleepTime = sleepTime;
-    }
-
-    public static Config getInstance() {
-        if (instance == null) {
-            instance = Config.read();
-        }
-        return instance;
     }
 
     public static Codec<Map<Enchantment, Integer>> ENCHANTMENT_MAP_CODEC = Codec.unboundedMap(Registries.ENCHANTMENT.getCodec(), Codecs.POSITIVE_INT);
@@ -108,7 +106,7 @@ public class Config {
             float eatCooldownFactor
     ) {
         public HungerConfig() {
-            this(0.5f, 0.003f, 2.8f, 0.2f, 0.00028f, 1f, 1f, true, 0.2f);
+            this(0.25f, 0.003f, 2.8f, 0.2f, 0.0028f, 1f, 2f, true, 0.2f);
         }
 
         public static Codec<HungerConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group(

@@ -1,0 +1,29 @@
+{
+  "parent": "minecraft:adventure/shoot_arrow",
+  "criteria": {
+    "piercing": {
+      "conditions": {},
+      "trigger": "unruffled:piercing"
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.adventure.piercing.description"
+    },
+    "frame": "task",
+    "hidden": false,
+    "icon": {
+      "item": "unruffled:piercing_arrow"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.adventure.piercing.title"
+    }
+  },
+  "requirements": [
+    [
+      "piercing"
+    ]
+  ]
+}

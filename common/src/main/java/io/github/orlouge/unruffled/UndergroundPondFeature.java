@@ -29,7 +29,6 @@ public class UndergroundPondFeature extends Feature<DefaultFeatureConfig> {
             Blocks.MOSS_BLOCK.getDefaultState(),
             Blocks.MUD.getDefaultState(),
             Blocks.GRAVEL.getDefaultState(),
-            Blocks.GRAVEL.getDefaultState(),
             Blocks.GRAVEL.getDefaultState()
     };
     public static final BlockState[] CEILING_BLOCKS = {
@@ -247,7 +246,7 @@ public class UndergroundPondFeature extends Feature<DefaultFeatureConfig> {
                     }
                     for (int y = depth; y <= WATER_DEPTH; y++) {
                         BlockPos floor = origin.add(x, -y, z);
-                        if (random.nextInt(2 + WATER_DEPTH - depth) == 0) {
+                        if (random.nextInt(2 + (WATER_DEPTH - depth + 1) / 2) == 0) {
                             this.setBlockStateIf(world, floor, Blocks.SUSPICIOUS_GRAVEL.getDefaultState(), this::canReplace);
                             BlockEntity blockEntity = world.getBlockEntity(floor);
                             if (blockEntity instanceof BrushableBlockEntity) {

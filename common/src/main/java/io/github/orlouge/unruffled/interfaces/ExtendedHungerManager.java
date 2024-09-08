@@ -12,27 +12,58 @@ import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.util.Pair;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.dimension.DimensionType;
 
 public interface ExtendedHungerManager {
     default float getAttackExhaustion(PlayerEntity player, float cooldownProgress) {
         double attackSpeed = player.getAttributeValue(EntityAttributes.GENERIC_ATTACK_SPEED);
-        cooldownProgress *= cooldownProgress;
-        return (float) Math.min(6f, Math.max(0.02, Config.INSTANCE.get().hungerConfig.attackExhaustionFactor() *  20 * getStaminaRegenerationRate(20f) / (cooldownProgress * attackSpeed * getStaminaDepletionRate())));
+        cooldownProgress = (float) Math.pow(cooldownProgress, 3f);
+        return (float) Math.min(6f, Math.max(0.02, Config.INSTANCE.get().hungerConfig.attackExhaustionFactor() *  20 * getStaminaRegenerationRate(0f) / (cooldownProgress * attackSpeed * getStaminaDepletionRate())));
     }
 
     static boolean canAttack(PlayerEntity player, float stamina) {
         if (player.getHungerManager() instanceof ExtendedHungerManager ext) {
             float cooldown = player.getAttackCooldownProgress(0.5f);
+            //System.out.println("Cooldown: " + cooldown);
             return (cooldown >= 1f && Config.INSTANCE.get().hungerConfig.attackAlwaysAllowInTime()) || stamina > ext.getAttackExhaustion(player, cooldown) * ext.getStaminaDepletionRate();
         }
         return true;
     }
 
-    default float getStaminaRegenerationRate(float foodLevel) {
-        return Math.max(2, Math.min(10 / this.getWeight(), Math.min(foodLevel + 2, 10))) * Config.INSTANCE.get().hungerConfig.staminaRegenerationRate();
+    default float getStaminaRegenerationRate(float weariness) {
+        return (1 - weariness * 0.9f) * Config.INSTANCE.get().hungerConfig.staminaRegenerationRate();
     }
 
+    default float getTargetWeariness() {
+        float malus = this.getWearinessMalus();
+        return Math.max(0f, Math.min(1f,
+                (float) Math.tanh(2f * this.getBaseWeariness() * (1f + 0.5f * malus)) + 0.3f * malus
+        ));
+    }
+
+    default float getWearinessMalus() {
+        return Math.max(0f, Math.min(1f,
+               1f - 1f / this.getWeight() +
+               1f - Math.min(Math.min(this.getHealth(), this.getFoodLevel()) + 2f, 10f) / 10f +
+               (!(getDimension() == null || getDimension().bedWorks()) || isNight() || isUnderground() ? 0.5f : 0f)
+        ));
+    }
+
+    DimensionType getDimension();
+
+    float getHealth();
+
+    float getFoodLevel();
+
+    float getBaseWeariness();
+
+    float getAmortizedWeariness();
+
     float getStamina();
+
+    boolean isNight();
+
+    boolean isUnderground();
 
     default float getStaminaDepletionRate() {
         return Config.INSTANCE.get().hungerConfig.staminaDepletionRate();
@@ -40,10 +71,14 @@ public interface ExtendedHungerManager {
 
     default float getStaminaHungerMultiplier(Vec3d travelAmount) {
         float travelPenalty = Math.min((float) travelAmount.length() * Config.INSTANCE.get().hungerConfig.travelPenaltyFactor(), Config.INSTANCE.get().hungerConfig.maxTravelPenalty());
-        return Config.INSTANCE.get().hungerConfig.hungerDepletionRate() + travelPenalty;
+        return Config.INSTANCE.get().hungerConfig.hungerDepletionRate() + Math.max(travelPenalty, this.getAmortizedWeariness());
     }
 
     void addStamina(float diff);
+
+    void addWeariness(float diff);
+
+    void resetWeariness();
 
     default void addStaminaIfCanAttack(float diff, PlayerEntity player) {
         if (diff >= 0) {

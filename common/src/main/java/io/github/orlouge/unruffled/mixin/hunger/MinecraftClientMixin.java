@@ -7,9 +7,7 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(MinecraftClient.class)
@@ -26,5 +24,10 @@ public class MinecraftClientMixin {
         if (this.player != null) {
             if (!ExtendedHungerManager.canAttack(this.player, UnruffledModClient.stamina)) cir.cancel();
         }
+    }
+
+    @ModifyConstant(method = "doAttack", constant = @Constant(intValue = 10, ordinal = 1))
+    public int decreaseMissCooldown(int cooldown) {
+        return cooldown / 5;
     }
 }

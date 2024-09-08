@@ -28,7 +28,7 @@ public class HostileEntityMixin {
                 if (world.toServerWorld().isNight()) {
                     for (UUID playerUuid : players) {
                         if (world.getPlayerByUuid(playerUuid) instanceof ServerPlayerEntity serverPlayer) {
-                            if (serverPlayer.getBlockPos().isWithinDistance(pos, PeacefulChunks.PEACEFUL_RANGE * 12)) {
+                            if (serverPlayer.getBlockPos().getY() >= world.getSeaLevel() - 5 && serverPlayer.getBlockPos().isWithinDistance(pos, PeacefulChunks.PEACEFUL_RANGE * 12)) {
                                 UnruffledMod.PEACEFUL_CHUNK_CRITERION.trigger(serverPlayer);
                             }
                         }

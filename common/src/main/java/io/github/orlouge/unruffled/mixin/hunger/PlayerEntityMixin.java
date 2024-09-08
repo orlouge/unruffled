@@ -7,6 +7,7 @@ import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffectUtil;
 import net.minecraft.entity.player.HungerManager;
 import net.minecraft.entity.player.PlayerEntity;
@@ -28,11 +29,14 @@ public abstract class PlayerEntityMixin extends LivingEntity {
         super(entityType, world);
     }
 
-    @Shadow public abstract void addExhaustion(float exhaustion);
+    @Shadow
+    public abstract void addExhaustion(float exhaustion);
 
-    @Shadow public abstract HungerManager getHungerManager();
+    @Shadow
+    public abstract HungerManager getHungerManager();
 
-    @Shadow public abstract float getAttackCooldownProgress(float baseTime);
+    @Shadow
+    public abstract float getAttackCooldownProgress(float baseTime);
 
     @Inject(method = "attack", at = @At("HEAD"), cancellable = true)
     public void onAttackHead(Entity target, CallbackInfo ci) {
@@ -55,7 +59,7 @@ public abstract class PlayerEntityMixin extends LivingEntity {
     public void onAttackExhaustion(PlayerEntity instance, float exhaustion) {
         if (((Object) this) instanceof ServerPlayerEntity serverPlayer && this.getHungerManager() instanceof ExtendedHungerManager extendedHungerManager) {
             float stamina = extendedHungerManager.getStamina();
-            if (stamina > 0.4f && stamina - attackExhaustion * extendedHungerManager.getStaminaDepletionRate() < 0.1f) {
+            if (stamina > 0.35f && stamina - attackExhaustion * extendedHungerManager.getStaminaDepletionRate() < 0.1f) {
                 UnruffledMod.FAST_ATTACK_CRITERION.trigger(serverPlayer);
             }
         }
@@ -82,7 +86,7 @@ public abstract class PlayerEntityMixin extends LivingEntity {
 
     @ModifyConstant(method = "increaseTravelMotionStats", constant = @Constant(floatValue = 0.01f, ordinal = 0))
     public float increaseSwimmingExhaustion(float constant) {
-        return constant * 4;
+        return constant * 4f;
     }
 
     @ModifyConstant(method = "increaseTravelMotionStats", constant = @Constant(floatValue = 0.1f, ordinal = 0))
@@ -117,6 +121,34 @@ public abstract class PlayerEntityMixin extends LivingEntity {
 
     @Redirect(method = "getBlockBreakingSpeed", at = @At(value = "INVOKE", target = "Lnet/minecraft/enchantment/EnchantmentHelper;hasAquaAffinity(Lnet/minecraft/entity/LivingEntity;)Z"))
     public boolean waterBreathingIsAquaAffinity(LivingEntity entity) {
-        return EnchantmentHelper.hasAquaAffinity(entity) || StatusEffectUtil.hasWaterBreathing(entity);
+        if (EnchantmentHelper.hasAquaAffinity(entity)) return true;
+        if (StatusEffectUtil.hasWaterBreathing(entity)) {
+            if (entity instanceof ServerPlayerEntity player) {
+                UnruffledMod.AQUA_AFFINITY_CRITERION.trigger(player);
+            }
+            return true;
+        }
+        return false;
+    }
+
+    @Inject(method = "wakeUp", at = @At("HEAD"))
+    public void resetWearinessOnWakeUp(boolean skipSleepTimer, boolean updateSleepingPlayers, CallbackInfo ci) {
+        if (this.getHungerManager() instanceof ExtendedHungerManager extendedHungerManager) {
+            extendedHungerManager.resetWeariness();
+        }
+    }
+
+    @Inject(method = "damageShield", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;damage(ILnet/minecraft/entity/LivingEntity;Ljava/util/function/Consumer;)V"))
+    public void consumeStaminaOnShieldHit(float amount, CallbackInfo ci) {
+        if (this.getHungerManager() instanceof ExtendedHungerManager extendedHungerManager) {
+            extendedHungerManager.addStamina(Math.min(0.33f, -amount / 30f));
+        }
+    }
+
+    @Inject(method = "applyDamage", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;setHealth(F)V"))
+    public void addWearinessOnDamage(DamageSource source, float amount, CallbackInfo ci) {
+        if (this.getHungerManager() instanceof ExtendedHungerManager extendedHungerManager) {
+            extendedHungerManager.addWeariness(amount / 1000f);
+        }
     }
 }

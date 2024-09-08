@@ -56,6 +56,7 @@ public abstract class InGameHudMixin {
         }
     }
 
+    /*
     @Redirect(method = "renderCrosshair", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;getAttackCooldownProgress(F)F"))
     public float redirectRenderCrosshairCooldown(ClientPlayerEntity player, float base) {
         float cooldownProgress = player.getAttackCooldownProgress(base);
@@ -66,4 +67,5 @@ public abstract class InGameHudMixin {
             return cooldownProgress;
         }
     }
+     */
 }

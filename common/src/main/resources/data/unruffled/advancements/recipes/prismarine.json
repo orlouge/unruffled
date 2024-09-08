@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "rewards": {
+    "recipes": [
+      "unruffled:dark_prismarine",
+      "unruffled:prismarine_bricks_from_prismarine_stonecutting",
+      "unruffled:sea_lantern"
+    ]
+  },
+  "criteria": {
+    "has_prismarine": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [{
+          "item": "minecraft:prismarine"
+        }]
+      }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "unruffled:dark_prismarine"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_prismarine",
+      "has_the_recipe"
+    ]
+  ]
+}

@@ -62,6 +62,7 @@ public class Trades {
     };
     public static final TradeOffers.Factory[] WANDERING_TRADER_ASSORTED = new TradeOffers.Factory[] {
             new TradeOffers.SellItemFactory(Items.FEATHER, 1, 16, 12, 1),
+            new TradeOffers.SellItemFactory(Items.FERMENTED_SPIDER_EYE, 1, 4, 12, 1),
             new TradeOffers.SellItemFactory(Items.BUNDLE, 1, 1, 12, 1),
             new TradeOffers.SellItemFactory(Items.SHULKER_SHELL, 8, 1, 2, 1),
             new TradeOffers.SellItemFactory(Items.OBSIDIAN, 1, 5, 12, 1),
@@ -71,6 +72,7 @@ public class Trades {
             new TradeOffers.SellItemFactory(Items.RECOVERY_COMPASS, 16, 1, 1, 1),
             new TradeOffers.SellItemFactory(Items.ENDER_EYE, 1, 1, 12, 1),
             new SellNbtItemFactory(CustomItems.SACRED_SWORD, ItemEnchantmentsHelper::setItemEnchantments, 32, 1, 1, 10),
+            new TradeOffers.SellItemFactory(new ItemStack(Items.LODESTONE), 8, 1, 12, 10, 0.2F),
     };
     public static final TradeOffers.Factory[] WANDERING_TRADER_POTIONS = new TradeOffers.Factory[] {
             new SellNbtItemFactory(Items.SPLASH_POTION, stack -> PotionUtil.setPotion(stack, Potions.STRONG_HEALING), 1, 1, 16, 1),

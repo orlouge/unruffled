@@ -16,3 +16,9 @@ accessible method net/minecraft/entity/Entity getVelocityAffectingPos ()Lnet/min
 accessible method net/minecraft/advancement/criterion/Criteria register (Lnet/minecraft/advancement/criterion/Criterion;)Lnet/minecraft/advancement/criterion/Criterion;
 accessible class net/minecraft/village/TradeOffers$SellMapFactory
 accessible class net/minecraft/village/TradeOffers$SellDyedArmorFactory
+accessible field net/minecraft/block/DecoratedPotBlock FACING Lnet/minecraft/state/property/DirectionProperty;
+accessible field net/minecraft/block/entity/DecoratedPotBlockEntity sherds Lnet/minecraft/block/entity/DecoratedPotBlockEntity$Sherds;
+accessible method net/minecraft/entity/Entity setRotation (FF)V
+accessible method net/minecraft/entity/decoration/ItemFrameEntity setRotation (IZ)V
+accessible field net/minecraft/block/entity/ChiseledBookshelfBlockEntity inventory Lnet/minecraft/util/collection/DefaultedList;
+accessible method net/minecraft/item/CompassItem getLodestoneDimension (Lnet/minecraft/nbt/NbtCompound;)Ljava/util/Optional;

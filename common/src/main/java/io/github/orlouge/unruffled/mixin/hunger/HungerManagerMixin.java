@@ -11,6 +11,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameRules;
+import net.minecraft.world.dimension.DimensionType;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -33,14 +34,33 @@ public abstract class HungerManagerMixin implements ExtendedHungerManager {
     private float stamina = 1f;
     private float lastStamina = 0f;
     private float lastStaminaRegeneration = 1f;
+    private float baseWeariness = 0f;
+    private float amortizedWeariness = 0f;
     private float foodToConsume = 0f;
     private float foodCooldown = 0f;
     private Vec3d averagePos = null;
+    private DimensionType dimensionType = null;
+    private boolean isUnderground = false, isNight = false;
+    private float health = 20f;
 
     @Inject(method = "update", at = @At("HEAD"), cancellable = true)
     public void onUpdate(PlayerEntity player, CallbackInfo ci) {
+        Vec3d playerPos = player.getPos();
+
+        baseWeariness = baseWeariness * 0.9998f;
+        DimensionType currentDimension = player.getWorld().getDimension();
+        if (currentDimension != dimensionType) {
+            averagePos = playerPos;
+        }
+        dimensionType = currentDimension;
+        health = player.getHealth();
+        isNight = player.getWorld().isNight();
+        isUnderground = player.getPos().getY() < player.getWorld().getSeaLevel() * 0.9 || player.isSubmergedInWater();
+        float targetWeariness = this.getTargetWeariness();
+        amortizedWeariness = Math.min(1f, 0.997f * amortizedWeariness + 0.003f * targetWeariness);
+
         foodCooldown = Math.max(0f, foodCooldown - 0.001f);
-        Vec3d playerPos = player.getPos(), travelAmount = new Vec3d(0, 0, 0);
+        Vec3d travelAmount = new Vec3d(0, 0, 0);
         if (this.averagePos == null) {
             this.averagePos = playerPos;
         } else {
@@ -57,7 +77,7 @@ public abstract class HungerManagerMixin implements ExtendedHungerManager {
         }
         if (player.hasStatusEffect(StatusEffects.HUNGER)) {
             float hungerExhaustion = player.getStatusEffect(StatusEffects.HUNGER).getAmplifier() * 0.005f;
-            if (this.stamina > Math.max(this.minStaminaToAttack(player), this.getStaminaRegenerationRate(20f) * 2)) {
+            if (this.stamina > Math.max(this.minStaminaToAttack(player), this.getStaminaRegenerationRate(1) * 2)) {
                 float exhaustionFraction = hungerExhaustion * this.stamina;
                 this.stamina = Math.max(0f, stamina - exhaustionFraction  * this.getStaminaDepletionRate());
                 hungerExhaustion -= exhaustionFraction;
@@ -68,7 +88,9 @@ public abstract class HungerManagerMixin implements ExtendedHungerManager {
         float staminaHungerMultiplier = this.getStaminaHungerMultiplier(travelAmount);
         foodToConsume += 0.0001f * Math.max(0f, staminaHungerMultiplier - 0.3f);
         if (this.exhaustion > 0) {
-            this.stamina = Math.max(0f, stamina - this.exhaustion * this.getStaminaDepletionRate());
+            float consumedStamina = this.exhaustion * this.getStaminaDepletionRate();
+            this.stamina = Math.max(0f, stamina - consumedStamina);
+            this.addWeariness(consumedStamina * (0.01f + 0.1f * this.amortizedWeariness));
             this.exhaustion = 0;
         }
         if (this.stamina > 0.05 && player.getHealth() < player.getMaxHealth() && player.getWorld().getGameRules().getBoolean(GameRules.NATURAL_REGENERATION)) {
@@ -78,7 +100,8 @@ public abstract class HungerManagerMixin implements ExtendedHungerManager {
                 this.foodTickTimer = 0;
             }
         }
-        float staminaRegeneration = this.getStaminaRegenerationRate(this.foodLevel);
+        float staminaRegeneration = this.getStaminaRegenerationRate(this.amortizedWeariness);
+        //System.out.println("W " + baseWeariness + " " + amortizedWeariness + " " + targetWeariness + " " + staminaRegeneration);
         if (player.hasStatusEffect(StatusEffects.SPEED)) {
             staminaRegeneration *= 1.5f + 0.5f * (float) player.getStatusEffect(StatusEffects.SPEED).getAmplifier();
         }
@@ -91,6 +114,7 @@ public abstract class HungerManagerMixin implements ExtendedHungerManager {
         if (this.stamina < 1) {
             float restoredStamina = Math.min(1.0f, this.stamina + staminaRegeneration);
             float consumedFood = (restoredStamina - stamina) * staminaHungerMultiplier / (4f * this.getStaminaDepletionRate());
+            //this.addWeariness((restoredStamina - stamina) * (0.01f + 0.14f * this.amortizedWeariness));
             stamina = restoredStamina;
             if (this.saturationLevel > 0.0F) {
                 this.saturationLevel = Math.max(this.saturationLevel - consumedFood, 0.0F);
@@ -102,7 +126,7 @@ public abstract class HungerManagerMixin implements ExtendedHungerManager {
             this.foodLevel = Math.max(this.foodLevel - (int) foodToConsume, 0);
             foodToConsume = Math.max(0, foodToConsume - (int) foodToConsume);
         }
-        if ((this.stamina != this.lastStamina || staminaRegeneration != this.lastStaminaRegeneration) && player instanceof ServerPlayerEntity serverPlayer) {
+        if ((this.stamina != this.lastStamina || Math.abs(staminaRegeneration - this.lastStaminaRegeneration) > 0.0001f) && player instanceof ServerPlayerEntity serverPlayer) {
             new Packets.ExtendedHungerUpdate(
                     this.stamina,
                     staminaRegeneration / Config.INSTANCE.get().hungerConfig.staminaRegenerationRate(),
@@ -126,12 +150,20 @@ public abstract class HungerManagerMixin implements ExtendedHungerManager {
     @Inject(method = "writeNbt", at = @At("RETURN"))
     public void onWriteNbt(NbtCompound nbt, CallbackInfo ci) {
         nbt.putFloat("stamina", stamina);
+        nbt.putFloat("baseWeariness", baseWeariness);
+        nbt.putFloat("amortizedWeariness", amortizedWeariness);
     }
 
     @Inject(method = "readNbt", at = @At("RETURN"))
     public void onReadNbt(NbtCompound nbt, CallbackInfo ci) {
         if (nbt.contains("stamina")) {
             this.stamina = nbt.getFloat("stamina");
+        }
+        if (nbt.contains("baseWeariness")) {
+            this.baseWeariness = nbt.getFloat("baseWeariness");
+        }
+        if (nbt.contains("amortizedWeariness")) {
+            this.amortizedWeariness = nbt.getFloat("amortizedWeariness");
         }
     }
 
@@ -155,5 +187,52 @@ public abstract class HungerManagerMixin implements ExtendedHungerManager {
     @Override
     public void addStamina(float diff) {
         this.stamina = Math.max(0, Math.min(1, stamina + diff));
+    }
+
+
+    @Override
+    public DimensionType getDimension() {
+        return this.dimensionType;
+    }
+
+    @Override
+    public float getHealth() {
+        return this.health;
+    }
+
+    @Override
+    public float getFoodLevel() {
+        return this.foodLevel;
+    }
+
+    @Override
+    public float getBaseWeariness() {
+        return this.baseWeariness;
+    }
+
+    @Override
+    public float getAmortizedWeariness() {
+        return this.amortizedWeariness;
+    }
+
+    @Override
+    public void addWeariness(float diff) {
+        this.baseWeariness = Math.max(0, Math.min(1, this.baseWeariness + diff));
+    }
+
+    @Override
+    public void resetWeariness() {
+        this.baseWeariness = 0;
+        this.amortizedWeariness = 0;
+    }
+
+    @Override
+    public boolean isNight() {
+        return isNight;
+    }
+
+    @Override
+    public boolean isUnderground() {
+        return isUnderground;
     }
 }

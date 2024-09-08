@@ -21,7 +21,7 @@ public abstract class WanderingTraderEntityMixin extends MerchantEntity {
         if (this.offers != null) {
             this.fillRecipesFromPool(this.offers, Trades.WANDERING_TRADER_DECORATION, 2);
             this.fillRecipesFromPool(this.offers, Trades.WANDERING_TRADER_GLAZED_TERRACOTTA, 1);
-            this.fillRecipesFromPool(this.offers, Trades.WANDERING_TRADER_ASSORTED, 3);
+            this.fillRecipesFromPool(this.offers, Trades.WANDERING_TRADER_ASSORTED, 4);
             this.fillRecipesFromPool(this.offers, Trades.WANDERING_TRADER_POTIONS, 1);
             this.fillRecipesFromPool(this.offers, Trades.WANDERING_TRADER_BUY, 1);
             this.fillRecipesFromPool(this.offers, Trades.WANDERING_TRADER_CODEX, 1);

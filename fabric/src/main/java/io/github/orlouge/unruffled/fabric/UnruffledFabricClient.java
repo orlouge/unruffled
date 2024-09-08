@@ -29,7 +29,7 @@ import net.minecraft.util.Identifier;
 import java.util.Map;
 
 @Environment(EnvType.CLIENT)
-public class UnruffedFabricClient implements ClientModInitializer {
+public class UnruffledFabricClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         UnruffledModClient.initClient();

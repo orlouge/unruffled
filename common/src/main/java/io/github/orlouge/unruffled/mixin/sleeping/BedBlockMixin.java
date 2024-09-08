@@ -26,6 +26,9 @@ public class BedBlockMixin {
             }
             if (serverPlayer.getSpawnPointPosition() != null && serverPlayer.getSpawnPointPosition().equals(pos)) {
                 PeacefulChunks.get(serverWorld.getPersistentStateManager()).remove(serverPlayer.getUuid(), new ChunkPos(pos), PeacefulChunks.PEACEFUL_RANGE);
+                if (serverPlayer.getSpawnPointDimension().equals(world.getRegistryKey())) {
+                    serverPlayer.setSpawnPoint(null, null, 0, false, false);
+                }
             }
         }
     }

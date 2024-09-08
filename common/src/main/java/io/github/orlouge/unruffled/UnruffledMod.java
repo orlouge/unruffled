@@ -4,17 +4,22 @@ import io.github.orlouge.unruffled.advancements.*;
 import io.github.orlouge.unruffled.items.CustomItems;
 import io.github.orlouge.unruffled.interfaces.ExtendedHungerManager;
 import io.github.orlouge.unruffled.mixin.accessors.ItemAccessor;
-import io.github.orlouge.unruffled.utils.BrewingPotionRecipe;
+import io.github.orlouge.unruffled.potions.BrewingPotionRecipe;
+import io.github.orlouge.unruffled.potions.TeleportEffect;
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.Block;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.Enchantments;
+import net.minecraft.entity.attribute.EntityAttributeModifier;
+import net.minecraft.entity.attribute.EntityAttributes;
+import net.minecraft.entity.effect.StatusEffect;
+import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.loot.LootTables;
+import net.minecraft.potion.Potion;
 import net.minecraft.potion.Potions;
 import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.Identifier;
@@ -38,10 +43,21 @@ public class UnruffledMod {
     public static final KnockbackCriterion KNOCKBACK_CRITERION = Criteria.register(new KnockbackCriterion(new Identifier(UnruffledMod.MOD_ID, "knockback")));
     public static final HeavyInventoryCriterion HEAVY_INVENTORY_CRITERION = Criteria.register(new HeavyInventoryCriterion(new Identifier(UnruffledMod.MOD_ID, "heavy_inventory")));
     public static final PeacefulChunkCriterion PEACEFUL_CHUNK_CRITERION = Criteria.register(new PeacefulChunkCriterion(new Identifier(UnruffledMod.MOD_ID, "peaceful_chunk")));
+    public static final TeleportationCriterion TELEPORTATION_CRITERION = Criteria.register(new TeleportationCriterion(new Identifier(UnruffledMod.MOD_ID, "teleportation")));
+    public static final AquaAffinityCriterion AQUA_AFFINITY_CRITERION = Criteria.register(new AquaAffinityCriterion(new Identifier(UnruffledMod.MOD_ID, "aqua_affinity")));
+    public static final PiercingCriterion PIERCING_CRITERION = Criteria.register(new PiercingCriterion(new Identifier(UnruffledMod.MOD_ID, "piercing")));
 
     public static final UndergroundPondFeature UNDERGROUND_POND_FEATURE = new UndergroundPondFeature(DefaultFeatureConfig.CODEC);
+    public static final UndergroundCabinFeature UNDERGROUND_CABIN_FEATURE = new UndergroundCabinFeature(DefaultFeatureConfig.CODEC);
     public static final ConfiguredFeature<DefaultFeatureConfig, UndergroundPondFeature> UNDERGROUND_POND_CONFIGURED_FEATURE =
             new ConfiguredFeature<>(UNDERGROUND_POND_FEATURE, new DefaultFeatureConfig());
+    public static final ConfiguredFeature<DefaultFeatureConfig, UndergroundCabinFeature> UNDERGROUND_CABIN_CONFIGURED_FEATURE =
+            new ConfiguredFeature<>(UNDERGROUND_CABIN_FEATURE, new DefaultFeatureConfig());
+
+    public static final StatusEffect TELEPORTATION_EFFECT = new TeleportEffect()
+        .addAttributeModifier(EntityAttributes.GENERIC_MOVEMENT_SPEED, "a6032b73-feef-4d6d-ba59-2b701b5e71e0", -0.50, EntityAttributeModifier.Operation.MULTIPLY_TOTAL)
+        .addAttributeModifier(EntityAttributes.GENERIC_ATTACK_SPEED, "33f6133c-109f-4b18-80b2-90919e060c4b", -0.50, EntityAttributeModifier.Operation.MULTIPLY_TOTAL);
+    public static final Potion TELEPORTATION_POTION = new Potion(new StatusEffectInstance(TELEPORTATION_EFFECT, 100, 0));
 
 
     public static final Set<Enchantment> DEFAULT_UNOBTAINABLE_ENCHANTMENTS = Registries.ENCHANTMENT.getEntrySet().stream().filter(
@@ -66,23 +82,30 @@ public class UnruffledMod {
     );
 
     public static final List<BrewingPotionRecipe> POTION_RECIPES = List.of(
-            new BrewingPotionRecipe(Potions.MUNDANE, Items.FERMENTED_SPIDER_EYE, Potions.AWKWARD)
+            new BrewingPotionRecipe(Potions.MUNDANE, Items.FERMENTED_SPIDER_EYE, Potions.AWKWARD),
+            new BrewingPotionRecipe(Potions.AWKWARD, Items.ENDER_EYE, TELEPORTATION_POTION)
     );
 
-    public static Map<Identifier, List<Integer>> DEFAULT_LOOT_CODICES_ADD = Map.ofEntries(
-            Map.entry(LootTables.BURIED_TREASURE_CHEST, List.of(1, 4, 8, 6)),
-            Map.entry(LootTables.SHIPWRECK_MAP_CHEST, List.of(2, 5, 10)),
-            Map.entry(LootTables.UNDERWATER_RUIN_BIG_CHEST, List.of(3, 7, 9)),
-            Map.entry(LootTables.SIMPLE_DUNGEON_CHEST, List.of(11, 13, 16)),
-            Map.entry(LootTables.ANCIENT_CITY_CHEST, List.of(12, 15, 19, 20)),
-            Map.entry(LootTables.BASTION_TREASURE_CHEST, List.of(14, 17, 18)),
-            Map.entry(LootTables.IGLOO_CHEST_CHEST, List.of(21, 25, 28)),
-            Map.entry(LootTables.STRONGHOLD_LIBRARY_CHEST, List.of(23, 24, 27, 29)),
-            Map.entry(LootTables.WOODLAND_MANSION_CHEST, List.of(22, 26, 30)),
-            Map.entry(LootTables.DESERT_PYRAMID_CHEST, List.of(31, 34, 36)),
-            Map.entry(LootTables.NETHER_BRIDGE_CHEST, List.of(33, 35, 38, 39)),
-            Map.entry(LootTables.JUNGLE_TEMPLE_CHEST, List.of(41, 45, 47, 48))
-    );
+    public static Map<Identifier, List<Integer>> DEFAULT_LOOT_CODICES_ADD;
+
+    public static final Identifier BOOKSHELF_LOOT_TABLE = new Identifier(UnruffledMod.MOD_ID, "chests/bookshelf");
+    static {
+        DEFAULT_LOOT_CODICES_ADD = Map.ofEntries(
+                Map.entry(LootTables.BURIED_TREASURE_CHEST, List.of(1, 4, 6)),
+                Map.entry(LootTables.SHIPWRECK_MAP_CHEST, List.of(2, 5, 10)),
+                Map.entry(LootTables.UNDERWATER_RUIN_BIG_CHEST, List.of(3, 7, 9)),
+                Map.entry(LootTables.SIMPLE_DUNGEON_CHEST, List.of(11, 16)),
+                Map.entry(LootTables.ANCIENT_CITY_CHEST, List.of(12, 15, 20)),
+                Map.entry(LootTables.BASTION_TREASURE_CHEST, List.of(14, 17, 18)),
+                Map.entry(LootTables.IGLOO_CHEST_CHEST, List.of(21, 25, 28)),
+                Map.entry(LootTables.STRONGHOLD_LIBRARY_CHEST, List.of(23, 24, 27, 29)),
+                Map.entry(LootTables.WOODLAND_MANSION_CHEST, List.of(22, 26, 30)),
+                Map.entry(LootTables.DESERT_PYRAMID_CHEST, List.of(31, 34, 36)),
+                Map.entry(LootTables.NETHER_BRIDGE_CHEST, List.of(33, 35, 38, 39)),
+                Map.entry(LootTables.JUNGLE_TEMPLE_CHEST, List.of(41, 45, 48)),
+                Map.entry(BOOKSHELF_LOOT_TABLE, List.of(8, 13, 19, 47))
+        );
+    }
 
     public static Map<Identifier, List<Integer>> DEFAULT_LOOT_CODICES_MODIFY = Map.ofEntries(
             Map.entry(LootTables.DESERT_PYRAMID_ARCHAEOLOGY, List.of(32, 37, 40)),
@@ -91,7 +114,6 @@ public class UnruffledMod {
     );
 
     public static void init() {
-        Config.getInstance();
         Packets.AttackMiss.register(player -> {
             if (player.getHungerManager() instanceof ExtendedHungerManager ext) {
                 ext.addStaminaIfCanAttack(-0.02f, player);

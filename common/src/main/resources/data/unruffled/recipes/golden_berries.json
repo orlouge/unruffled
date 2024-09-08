@@ -1,9 +1,9 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    "GGG",
+    "NGN",
     "GBG",
-    "GGG"
+    "NGN"
   ],
   "key": {
     "B": {
@@ -11,6 +11,9 @@
     },
     "G": {
       "item": "minecraft:gold_ingot"
+    },
+    "N": {
+      "item": "minecraft:gold_nugget"
     }
   },
   "result": {

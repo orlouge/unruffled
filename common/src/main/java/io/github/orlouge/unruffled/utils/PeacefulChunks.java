@@ -41,7 +41,7 @@ public class PeacefulChunks extends PersistentState {
         ChunkPos prevPos = playerCenterMap.get(uuid);
         if (prevPos != null) {
             if (prevPos.equals(pos)) return;
-            this._remove(uuid, pos, range);
+            this.removeFromChunkMap(uuid, pos, range);
         }
         range += 1;
         for (int x = pos.x - range; x <= pos.x + range; x++) {
@@ -55,14 +55,18 @@ public class PeacefulChunks extends PersistentState {
     }
 
     public void remove(UUID uuid, ChunkPos pos, int range) {
-        this._remove(uuid, pos, range);
+        this.removeFromChunkMap(uuid, pos, range);
         ChunkPos prevPos = playerCenterMap.get(uuid);
-        if (prevPos != null && !prevPos.equals(pos)) this._remove(uuid, prevPos, range);
+        if (prevPos != null && !prevPos.equals(pos)) this.removeFromChunkMap(uuid, prevPos, range);
         playerCenterMap.remove(uuid);
         this.markDirty();
     }
 
-    private void _remove(UUID uuid, ChunkPos pos, int range) {
+    public ChunkPos getCenterPos(UUID uuid) {
+        return playerCenterMap.get(uuid);
+    }
+
+    private void removeFromChunkMap(UUID uuid, ChunkPos pos, int range) {
         range += 1;
         for (int x = pos.x - range; x <= pos.x + range; x++) {
             for (int z = pos.z - range; z <= pos.z + range; z++) {

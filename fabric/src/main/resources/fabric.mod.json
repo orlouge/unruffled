@@ -19,7 +19,7 @@
       "io.github.orlouge.unruffled.fabric.UnruffledFabric"
     ],
     "client": [
-      "io.github.orlouge.unruffled.fabric.UnruffedFabricClient"
+      "io.github.orlouge.unruffled.fabric.UnruffledFabricClient"
     ]
   },
   "mixins": [

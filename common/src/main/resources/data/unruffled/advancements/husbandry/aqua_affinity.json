@@ -1,0 +1,30 @@
+{
+  "parent": "husbandry/breed_an_animal",
+  "criteria": {
+    "mine": {
+      "conditions": {},
+      "trigger": "unruffled:aqua_affinity"
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.husbandry.aqua_affinity.description"
+    },
+    "frame": "task",
+    "hidden": false,
+    "icon": {
+      "item": "turtle_helmet",
+      "nbt": "{Damage:0}"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.husbandry.aqua_affinity.title"
+    }
+  },
+  "requirements": [
+    [
+      "mine"
+    ]
+  ]
+}

@@ -33,6 +33,6 @@ public class CustomItems {
     );
 
     public static boolean isDisabled(Enchantment enchantment, ItemStack stack) {
-        return Config.INSTANCE.get().disabledEnchantments.contains(enchantment) && !(Config.INSTANCE.get().itemEnchantments.getOrDefault(stack.getItem(), Collections.emptyMap()).containsKey(enchantment));
+        return Config.isLoaded() && Config.INSTANCE.get().disabledEnchantments.contains(enchantment) && !(Config.INSTANCE.get().itemEnchantments.getOrDefault(stack.getItem(), Collections.emptyMap()).containsKey(enchantment));
     }
 }

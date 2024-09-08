@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "rewards": {
+    "recipes": [
+      "unruffled:bundle",
+      "unruffled:bundle_rabbit_hide",
+      "unruffled:name_tag"
+    ]
+  },
+  "criteria": {
+    "has_string": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [{
+          "item": "minecraft:string"
+        }]
+      }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "unruffled:bundle"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_string",
+      "has_the_recipe"
+    ]
+  ]
+}

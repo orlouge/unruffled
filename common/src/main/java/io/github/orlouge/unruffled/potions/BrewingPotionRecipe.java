@@ -1,4 +1,4 @@
-package io.github.orlouge.unruffled.utils;
+package io.github.orlouge.unruffled.potions;
 
 import net.minecraft.item.Item;
 import net.minecraft.potion.Potion;

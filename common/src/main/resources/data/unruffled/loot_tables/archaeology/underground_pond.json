@@ -39,7 +39,7 @@
         {
           "type": "minecraft:item",
           "name": "unruffled:golden_berries",
-          "weight": 3
+          "weight": 4
         }
       ],
       "rolls": 1.0
