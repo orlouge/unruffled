@@ -3,6 +3,7 @@ package io.github.orlouge.unruffled;
 import com.mojang.serialization.Codec;
 import io.github.orlouge.unruffled.items.AncientCodexItem;
 import io.github.orlouge.unruffled.items.CustomItems;
+import io.github.orlouge.unruffled.items.ItemEnchantmentsHelper;
 import io.github.orlouge.unruffled.utils.BlockTemplate;
 import io.github.orlouge.unruffled.utils.WeightedRandomList;
 import net.minecraft.block.*;
@@ -281,13 +282,13 @@ public class UndergroundCabinFeature extends Feature<DefaultFeatureConfig> {
                     (ctx) -> {
                         ItemFrameEntity itemFrame = new ItemFrameEntity(ctx.world().toServerWorld(), ctx.pos(), Direction.UP);
                         itemFrame.setInvisible(true);
-                        itemFrame.setHeldItemStack(new ItemStack(switch (ctx.random().nextInt(9)) {
-                            case 0 -> Items.IRON_AXE;
-                            case 1 -> CustomItems.SACRED_SWORD;
-                            case 2 -> Items.DIAMOND_SWORD;
-                            case 3 -> Items.DIAMOND_AXE;
-                            default -> Items.IRON_SWORD;
-                        }), false);
+                        itemFrame.setHeldItemStack(switch (ctx.random().nextInt(9)) {
+                            case 0 -> Items.IRON_AXE.getDefaultStack();
+                            case 1 -> ItemEnchantmentsHelper.createWithItemEnchantments(CustomItems.SACRED_SWORD);
+                            case 2 -> Items.DIAMOND_SWORD.getDefaultStack();
+                            case 3 -> Items.DIAMOND_AXE.getDefaultStack();
+                            default -> Items.IRON_SWORD.getDefaultStack();
+                        }, false);
                         itemFrame.setRotation(switch (ctx.direction()) {
                             case NORTH -> 1;
                             case EAST -> 3;
@@ -582,9 +583,10 @@ public class UndergroundCabinFeature extends Feature<DefaultFeatureConfig> {
     static {
         WALL_TEMPLATES.add(8, BREWING_ROOM);
         WALL_TEMPLATES.add(6, CART_ROOM);
-        WALL_TEMPLATES.add(5, FURNACE_ROOM);
-        WALL_TEMPLATES.add(5, SMITHING_ROOM);
         WALL_TEMPLATES.add(5, BED_ROOM);
+        WALL_TEMPLATES.add(4, FURNACE_ROOM);
+        WALL_TEMPLATES.add(4, SMITHING_ROOM);
+        WALL_TEMPLATES.add(4, LODESTONE_ROOM);
         WALL_TEMPLATES.add(3, ARCHAEOLOGY_ROOM);
         WALL_TEMPLATES.add(2, LIBRARY_ROOM);
         WALL_TEMPLATES.add(2, CAULDRON_ROOM);
@@ -592,7 +594,6 @@ public class UndergroundCabinFeature extends Feature<DefaultFeatureConfig> {
         WALL_TEMPLATES.add(2, TNT_ROOM);
         WALL_TEMPLATES.add(2, AMETHYST_ROOM);
         WALL_TEMPLATES.add(1, TARGET_ROOM);
-        WALL_TEMPLATES.add(1, LODESTONE_ROOM);
         WALL_TEMPLATES.add(1, LAMP_ROOM);
 
         WALL_TEMPLATES.add(6, new RandomPile(BlockTemplate.random(new BlockState[] {

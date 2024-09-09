@@ -25,12 +25,16 @@
         {
           "type": "minecraft:item",
           "name": "minecraft:lodestone"
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:compass"
         }
       ],
       "rolls": {
         "type": "minecraft:uniform",
-        "max": 2.0,
-        "min": 0.0
+        "max": 3.0,
+        "min": 1.0
       }
     }
   ],

@@ -20,7 +20,7 @@ public class WanderingTraderManagerMixin {
 
     @ModifyConstant(method = "spawn", constant = @Constant(intValue = 25))
     public int decreaseMinimumChanceAndIncrement(int constant) {
-        return 3;
+        return 5;
     }
 
     @ModifyConstant(method = "spawn", constant = @Constant(intValue = 75))
@@ -36,5 +36,15 @@ public class WanderingTraderManagerMixin {
     @ModifyConstant(method = "trySpawn", constant = @Constant(intValue = 10))
     public int alwaysAttemptSpawn(int constant) {
         return 1;
+    }
+
+    @ModifyConstant(method = "trySpawn", constant = @Constant(intValue = 48, ordinal = 2))
+    public int decreaseSpawnRange(int constant) {
+        return 32;
+    }
+
+    @ModifyConstant(method = "getNearbySpawnPos", constant = @Constant(intValue = 10))
+    public int increaseSpawnPosAttempts(int attempts) {
+        return 100;
     }
 }

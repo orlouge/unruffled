@@ -1,8 +1,12 @@
 package io.github.orlouge.unruffled;
 
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonSerializationContext;
 import io.github.orlouge.unruffled.advancements.*;
 import io.github.orlouge.unruffled.items.CustomItems;
 import io.github.orlouge.unruffled.interfaces.ExtendedHungerManager;
+import io.github.orlouge.unruffled.items.ItemEnchantmentsLootFunction;
 import io.github.orlouge.unruffled.mixin.accessors.ItemAccessor;
 import io.github.orlouge.unruffled.potions.BrewingPotionRecipe;
 import io.github.orlouge.unruffled.potions.TeleportEffect;
@@ -17,18 +21,21 @@ import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.loot.LootTables;
+import net.minecraft.loot.function.LootFunctionType;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.Potions;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.JsonSerializer;
 import net.minecraft.world.gen.feature.ConfiguredFeature;
 import net.minecraft.world.gen.feature.DefaultFeatureConfig;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class UnruffledMod {
@@ -46,6 +53,9 @@ public class UnruffledMod {
     public static final TeleportationCriterion TELEPORTATION_CRITERION = Criteria.register(new TeleportationCriterion(new Identifier(UnruffledMod.MOD_ID, "teleportation")));
     public static final AquaAffinityCriterion AQUA_AFFINITY_CRITERION = Criteria.register(new AquaAffinityCriterion(new Identifier(UnruffledMod.MOD_ID, "aqua_affinity")));
     public static final PiercingCriterion PIERCING_CRITERION = Criteria.register(new PiercingCriterion(new Identifier(UnruffledMod.MOD_ID, "piercing")));
+
+    public static final Supplier<LootFunctionType> ITEM_ENCHANTMENTS_LOOT_FUNCTION_TYPE =
+        Platform.registerLootFunctionType(new Identifier(MOD_ID, "item_enchantments"), new Serializer());
 
     public static final UndergroundPondFeature UNDERGROUND_POND_FEATURE = new UndergroundPondFeature(DefaultFeatureConfig.CODEC);
     public static final UndergroundCabinFeature UNDERGROUND_CABIN_FEATURE = new UndergroundCabinFeature(DefaultFeatureConfig.CODEC);
@@ -126,5 +136,17 @@ public class UnruffledMod {
         }
         ((ItemAccessor) Items.POTION).setMaxCount(16);
         //((ToolMaterialsAccessor) (Object) ToolMaterials.GOLD).setItemDurability(200);
+    }
+
+    public static class Serializer implements JsonSerializer<ItemEnchantmentsLootFunction> {
+
+        @Override
+        public void toJson(JsonObject json, ItemEnchantmentsLootFunction object, JsonSerializationContext context) {
+        }
+
+        @Override
+        public ItemEnchantmentsLootFunction fromJson(JsonObject json, JsonDeserializationContext context) {
+            return new ItemEnchantmentsLootFunction();
+        }
     }
 }

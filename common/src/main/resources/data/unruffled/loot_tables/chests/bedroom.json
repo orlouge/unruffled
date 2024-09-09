@@ -63,6 +63,9 @@
                 "min": 0.8
               },
               "function": "minecraft:set_damage"
+            },
+            {
+              "function": "unruffled:item_enchantments"
             }
           ],
           "name": "unruffled:iron_bolster"
