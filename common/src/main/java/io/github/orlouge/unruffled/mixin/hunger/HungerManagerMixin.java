@@ -89,9 +89,10 @@ public abstract class HungerManagerMixin implements ExtendedHungerManager {
         foodToConsume += 0.0001f * Math.max(0f, staminaHungerMultiplier - 0.3f);
         if (this.exhaustion > 0) {
             float consumedStamina = this.exhaustion * this.getStaminaDepletionRate();
+            this.foodToConsume += Config.INSTANCE.get().hungerConfig.hungerDepletionRate() * Math.max(0f, consumedStamina - stamina) / this.getStaminaDepletionRate();
+            this.exhaustion = 0;
             this.stamina = Math.max(0f, stamina - consumedStamina);
             this.addWeariness(consumedStamina * (0.01f + 0.1f * this.amortizedWeariness));
-            this.exhaustion = 0;
         }
         if (this.stamina > 0.05 && player.getHealth() < player.getMaxHealth() && player.getWorld().getGameRules().getBoolean(GameRules.NATURAL_REGENERATION)) {
             ++this.foodTickTimer;

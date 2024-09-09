@@ -59,7 +59,7 @@ public abstract class PlayerEntityMixin extends LivingEntity {
     public void onAttackExhaustion(PlayerEntity instance, float exhaustion) {
         if (((Object) this) instanceof ServerPlayerEntity serverPlayer && this.getHungerManager() instanceof ExtendedHungerManager extendedHungerManager) {
             float stamina = extendedHungerManager.getStamina();
-            if (stamina > 0.35f && stamina - attackExhaustion * extendedHungerManager.getStaminaDepletionRate() < 0.1f) {
+            if (stamina > 0.4f && stamina - attackExhaustion * extendedHungerManager.getStaminaDepletionRate() < 0.1f) {
                 UnruffledMod.FAST_ATTACK_CRITERION.trigger(serverPlayer);
             }
         }
