@@ -24,15 +24,9 @@ public class FireworkRocketEntityMixin {
     public Vec3d slowHorizontalRocket(Vec3d playerVelocity, double x, double y, double z) {
         double factor = 1;
         if (this.shooter != null) {
-            Vec3d direction = this.shooter.getRotationVector();
-            double ydir = 0.4 * Math.max(0, direction.y);
-            if (Math.abs(direction.x) > 0.01) {
-                factor = Math.min(factor, ydir / Math.abs(direction.x));
-            }
-            if (Math.abs(direction.z) > 0.01) {
-                factor = Math.min(factor, ydir / Math.abs(direction.z));
-            }
-            factor = Math.max(0.08, factor * factor);
+            Vec3d direction = this.shooter.getRotationVector().normalize();
+            factor = 0.5 + direction.getY() * 0.5;
+            factor = Math.min(1, Math.pow(factor, 5) + 0.04);
         }
         return playerVelocity.add(x * factor, y * factor, z * factor);
     }
