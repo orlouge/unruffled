@@ -91,6 +91,8 @@ public class UnruffledFabric implements ModInitializer {
                     return lootManager.getLootTable(new Identifier(UnruffledMod.MOD_ID, "entities/wither_skeleton"));
                 } else if (id.equals(new Identifier(Identifier.DEFAULT_NAMESPACE, "entities/skeleton"))) {
                     return lootManager.getLootTable(new Identifier(UnruffledMod.MOD_ID, "entities/skeleton"));
+                } else if (id.equals(new Identifier(Identifier.DEFAULT_NAMESPACE, "entities/zombie"))) {
+                    return lootManager.getLootTable(new Identifier(UnruffledMod.MOD_ID, "entities/zombie"));
                 } else if (id.equals(new Identifier(Identifier.DEFAULT_NAMESPACE, "blocks/nether_quartz_ore"))) {
                     return lootManager.getLootTable(new Identifier(UnruffledMod.MOD_ID, "blocks/nether_quartz_ore"));
                 } else if (id.equals(new Identifier(Identifier.DEFAULT_NAMESPACE, "blocks/ender_chest"))) {

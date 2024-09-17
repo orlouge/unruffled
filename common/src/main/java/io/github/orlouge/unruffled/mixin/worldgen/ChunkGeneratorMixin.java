@@ -20,7 +20,7 @@ public class ChunkGeneratorMixin {
     public void modifyStructurePlacement(DynamicRegistryManager registryManager, StructurePlacementCalculator placementCalculator, StructureAccessor structureAccessor, Chunk chunk, StructureTemplateManager structureTemplateManager, CallbackInfo ci) {
         for (RegistryEntry<StructureSet> entry : placementCalculator.getStructureSets()) {
             if (entry.value().placement() instanceof StructurePlacementWithSpreadFactor structurePlacementWithSpreadFactor) {
-                structurePlacementWithSpreadFactor.setSpreadFactor(2.5f, 16);
+                structurePlacementWithSpreadFactor.setSpreadFactor(3f, 64);
             }
         }
     }

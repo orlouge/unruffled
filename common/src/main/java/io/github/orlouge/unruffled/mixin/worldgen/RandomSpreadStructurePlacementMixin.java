@@ -36,8 +36,9 @@ public abstract class RandomSpreadStructurePlacementMixin extends StructurePlace
 
     @Inject(method = "getStartChunk", at = @At("HEAD"), cancellable = true)
     public void applySpreadFactor(long seed, int chunkX, int chunkZ, CallbackInfoReturnable<ChunkPos> cir) {
-        if (spreadFactor > 0) {
-            float correctedSpreadFactor = this.separation > 0 ? Math.max(1, spreadFactor / (1 + this.separation / this.correctionFactor)) : 1;
+        if (spreadFactor > 0 && this.separation > 0) {
+            float rarity = this.spacing + this.separation * 2;
+            float correctedSpreadFactor = Math.max(1, spreadFactor / (1 + rarity / this.correctionFactor));
             int spacing = (int) (this.spacing * correctedSpreadFactor);
             int separation = (int) (this.separation * correctedSpreadFactor);
             int i = Math.floorDiv(chunkX, spacing);

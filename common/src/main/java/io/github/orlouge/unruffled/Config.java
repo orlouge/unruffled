@@ -29,6 +29,7 @@ public class Config {
     public final Map<Identifier, List<Integer>> lootCodicesAdd, lootCodicesModify;
     public final boolean peacefulChunks;
     public final int sleepTime;
+    public final float structureSpreadFactor, structureSpreadCorrection;
 
     public static final String CONFIG_FNAME = Platform.getConfigDirectory() + "/" + UnruffledMod.MOD_ID + ".json";
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
@@ -67,11 +68,11 @@ public class Config {
             UnruffledMod.DEFAULT_UNOBTAINABLE_ENCHANTMENTS, UnruffledMod.DEFAULT_DISABLED_ENCHANTMENTS,
             UnruffledMod.DEFAULT_ITEM_ENCHANTMENTS,
             UnruffledMod.DEFAULT_LOOT_CODICES_ADD, UnruffledMod.DEFAULT_LOOT_CODICES_MODIFY,
-            true, 16000
+            true, 16000, UnruffledMod.DEFAULT_STRUCTURE_SPREAD_FACTOR, UnruffledMod.DEFAULT_STRUCTURE_SPREAD_CORRECTION
         );
     }
 
-    public Config(HungerConfig hungerConfig, Set<Enchantment>unobtainableEnchantments, Set<Enchantment> disabledEnchantments, Map<Item, Map<Enchantment, Integer>> itemEnchantments, Map<Identifier, List<Integer>> lootCodicesAdd, Map<Identifier, List<Integer>> lootCodicesModify, boolean peacefulChunks, int sleepTime) {
+    public Config(HungerConfig hungerConfig, Set<Enchantment>unobtainableEnchantments, Set<Enchantment> disabledEnchantments, Map<Item, Map<Enchantment, Integer>> itemEnchantments, Map<Identifier, List<Integer>> lootCodicesAdd, Map<Identifier, List<Integer>> lootCodicesModify, boolean peacefulChunks, int sleepTime, float structureSpreadFactor, float structureSpreadCorrection) {
         this.hungerConfig = hungerConfig;
         this.unobtainableEnchantments = unobtainableEnchantments;
         this.disabledEnchantments = disabledEnchantments;
@@ -80,6 +81,8 @@ public class Config {
         this.lootCodicesModify = lootCodicesModify;
         this.peacefulChunks = peacefulChunks;
         this.sleepTime = sleepTime;
+        this.structureSpreadFactor = structureSpreadFactor;
+        this.structureSpreadCorrection = structureSpreadCorrection;
     }
 
     public static Codec<Map<Enchantment, Integer>> ENCHANTMENT_MAP_CODEC = Codec.unboundedMap(Registries.ENCHANTMENT.getCodec(), Codecs.POSITIVE_INT);
@@ -93,8 +96,9 @@ public class Config {
             Codec.unboundedMap(Identifier.CODEC, new ListCodec<>(Codecs.rangedInt(1, 50))).fieldOf("loot_codices_numbers_chest").forGetter(config -> config.lootCodicesAdd),
             Codec.unboundedMap(Identifier.CODEC, new ListCodec<>(Codecs.rangedInt(1, 50))).fieldOf("loot_codices_numbers_archaeology").forGetter(config -> config.lootCodicesModify),
             Codec.BOOL.fieldOf("disable_hostile_mobs_around_spawn_beds").forGetter(config -> config.peacefulChunks),
-            Codec.INT.fieldOf("sleep_time_set_to_negative_to_disable").forGetter(config -> config.sleepTime)
-
+            Codec.INT.fieldOf("sleep_time_set_to_negative_to_disable").forGetter(config -> config.sleepTime),
+            Codec.FLOAT.optionalFieldOf("structure_spread_factor", UnruffledMod.DEFAULT_STRUCTURE_SPREAD_FACTOR).forGetter(config -> config.structureSpreadFactor),
+            Codec.FLOAT.optionalFieldOf("structure_spread_correction", UnruffledMod.DEFAULT_STRUCTURE_SPREAD_CORRECTION).forGetter(config -> config.structureSpreadCorrection)
     ).apply(instance, Config::new));
 
     public static final Lazy<Config> INSTANCE = new Lazy<>(() -> Config.read());

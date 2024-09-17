@@ -1,4 +1,4 @@
-package io.github.orlouge.unruffled.mixin.brewing;
+package io.github.orlouge.unruffled.mixin.potions;
 
 import io.github.orlouge.unruffled.UnruffledMod;
 import net.minecraft.block.BlockState;

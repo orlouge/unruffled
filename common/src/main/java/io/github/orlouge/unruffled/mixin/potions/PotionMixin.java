@@ -1,4 +1,4 @@
-package io.github.orlouge.unruffled.mixin.brewing;
+package io.github.orlouge.unruffled.mixin.potions;
 
 import com.google.common.collect.ImmutableList;
 import net.minecraft.entity.effect.StatusEffectInstance;

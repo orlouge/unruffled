@@ -1,13 +1,9 @@
-package io.github.orlouge.unruffled.mixin.brewing;
+package io.github.orlouge.unruffled.mixin.potions;
 
 import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ItemStack;
 import net.minecraft.screen.BrewingStandScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(BrewingStandScreenHandler.class)
 public class BrewingStandScreenHandlerMixin {

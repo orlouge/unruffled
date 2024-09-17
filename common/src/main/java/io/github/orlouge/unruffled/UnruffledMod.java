@@ -51,6 +51,7 @@ public class UnruffledMod {
     public static final HeavyInventoryCriterion HEAVY_INVENTORY_CRITERION = Criteria.register(new HeavyInventoryCriterion(new Identifier(UnruffledMod.MOD_ID, "heavy_inventory")));
     public static final PeacefulChunkCriterion PEACEFUL_CHUNK_CRITERION = Criteria.register(new PeacefulChunkCriterion(new Identifier(UnruffledMod.MOD_ID, "peaceful_chunk")));
     public static final TeleportationCriterion TELEPORTATION_CRITERION = Criteria.register(new TeleportationCriterion(new Identifier(UnruffledMod.MOD_ID, "teleportation")));
+    public static final PigTeleportationCriterion PIG_TELEPORTATION_CRITERION = Criteria.register(new PigTeleportationCriterion(new Identifier(UnruffledMod.MOD_ID, "pig_teleportation")));
     public static final AquaAffinityCriterion AQUA_AFFINITY_CRITERION = Criteria.register(new AquaAffinityCriterion(new Identifier(UnruffledMod.MOD_ID, "aqua_affinity")));
     public static final PiercingCriterion PIERCING_CRITERION = Criteria.register(new PiercingCriterion(new Identifier(UnruffledMod.MOD_ID, "piercing")));
 
@@ -97,6 +98,9 @@ public class UnruffledMod {
     );
 
     public static Map<Identifier, List<Integer>> DEFAULT_LOOT_CODICES_ADD;
+
+    public static final float DEFAULT_STRUCTURE_SPREAD_FACTOR = 3f;
+    public static final float DEFAULT_STRUCTURE_SPREAD_CORRECTION = 64f;
 
     public static final Identifier BOOKSHELF_LOOT_TABLE = new Identifier(UnruffledMod.MOD_ID, "chests/bookshelf");
     static {

@@ -1,10 +1,13 @@
 package io.github.orlouge.unruffled.potions;
 
 import io.github.orlouge.unruffled.UnruffledMod;
+import io.github.orlouge.unruffled.interfaces.TeleporterEntity;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.AttributeContainer;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectCategory;
+import net.minecraft.entity.passive.PigEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.CompassItem;
 import net.minecraft.item.ItemStack;
@@ -21,8 +24,11 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.minecraft.world.dimension.DimensionTypes;
 import net.minecraft.world.poi.PointOfInterestTypes;
 
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Optional;
 
 public class TeleportEffect extends StatusEffect  {
@@ -41,10 +47,13 @@ public class TeleportEffect extends StatusEffect  {
 
     @Override
     public void onRemoved(LivingEntity entity, AttributeContainer attributes, int amplifier) {
-        if (entity instanceof ServerPlayerEntity player) {
+        if (entity instanceof TeleporterEntity teleporter && teleporter.isTeleporting() && entity instanceof ServerPlayerEntity player) {
+            ServerWorld playerWorld = player.getServerWorld();
             ServerWorld targetWorld = null;
             BlockPos targetPos = null;
             boolean hasCompass = false;
+            Collection<Entity> teleportTargets = teleporter.getTeleportTargets();
+            teleporter.clearTeleporting();
             for (int i = -2; i < player.getInventory().size(); i++) {
                 ItemStack stack;
                 if (i == -2) {
@@ -64,7 +73,7 @@ public class TeleportEffect extends StatusEffect  {
 
                     Optional<RegistryKey<World>> lodestoneDimension = CompassItem.getLodestoneDimension(compassNbt);
                     if (lodestoneDimension.isPresent()) {
-                        targetWorld = player.getServerWorld().getServer().getWorld(lodestoneDimension.get());
+                        targetWorld = playerWorld.getServer().getWorld(lodestoneDimension.get());
                         if (targetWorld == null) continue;
                         BlockPos lodestonePos = NbtHelper.toBlockPos(compassNbt.getCompound("LodestonePos"));
                         if (targetWorld.isInBuildLimit(lodestonePos) && targetWorld.getPointOfInterestStorage().hasTypeAt(PointOfInterestTypes.LODESTONE, lodestonePos)) {
@@ -84,7 +93,7 @@ public class TeleportEffect extends StatusEffect  {
                 for (int y = 0; y <= 1; y++) {
                     for (int x = -1; x <= 1; x++) {
                         for (int z = -1; z <= 1; z++) {
-                            teleportPos = PlayerEntity.findRespawnPosition(targetWorld, targetPos.add(x, y, z), player.getSpawnAngle(), true, true);
+                            teleportPos = PlayerEntity.findRespawnPosition(targetWorld, targetPos.add(x, y, z), 0f, true, true);
                             if (teleportPos.isPresent()) break found;
                         }
                     }
@@ -95,6 +104,12 @@ public class TeleportEffect extends StatusEffect  {
                     Vec3d deltaVec = teleportPos.get().add(0, 1, 0).subtract(targetPos.toCenterPos()).normalize();
                     float yaw = (float) MathHelper.atan2(deltaVec.getZ(), deltaVec.getX()) * 57 + 90;
                     float pitch = (float) Math.asin(MathHelper.clamp(deltaVec.getY(), -1, 1)) * 57;
+                    for (Entity targetEntity : teleportTargets) {
+                        targetEntity.teleport(targetWorld, teleportPos.get().getX(), teleportPos.get().getY(), teleportPos.get().getZ(), new HashSet<>(), yaw, pitch);
+                        if (targetEntity instanceof PigEntity && targetWorld != playerWorld && targetWorld.getDimensionKey().equals(DimensionTypes.THE_END)) {
+                            UnruffledMod.PIG_TELEPORTATION_CRITERION.trigger(player);
+                        }
+                    }
                     player.teleport(targetWorld, teleportPos.get().getX(), teleportPos.get().getY(), teleportPos.get().getZ(), yaw, pitch);
                     targetWorld.playSound(null, targetPos, SoundEvents.ITEM_CHORUS_FRUIT_TELEPORT, SoundCategory.PLAYERS, 1f, 1f);
                     UnruffledMod.TELEPORTATION_CRITERION.trigger(player);
