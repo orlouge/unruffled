@@ -893,14 +893,17 @@ public class UndergroundCabinFeature extends Feature<DefaultFeatureConfig> {
         }
 
         private void addWallOrRoom(BlockPos center, Direction direction) {
+            boolean generateWall = true;
             BlockPos nextTileCenter = center.add(direction.getVector().multiply(WALL_RADIUS * 2));
             if (0.5f - 10f / (20 + availableTiles.size()) >= random.nextFloat() && availableTiles.contains(nextTileCenter)) {
                 if (checkTile(world, nextTileCenter)) {
                     roomWithDoor(nextTileCenter, direction.getOpposite(), new RoomPassage(nextTileCenter, direction.getOpposite()));
+                    generateWall = false;
                 } else {
                     availableTiles.remove(nextTileCenter);
                 }
-            } else {
+            }
+            if (generateWall) {
                 generatedPieces.add(new Wall(center, direction));
                 placedWalls.add(wallCenter(center, direction));
                 decorateWall(center, direction);

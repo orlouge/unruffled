@@ -133,6 +133,7 @@ public abstract class PlayerEntityMixin extends LivingEntity {
 
     @Inject(method = "wakeUp", at = @At("HEAD"))
     public void resetWearinessOnWakeUp(boolean skipSleepTimer, boolean updateSleepingPlayers, CallbackInfo ci) {
+        if (skipSleepTimer || updateSleepingPlayers || !this.isSleeping()) return;
         if (this.getHungerManager() instanceof ExtendedHungerManager extendedHungerManager) {
             extendedHungerManager.resetWeariness();
         }

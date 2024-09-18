@@ -34,6 +34,8 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements Ha
     @Shadow private float spawnAngle = 0f;
     @Shadow private boolean spawnForced = false;
 
+    @Shadow public abstract void updateInput(float sidewaysSpeed, float forwardSpeed, boolean jumping, boolean sneaking);
+
     @Inject(method = "wakeUp", at = @At("HEAD"))
     public void updatePeacefulChunksOnWakeUp(boolean skipSleepTimer, boolean updateSleepingPlayers, CallbackInfo ci) {
         if (skipSleepTimer || updateSleepingPlayers || this.spawnPointPosition == null || !this.isSleeping()) return;
