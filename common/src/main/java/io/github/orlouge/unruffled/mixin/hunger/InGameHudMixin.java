@@ -11,7 +11,9 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(InGameHud.class)
 public abstract class InGameHudMixin {
@@ -25,21 +27,20 @@ public abstract class InGameHudMixin {
 
     @Shadow private long heartJumpEndTick;
 
-    @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameHud;renderExperienceBar(Lnet/minecraft/client/gui/DrawContext;I)V"))
-    public void redirectRenderXpBar(InGameHud instance, DrawContext context, int x) {
-        ClientPlayerEntity player = ((InGameHudMixin) (Object) instance).client.player;
+    @Inject(method = "renderExperienceBar", at = @At("HEAD"), cancellable = true)
+    public void redirectRenderXpBar(DrawContext context, int x, CallbackInfo ci) {
+        ClientPlayerEntity player = this.client.player;
         if (player != null) {
             if (player.getHealth() >= player.getMaxHealth()) {
                 this.heartJumpEndTick = 0;
             }
-            if (!(player.getHungerManager() instanceof ExtendedHungerManager hungerManager)) {
-                instance.renderExperienceBar(context, x);
+            if (!(player.getHungerManager() instanceof ExtendedHungerManager)) {
                 return;
             }
         }
         float stamina = UnruffledModClient.stamina;
         if (stamina > 0) {
-            int y = ((InGameHudMixin) (Object) instance).scaledHeight - 32 + 3;
+            int y = this.scaledHeight - 32 + 3;
             int width = (int) (stamina * 183.0F);
             float regen = UnruffledModClient.lastStaminaRegeneration;
             float travel = UnruffledModClient.lastTravelPenalty;
@@ -54,6 +55,7 @@ public abstract class InGameHudMixin {
                 }
             }
         }
+        ci.cancel();
     }
 
     /*
