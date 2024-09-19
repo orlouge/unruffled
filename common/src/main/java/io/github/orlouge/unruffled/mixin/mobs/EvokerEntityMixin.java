@@ -1,5 +1,6 @@
 package io.github.orlouge.unruffled.mixin.mobs;
 
+import io.github.orlouge.unruffled.Config;
 import io.github.orlouge.unruffled.items.CustomItems;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.damage.DamageSource;
@@ -26,21 +27,25 @@ public abstract class EvokerEntityMixin extends SpellcastingIllagerEntity {
     @Override
     public void onDeath(DamageSource damageSource) {
         if (!this.raidSpawned && this.getRaid() == null && damageSource.getAttacker() instanceof PlayerEntity playerEntity) {
-            StatusEffectInstance playerBadOmen = playerEntity.getStatusEffect(StatusEffects.BAD_OMEN);
-            int level = 1;
-            if (playerBadOmen != null) {
-                level += playerBadOmen.getAmplifier();
-                playerEntity.removeStatusEffectInternal(StatusEffects.BAD_OMEN);
-            } else {
-                --level;
-            }
+            if (Config.INSTANCE.get().mechanicsConfig.badOmenFromEvoker()) {
+                StatusEffectInstance playerBadOmen = playerEntity.getStatusEffect(StatusEffects.BAD_OMEN);
+                int level = 1;
+                if (playerBadOmen != null) {
+                    level += playerBadOmen.getAmplifier();
+                    playerEntity.removeStatusEffectInternal(StatusEffects.BAD_OMEN);
+                } else {
+                    --level;
+                }
 
-            level = MathHelper.clamp(level, 0, 4);
-            StatusEffectInstance newPlayerBadOmen = new StatusEffectInstance(StatusEffects.BAD_OMEN, 120000, level, false, false, true);
-            if (!this.getWorld().getGameRules().getBoolean(GameRules.DISABLE_RAIDS)) {
-                playerEntity.addStatusEffect(newPlayerBadOmen);
+                level = MathHelper.clamp(level, 0, 4);
+                StatusEffectInstance newPlayerBadOmen = new StatusEffectInstance(StatusEffects.BAD_OMEN, 120000, level, false, false, true);
+                if (!this.getWorld().getGameRules().getBoolean(GameRules.DISABLE_RAIDS)) {
+                    playerEntity.addStatusEffect(newPlayerBadOmen);
+                }
             }
-            this.dropItem(CustomItems.EVIL_TOTEM);
+            if (Config.INSTANCE.get().mechanicsConfig.evokerDropsEvilTotem()) {
+                this.dropItem(CustomItems.EVIL_TOTEM);
+            }
         }
 
         super.onDeath(damageSource);

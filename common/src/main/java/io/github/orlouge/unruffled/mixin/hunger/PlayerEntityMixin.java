@@ -1,5 +1,6 @@
 package io.github.orlouge.unruffled.mixin.hunger;
 
+import io.github.orlouge.unruffled.Config;
 import io.github.orlouge.unruffled.UnruffledMod;
 import io.github.orlouge.unruffled.UnruffledModClient;
 import io.github.orlouge.unruffled.interfaces.ExtendedHungerManager;
@@ -151,5 +152,10 @@ public abstract class PlayerEntityMixin extends LivingEntity {
         if (this.getHungerManager() instanceof ExtendedHungerManager extendedHungerManager) {
             extendedHungerManager.addWeariness(amount / 1000f);
         }
+    }
+
+    @ModifyConstant(method = "Lnet/minecraft/entity/player/PlayerEntity;dropItem(Lnet/minecraft/item/ItemStack;ZZ)Lnet/minecraft/entity/ItemEntity;", constant = @Constant(floatValue = 0.5f, ordinal = 0))
+    public float modifyDropSpread(float velocity) {
+        return velocity * Config.INSTANCE.get().mechanicsConfig.dropSpreadFactor();
     }
 }

@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 public class CrossbowItemMixin {
     @Redirect(method = "usageTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/enchantment/EnchantmentHelper;getLevel(Lnet/minecraft/enchantment/Enchantment;Lnet/minecraft/item/ItemStack;)I"))
     public int quickChargeTick(Enchantment enchantment, ItemStack stack) {
-        if (Config.INSTANCE.get().disabledEnchantments.contains(enchantment)) {
+        if (Config.INSTANCE.get().enchantmentsConfig.disabledEnchantments().contains(enchantment)) {
             return 2;
         } else {
             return EnchantmentHelper.getLevel(enchantment, stack);
@@ -23,7 +23,7 @@ public class CrossbowItemMixin {
 
     @Redirect(method = "getPullTime", at = @At(value = "INVOKE", target = "Lnet/minecraft/enchantment/EnchantmentHelper;getLevel(Lnet/minecraft/enchantment/Enchantment;Lnet/minecraft/item/ItemStack;)I"))
     private static int quickChargePull(Enchantment enchantment, ItemStack stack) {
-        if (Config.INSTANCE.get().disabledEnchantments.contains(enchantment)) {
+        if (Config.INSTANCE.get().enchantmentsConfig.disabledEnchantments().contains(enchantment)) {
             return 2;
         } else {
             return EnchantmentHelper.getLevel(enchantment, stack);

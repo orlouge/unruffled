@@ -1,5 +1,6 @@
 package io.github.orlouge.unruffled.mixin.enchanting;
 
+import io.github.orlouge.unruffled.Config;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.GrindstoneBlock;
 import net.minecraft.entity.player.PlayerEntity;
@@ -17,6 +18,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class GrindstoneBlockMixin {
     @Inject(method = "onUse", at = @At("HEAD"), cancellable = true)
     public void onUseTable(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit, CallbackInfoReturnable<ActionResult> cir) {
+        if (!Config.INSTANCE.get().enchantmentsConfig.disableGrindstone()) return;
         cir.setReturnValue(ActionResult.PASS);
         cir.cancel();
     }

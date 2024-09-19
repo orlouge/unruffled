@@ -1,5 +1,6 @@
 package io.github.orlouge.unruffled.mixin.worldgen;
 
+import io.github.orlouge.unruffled.Config;
 import net.minecraft.world.gen.chunk.ChunkGeneratorSettings;
 import net.minecraft.world.gen.chunk.ChunkNoiseSampler;
 import org.spongepowered.asm.mixin.Mixin;
@@ -11,6 +12,7 @@ public class ChunkNoiseSamplerMixin {
     @Redirect(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/gen/chunk/ChunkGeneratorSettings;oreVeins()Z"))
     public boolean disableOreVeins(ChunkGeneratorSettings instance) {
         // TODO: check if cov installed
+        if (!Config.INSTANCE.get().worldgenConfig.disableOreVeins()) return instance.oreVeins();
         return false;
     }
 }

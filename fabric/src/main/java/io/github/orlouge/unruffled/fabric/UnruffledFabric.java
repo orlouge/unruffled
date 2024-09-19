@@ -85,7 +85,7 @@ public class UnruffledFabric implements ModInitializer {
                     return lootManager.getLootTable(new Identifier(UnruffledMod.MOD_ID, "entities/iron_golem"));
                 } else if (id.equals(new Identifier(Identifier.DEFAULT_NAMESPACE, "entities/spider"))) {
                     return lootManager.getLootTable(new Identifier(UnruffledMod.MOD_ID, "entities/spider"));
-                } else if (id.equals(new Identifier(Identifier.DEFAULT_NAMESPACE, "entities/evoker"))) {
+                } else if (id.equals(new Identifier(Identifier.DEFAULT_NAMESPACE, "entities/evoker")) && Config.INSTANCE.get().mechanicsConfig.disableTotemOfUndying()) {
                     return lootManager.getLootTable(new Identifier(UnruffledMod.MOD_ID, "entities/evoker"));
                 } else if (id.equals(new Identifier(Identifier.DEFAULT_NAMESPACE, "entities/wither_skeleton"))) {
                     return lootManager.getLootTable(new Identifier(UnruffledMod.MOD_ID, "entities/wither_skeleton"));
@@ -104,16 +104,16 @@ public class UnruffledFabric implements ModInitializer {
 
         LootTableEvents.MODIFY.register((resourceManager, lootManager, id, tableBuilder, source) -> {
             if (source.isBuiltin()) {
-                if (Config.INSTANCE.get().lootCodicesAdd.containsKey(id)) {
-                    List<LootPoolEntry> entries = Config.INSTANCE.get().lootCodicesAdd.get(id).stream().map(
+                if (Config.INSTANCE.get().lootConfig.lootCodicesAdd().containsKey(id)) {
+                    List<LootPoolEntry> entries = Config.INSTANCE.get().lootConfig.lootCodicesAdd().get(id).stream().map(
                             number -> ItemEntry.builder(CustomItems.ANCIENT_CODEX).apply(
                                     SetNbtLootFunction.builder(AncientCodexItem.getNumberNbt(number))
                             ).build()
                     ).toList();
                     LootPool.Builder poolBuilder = LootPool.builder().with(entries).rolls(UniformLootNumberProvider.create(0, 1));
                     tableBuilder.pool(poolBuilder);
-                } else if (Config.INSTANCE.get().lootCodicesModify.containsKey(id)) {
-                    List<LootPoolEntry> entries = Config.INSTANCE.get().lootCodicesModify.get(id).stream().map(
+                } else if (Config.INSTANCE.get().lootConfig.lootCodicesModify().containsKey(id)) {
+                    List<LootPoolEntry> entries = Config.INSTANCE.get().lootConfig.lootCodicesModify().get(id).stream().map(
                             number -> ItemEntry.builder(CustomItems.ANCIENT_CODEX).apply(
                                     SetNbtLootFunction.builder(AncientCodexItem.getNumberNbt(number))
                             ).build()
@@ -125,8 +125,8 @@ public class UnruffledFabric implements ModInitializer {
             }
         });
 
-        if (Config.INSTANCE.get().sleepTime >= 0) {
-            EntitySleepEvents.ALLOW_SLEEP_TIME.register((player, pos, isNight) -> !isNight || (player.getWorld().getLunarTime() % 24000 < Config.INSTANCE.get().sleepTime /*player.getWorld().getAmbientDarkness() < 11*/ && !player.getWorld().isThundering()) ? ActionResult.FAIL : ActionResult.SUCCESS);
+        if (Config.INSTANCE.get().mechanicsConfig.sleepTime() >= 0) {
+            EntitySleepEvents.ALLOW_SLEEP_TIME.register((player, pos, isNight) -> !isNight || (player.getWorld().getLunarTime() % 24000 < Config.INSTANCE.get().mechanicsConfig.sleepTime() /*player.getWorld().getAmbientDarkness() < 11*/ && !player.getWorld().isThundering()) ? ActionResult.FAIL : ActionResult.SUCCESS);
         }
 
         for (BrewingPotionRecipe brewingPotionRecipe : UnruffledMod.POTION_RECIPES) {

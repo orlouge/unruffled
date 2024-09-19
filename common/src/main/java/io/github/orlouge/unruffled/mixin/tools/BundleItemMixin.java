@@ -1,5 +1,6 @@
 package io.github.orlouge.unruffled.mixin.tools;
 
+import io.github.orlouge.unruffled.Config;
 import net.minecraft.item.BundleItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -13,35 +14,33 @@ import java.util.Optional;
 
 @Mixin(BundleItem.class)
 public abstract class BundleItemMixin extends Item {
-    private static final int BUNDLE_MAX_STORAGE = 256;
-
     public BundleItemMixin(Settings settings) {
         super(settings);
     }
 
     @ModifyConstant(method = "getAmountFilled", constant = @Constant(floatValue = 64f))
     private static float modifyGetAmountFilled(float max) {
-        return (float) BUNDLE_MAX_STORAGE;
+        return (float) Config.INSTANCE.get().mechanicsConfig.bundleSize();
     }
 
     @ModifyConstant(method = "onStackClicked", constant = @Constant(intValue = 64))
     public int modifyOnStackClicked(int max) {
-        return BUNDLE_MAX_STORAGE;
+        return Config.INSTANCE.get().mechanicsConfig.bundleSize();
     }
 
     @ModifyConstant(method = "getItemBarStep", constant = @Constant(intValue = 64))
     public int modifyGetItemBarStep(int max) {
-        return BUNDLE_MAX_STORAGE;
+        return Config.INSTANCE.get().mechanicsConfig.bundleSize();
     }
 
     @ModifyConstant(method = "addToBundle", constant = @Constant(intValue = 64))
     private static int modifyAddToBundle(int max) {
-        return BUNDLE_MAX_STORAGE;
+        return Config.INSTANCE.get().mechanicsConfig.bundleSize();
     }
 
     @ModifyConstant(method = "appendTooltip", constant = @Constant(intValue = 64))
     public int modifyAppendTooltip(int max) {
-        return BUNDLE_MAX_STORAGE;
+        return Config.INSTANCE.get().mechanicsConfig.bundleSize();
     }
 
     /*
@@ -56,7 +55,7 @@ public abstract class BundleItemMixin extends Item {
 
     @Override
     public boolean canBeNested() {
-        return false;
+        return Config.INSTANCE.get().mechanicsConfig.bundleSize() <= 64;
     }
 
     @ModifyVariable(method = "addToBundle", at = @At("STORE"))

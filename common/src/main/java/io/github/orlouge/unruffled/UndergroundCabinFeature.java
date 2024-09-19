@@ -841,7 +841,7 @@ public class UndergroundCabinFeature extends Feature<DefaultFeatureConfig> {
         BlockEntity entity = world.getBlockEntity(pos);
         if (entity instanceof ChiseledBookshelfBlockEntity bookshelf) {
             BlockState state = world.getBlockState(pos);
-            List<Integer> codices = Config.INSTANCE.get().lootCodicesAdd.getOrDefault(UnruffledMod.BOOKSHELF_LOOT_TABLE, Collections.emptyList());
+            List<Integer> codices = Config.INSTANCE.get().lootConfig.lootCodicesAdd().getOrDefault(UnruffledMod.BOOKSHELF_LOOT_TABLE, Collections.emptyList());
             for (int i = 0; i < 6; i++) {
                 int pick = random.nextInt(codices.size() * 8 + 4);
                 boolean set = false;

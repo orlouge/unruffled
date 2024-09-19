@@ -1,15 +1,10 @@
 package io.github.orlouge.unruffled.items;
 
-import io.github.orlouge.unruffled.Config;
-import io.github.orlouge.unruffled.UnruffledMod;
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.item.*;
 import net.minecraft.util.Rarity;
 
-import java.util.Collections;
 import java.util.Map;
 
 public class CustomItems {
@@ -32,7 +27,4 @@ public class CustomItems {
             "magnetic", CustomItems.MAGNETIC_TRIDENT
     );
 
-    public static boolean isDisabled(Enchantment enchantment, ItemStack stack) {
-        return Config.isLoaded() && Config.INSTANCE.get().disabledEnchantments.contains(enchantment) && !(Config.INSTANCE.get().itemEnchantments.getOrDefault(stack.getItem(), Collections.emptyMap()).containsKey(enchantment));
-    }
 }

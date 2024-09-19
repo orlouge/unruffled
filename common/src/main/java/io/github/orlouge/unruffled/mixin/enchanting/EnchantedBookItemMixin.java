@@ -15,11 +15,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class EnchantedBookItemMixin {
     @Inject(method = "addEnchantment", at = @At("HEAD"), cancellable = true)
     private static void disableEnchantments(ItemStack stack, EnchantmentLevelEntry entry, CallbackInfo ci) {
-        if (Config.INSTANCE.get().disabledEnchantments.contains(entry.enchantment)) ci.cancel();
+        if (Config.INSTANCE.get().enchantmentsConfig.disabledEnchantments().contains(entry.enchantment)) ci.cancel();
     }
 
     @Inject(method = "hasGlint", at = @At("RETURN"), cancellable = true)
     public void disableGlint(ItemStack stack, CallbackInfoReturnable<Boolean> cir) {
-        cir.setReturnValue(false);
+        if (Config.INSTANCE.get().enchantmentsConfig.disableGlint()) cir.setReturnValue(false);
     }
 }

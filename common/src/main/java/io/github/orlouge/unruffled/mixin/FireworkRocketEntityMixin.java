@@ -1,5 +1,6 @@
 package io.github.orlouge.unruffled.mixin;
 
+import io.github.orlouge.unruffled.Config;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.projectile.FireworkRocketEntity;
 import net.minecraft.util.math.Vec3d;
@@ -23,10 +24,10 @@ public class FireworkRocketEntityMixin {
     @Redirect(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/math/Vec3d;add(DDD)Lnet/minecraft/util/math/Vec3d;", ordinal = 0))
     public Vec3d slowHorizontalRocket(Vec3d playerVelocity, double x, double y, double z) {
         double factor = 1;
-        if (this.shooter != null) {
+        if (!Config.INSTANCE.get().elytraConfig.disableRocketSpeedChanges() && this.shooter != null) {
             Vec3d direction = this.shooter.getRotationVector().normalize();
             factor = 0.5 + direction.getY() * 0.5;
-            factor = Math.min(1, Math.pow(factor, 5) + 0.04);
+            factor = Math.min(1, Math.pow(factor, Config.INSTANCE.get().elytraConfig.horizontalRocketSpeedReduction()) + Config.INSTANCE.get().elytraConfig.minRocketSpeed());
         }
         return playerVelocity.add(x * factor, y * factor, z * factor);
     }

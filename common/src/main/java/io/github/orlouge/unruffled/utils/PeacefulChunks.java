@@ -77,11 +77,11 @@ public class PeacefulChunks extends PersistentState {
     }
 
     public boolean isPeaceful(ChunkPos pos) {
-        return Config.INSTANCE.get().peacefulChunks && !this.chunkPlayerMap.getOrDefault(pos, Collections.emptySet()).isEmpty();
+        return Config.INSTANCE.get().mechanicsConfig.peacefulChunks() && !this.chunkPlayerMap.getOrDefault(pos, Collections.emptySet()).isEmpty();
     }
 
     public Set<UUID> peacefulChunkBedOwners(ChunkPos pos) {
-        return Config.INSTANCE.get().peacefulChunks ? this.chunkPlayerMap.getOrDefault(pos, Collections.emptySet()) : Collections.emptySet();
+        return Config.INSTANCE.get().mechanicsConfig.peacefulChunks() ? this.chunkPlayerMap.getOrDefault(pos, Collections.emptySet()) : Collections.emptySet();
     }
 
     public static PeacefulChunks get(PersistentStateManager persistentStateManager) {

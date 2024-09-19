@@ -1,5 +1,6 @@
 package io.github.orlouge.unruffled.mixin.tools;
 
+import io.github.orlouge.unruffled.Config;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
@@ -33,6 +34,7 @@ public abstract class AnvilScreenHandlerMixin extends ForgingScreenHandler {
 
     @Inject(method = "updateResult", at = @At(value = "INVOKE", shift = At.Shift.BEFORE, target = "Lnet/minecraft/screen/AnvilScreenHandler;sendContentUpdates()V"))
     public void modifyResult(CallbackInfo ci) {
+        if (!Config.INSTANCE.get().enchantmentsConfig.disableEnchantingTable()) return;
         this.levelCost.set(0);
     }
 

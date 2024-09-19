@@ -1,6 +1,7 @@
 package io.github.orlouge.unruffled.mixin.potions;
 
 import com.google.common.collect.ImmutableList;
+import io.github.orlouge.unruffled.Config;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.potion.Potion;
 import org.spongepowered.asm.mixin.Mixin;
@@ -22,7 +23,7 @@ public class PotionMixin {
             for (StatusEffectInstance effect : cir.getReturnValue()) {
                 if (!effect.getEffectType().isInstant() && !effect.isInfinite()) {
                     StatusEffectInstance longerEffect = new StatusEffectInstance(effect);
-                    longerEffect.duration = longerEffect.mapDuration(duration -> duration * 2);
+                    longerEffect.duration = longerEffect.mapDuration(duration -> (int) Math.ceil(duration * Config.INSTANCE.get().mechanicsConfig.potionDurationFactor()));
                     effects.add(longerEffect);
                 } else {
                     effects.add(effect);

@@ -1,5 +1,6 @@
 package io.github.orlouge.unruffled.mixin.trading;
 
+import io.github.orlouge.unruffled.Config;
 import io.github.orlouge.unruffled.Trades;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.passive.MerchantEntity;
@@ -13,6 +14,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Mixin(VillagerEntity.class)
@@ -26,10 +28,15 @@ public abstract class VillagerEntityMixin extends MerchantEntity {
     @Inject(method = "fillRecipes", at = @At(value = "HEAD"), cancellable = true)
     public void modifyOffers(CallbackInfo ci) {
         VillagerData villagerData = this.getVillagerData();
-        List<TradeOffers.Factory[]> offersByLevel = Trades.VILLAGER_TRADES.get(villagerData.getProfession());
-        if (offersByLevel != null && offersByLevel.size() > villagerData.getLevel()) {
-            this.fillRecipesFromPool(this.getOffers(), offersByLevel.get(villagerData.getLevel()), 2);
-            ci.cancel();
-        }
+        Config.INSTANCE.get().tradesConfig.villagerTrades().ifPresent(trades -> {
+            Trades.ConfiguredVillagerTrades villagerTrades = trades.get(villagerData.getProfession());
+            if (villagerTrades != null && villagerTrades.enabled() && villagerTrades.pools().length >= villagerData.getLevel()) {
+                Trades.ConfiguredVillagerPool pool = villagerTrades.pools()[villagerData.getLevel() - 1];
+                this.fillRecipesFromPool(this.getOffers(), Arrays.stream(pool.trades()).map(
+                    Trades.ConfiguredTrade::toFactory
+                ).toArray(TradeOffers.Factory[]::new), pool.count());
+                ci.cancel();;
+            }
+        });
     }
 }

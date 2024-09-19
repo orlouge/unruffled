@@ -48,7 +48,6 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements Ha
         PeacefulChunks peacefulChunks = PeacefulChunks.get(this.getServerWorld().getPersistentStateManager());
         ChunkPos centerPos = peacefulChunks.getCenterPos(this.getUuid());
         if (sendMessage && centerPos != null && centerPos.equals(new ChunkPos(this.spawnPointPosition))) {
-            System.out.println("Setting backup spawn point " + this.spawnPointPosition + " (new spawn " + pos);
             this.setBackupSpawnPoint(this.spawnPointPosition);
             this.setBackupSpawnDimension(this.spawnPointDimension);
             this.setBackupSpawnAngle(this.spawnAngle);

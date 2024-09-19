@@ -1,5 +1,6 @@
 package io.github.orlouge.unruffled.mixin.trading;
 
+import io.github.orlouge.unruffled.Config;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.WanderingTraderManager;
 import net.minecraft.world.level.ServerWorldProperties;
@@ -20,7 +21,7 @@ public class WanderingTraderManagerMixin {
 
     @ModifyConstant(method = "spawn", constant = @Constant(intValue = 25))
     public int decreaseMinimumChanceAndIncrement(int constant) {
-        return 5;
+        return Config.INSTANCE.get().mechanicsConfig.wanderingSpawnFrequency();
     }
 
     @ModifyConstant(method = "spawn", constant = @Constant(intValue = 75))

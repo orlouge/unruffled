@@ -15,7 +15,7 @@ public class BowItemMixin {
     @ModifyArg(method = "onStoppedUsing", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;spawnEntity(Lnet/minecraft/entity/Entity;)Z"))
     public Entity modifyArrowProperties(Entity par1) {
         PersistentProjectileEntity arrowEntity = (PersistentProjectileEntity) par1;
-        if (Config.INSTANCE.get().disabledEnchantments.contains(Enchantments.POWER)) {
+        if (Config.INSTANCE.get().enchantmentsConfig.disabledEnchantments().contains(Enchantments.POWER)) {
             arrowEntity.setDamage(arrowEntity.getDamage() + 2.);
         }
         return arrowEntity;

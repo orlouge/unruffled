@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class MiningToolItemMixin {
     @Inject(method = "getMiningSpeedMultiplier", cancellable = true, at = @At("RETURN"))
     public void increaseMiningSpeedMultiplier(ItemStack stack, BlockState state, CallbackInfoReturnable<Float> cir) {
-        if (Config.INSTANCE.get().disabledEnchantments.contains(Enchantments.EFFICIENCY)) {
+        if (Config.INSTANCE.get().enchantmentsConfig.disabledEnchantments().contains(Enchantments.EFFICIENCY)) {
             float mul = cir.getReturnValue();
             cir.setReturnValue(Math.max(mul * mul / 2, mul));
         }

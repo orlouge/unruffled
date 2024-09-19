@@ -1,8 +1,10 @@
 package io.github.orlouge.unruffled.mixin.hunger;
 
+import io.github.orlouge.unruffled.Config;
 import io.github.orlouge.unruffled.UnruffledModClient;
 import io.github.orlouge.unruffled.interfaces.ExtendedHungerManager;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -26,6 +28,10 @@ public abstract class InGameHudMixin {
     @Shadow public abstract void renderExperienceBar(DrawContext context, int x);
 
     @Shadow private long heartJumpEndTick;
+
+    @Shadow private int scaledWidth;
+
+    @Shadow public abstract TextRenderer getTextRenderer();
 
     @Inject(method = "renderExperienceBar", at = @At("HEAD"), cancellable = true)
     public void redirectRenderXpBar(DrawContext context, int x, CallbackInfo ci) {
@@ -53,6 +59,18 @@ public abstract class InGameHudMixin {
                 } else {
                     context.drawTexturedQuad(ICONS, x, x + width, y, y + 5, 0, 0f, (float) width / 256f, 69f / 256f, (69f + 5f) / 256f, 1 / regen, 1 / regen, 1, 1);
                 }
+            }
+        }
+        if (Config.INSTANCE.get().enchantmentsConfig.showLevelNumber()) {
+            if (this.client.player.experienceLevel > 0) {
+                String levelString = "" + this.client.player.experienceLevel;
+                int k = (this.scaledWidth - this.getTextRenderer().getWidth(levelString)) / 2;
+                int l = this.scaledHeight - 31 - 4;
+                context.drawText(this.getTextRenderer(), levelString, k + 1, l, 0, false);
+                context.drawText(this.getTextRenderer(), levelString, k - 1, l, 0, false);
+                context.drawText(this.getTextRenderer(), levelString, k, l + 1, 0, false);
+                context.drawText(this.getTextRenderer(), levelString, k, l - 1, 0, false);
+                context.drawText(this.getTextRenderer(), levelString, k, l, 8453920, false);
             }
         }
         ci.cancel();
