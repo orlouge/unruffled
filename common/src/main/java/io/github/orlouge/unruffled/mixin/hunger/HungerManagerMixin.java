@@ -47,7 +47,12 @@ public abstract class HungerManagerMixin implements ExtendedHungerManager {
     public void onUpdate(PlayerEntity player, CallbackInfo ci) {
         Vec3d playerPos = player.getPos();
 
-        baseWeariness = baseWeariness * 0.9998f;
+        if (player.getVehicle() != null && new Vec3d(player.getVelocity().getX(), 0, player.getVelocity().getZ()).length() < 0.01f) {
+            baseWeariness = baseWeariness * 0.999f;
+        } else {
+            baseWeariness = baseWeariness * 0.9998f;
+        }
+
         DimensionType currentDimension = player.getWorld().getDimension();
         if (currentDimension != dimensionType) {
             averagePos = playerPos;
