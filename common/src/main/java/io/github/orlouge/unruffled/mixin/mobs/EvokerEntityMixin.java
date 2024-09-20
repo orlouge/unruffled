@@ -27,6 +27,7 @@ public abstract class EvokerEntityMixin extends SpellcastingIllagerEntity {
     @Override
     public void onDeath(DamageSource damageSource) {
         if (!this.raidSpawned && this.getRaid() == null && damageSource.getAttacker() instanceof PlayerEntity playerEntity) {
+            /*
             if (Config.INSTANCE.get().mechanicsConfig.badOmenFromEvoker()) {
                 StatusEffectInstance playerBadOmen = playerEntity.getStatusEffect(StatusEffects.BAD_OMEN);
                 int level = 1;
@@ -43,6 +44,7 @@ public abstract class EvokerEntityMixin extends SpellcastingIllagerEntity {
                     playerEntity.addStatusEffect(newPlayerBadOmen);
                 }
             }
+             */
             if (Config.INSTANCE.get().mechanicsConfig.evokerDropsEvilTotem()) {
                 this.dropItem(CustomItems.EVIL_TOTEM);
             }
