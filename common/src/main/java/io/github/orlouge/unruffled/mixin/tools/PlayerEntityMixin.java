@@ -17,6 +17,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(PlayerEntity.class)
 public abstract class PlayerEntityMixin extends LivingEntity {
@@ -29,11 +30,15 @@ public abstract class PlayerEntityMixin extends LivingEntity {
 
     @Shadow public abstract ItemStack getEquippedStack(EquipmentSlot slot);
 
+    @Shadow public abstract boolean isCreative();
+
+    @Shadow public abstract boolean isSpectator();
+
     @Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;updateTurtleHelmet()V", shift = At.Shift.AFTER))
     public void updateBadOmenEvilTotem(CallbackInfo ci) {
         unruffled_lastBadOmenCheckTicks++;
         if (unruffled_lastBadOmenCheckTicks > 15) {
-            if (this.getEquippedStack(EquipmentSlot.OFFHAND).isOf(CustomItems.EVIL_TOTEM) && Config.INSTANCE.get().mechanicsConfig.badOmenFromEvoker()) {
+            if (this.getEquippedStack(EquipmentSlot.OFFHAND).isOf(CustomItems.EVIL_TOTEM) && Config.INSTANCE.get().mechanicsConfig.badOmenFromEvilTotem()) {
                 unruffled_accumulatedBadOmenTicks += unruffled_lastBadOmenCheckTicks;
                 if ((Object) this instanceof ServerPlayerEntity serverPlayer) {
                     if (serverPlayer.getServerWorld().getRaidAt(this.getBlockPos()) == null) {
@@ -46,6 +51,14 @@ public abstract class PlayerEntityMixin extends LivingEntity {
                 unruffled_accumulatedBadOmenTicks = 0;
             }
             unruffled_lastBadOmenCheckTicks = 0;
+        }
+    }
+
+    @Inject(method = "hasReducedDebugInfo", at = @At("HEAD"), cancellable = true)
+    public void overrideReducedDebugInfo(CallbackInfoReturnable<Boolean> cir) {
+        if (Config.INSTANCE.get().mechanicsConfig.forceReducedDebugInfo() && !this.isCreative() && !this.isSpectator()) {
+            cir.setReturnValue(true);
+            cir.cancel();
         }
     }
 }

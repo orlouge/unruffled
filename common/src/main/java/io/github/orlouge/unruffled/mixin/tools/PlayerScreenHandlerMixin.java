@@ -1,5 +1,6 @@
 package io.github.orlouge.unruffled.mixin.tools;
 
+import io.github.orlouge.unruffled.Config;
 import io.github.orlouge.unruffled.items.CustomItems;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
@@ -19,7 +20,7 @@ public class PlayerScreenHandlerMixin {
         @Override
         public boolean canTakeItems(PlayerEntity playerEntity) {
             ItemStack stack = this.getStack();
-            return (stack.isEmpty() || playerEntity.isCreative() || !stack.isOf(CustomItems.EVIL_TOTEM)) && super.canTakeItems(playerEntity);
+            return (stack.isEmpty() || playerEntity.isCreative() || !stack.isOf(CustomItems.EVIL_TOTEM) || !Config.INSTANCE.get().mechanicsConfig.evilTotemBinding()) && super.canTakeItems(playerEntity);
         }
     }
 }

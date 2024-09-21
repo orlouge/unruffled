@@ -104,10 +104,10 @@ public class Config {
             float staminaDepletionRate, float travelPenaltyFactor, float maxTravelPenalty,
             float hungerDepletionRate, float staminaRegenerationRate, float inventoryWeightPenaltyFactor,
             float attackExhaustionFactor, boolean attackAlwaysAllowInTime,
-            float eatCooldownFactor, float wearinessIncreaseFactor
+            float eatCooldownFactor, float wearinessIncreaseFactor, float wearinessDecreaseFactor, float wearinessDecreaseFactorOnStillEntities
     ) {
         public HungerConfig() {
-            this(0.25f, 0.003f, 2.8f, 0.2f, 0.0028f, 1f, 2f, true, 0.2f, 0.1f);
+            this(0.25f, 0.003f, 2.8f, 0.2f, 0.0028f, 1f, 2f, true, 0.2f, 0.1f, 0.9998f, 0.9993f);
         }
 
         public static Codec<HungerConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group(
@@ -120,7 +120,9 @@ public class Config {
                 Codec.FLOAT.fieldOf("attack_exhaustion_factor").forGetter(HungerConfig::attackExhaustionFactor),
                 Codec.BOOL.fieldOf("attack_always_allow_in_time").forGetter(HungerConfig::attackAlwaysAllowInTime),
                 Codec.FLOAT.fieldOf("eat_cooldown_factor").forGetter(HungerConfig::eatCooldownFactor),
-                Codec.FLOAT.fieldOf("weariness_increase_factor").forGetter(HungerConfig::wearinessIncreaseFactor)
+                Codec.FLOAT.fieldOf("weariness_increase_factor").forGetter(HungerConfig::wearinessIncreaseFactor),
+            Codec.FLOAT.fieldOf("weariness_decrease_factor").forGetter(HungerConfig::wearinessDecreaseFactor),
+            Codec.FLOAT.fieldOf("weariness_decrease_factor_riding_still_entities").forGetter(HungerConfig::wearinessDecreaseFactorOnStillEntities)
         ).apply(instance, HungerConfig::new));
     }
 
@@ -140,7 +142,7 @@ public class Config {
             Codec.BOOL.fieldOf("disable_grindstone").forGetter(EnchantmentsConfig::disableGrindstone),
             Codec.BOOL.fieldOf("disable_repair_xp_cost").forGetter(EnchantmentsConfig::disableRepairXpCost),
             Codec.BOOL.fieldOf("disable_glint").forGetter(EnchantmentsConfig::disableGlint),
-            Codec.BOOL.fieldOf("display_level_number").forGetter(EnchantmentsConfig::showLevelNumber),
+            Codec.BOOL.fieldOf("display_xp_level_over_bar").forGetter(EnchantmentsConfig::showLevelNumber),
             ENCHANTMENT_SET_CODEC.fieldOf("unselectable_enchantments").forGetter(config -> config.unobtainableEnchantments),
             ENCHANTMENT_SET_CODEC.fieldOf("disabled_enchantments").forGetter(config -> config.disabledEnchantments),
             Codec.unboundedMap(Registries.ITEM.getCodec(), ENCHANTMENT_MAP_CODEC).fieldOf("intrinsic_enchantments").forGetter(config -> config.itemEnchantments)
@@ -170,13 +172,19 @@ public class Config {
 
     public record MechanicsConfig(
         boolean peacefulChunks, int sleepTime, float dropSpreadFactor,
-        boolean disableTotemOfUndying, boolean evokerDropsEvilTotem, boolean badOmenFromEvoker, boolean badOmenFromCaptain,
-        boolean canTeleportMobs, float potionDurationFactor, int bundleSize, int wanderingSpawnFrequency) {
+        boolean disableTotemOfUndying, boolean evokerDropsEvilTotem, boolean badOmenFromEvilTotem, boolean badOmenFromCaptain,
+        boolean evilTotemBinding,
+        boolean canTeleportMobs, float potionDurationFactor, int bundleSize, int wanderingSpawnFrequency,
+        boolean zombiesDontTargetVillagers,
+        boolean forceReducedDebugInfo, int maxMapSize) {
         public MechanicsConfig() {
             this(
                 true, 16000, 0.2f,
                 true, true, true, false,
-                true, 2f, 256, 5
+                true,
+                true, 2f, 256, 5,
+                true,
+                false, 4
             );
         }
         public static final Codec<MechanicsConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group(
@@ -184,13 +192,17 @@ public class Config {
             Codec.INT.fieldOf("sleep_time___set_to_negative_to_disable").forGetter(config -> config.sleepTime),
             Codec.FLOAT.fieldOf("drop_spread_factor").forGetter(config -> config.dropSpreadFactor),
             Codec.BOOL.fieldOf("disable_totem_of_undying").forGetter(config -> config.disableTotemOfUndying),
-            Codec.BOOL.fieldOf("evoker_drops_evil_totem").forGetter(config -> config.evokerDropsEvilTotem),
-            Codec.BOOL.fieldOf("evoker_gives_bad_omen").forGetter(config -> config.badOmenFromEvoker),
-            Codec.BOOL.fieldOf("captain_gives_bad_omen").forGetter(config -> config.badOmenFromCaptain),
+            Codec.BOOL.fieldOf("evil_totem_dropped_by_evoker").forGetter(config -> config.evokerDropsEvilTotem),
+            Codec.BOOL.fieldOf("evil_totem_bad_omen").forGetter(config -> config.badOmenFromEvilTotem),
+            Codec.BOOL.fieldOf("illager_captain_gives_bad_omen").forGetter(config -> config.badOmenFromCaptain),
+            Codec.BOOL.fieldOf("evil_totem_binding").forGetter(config -> config.evilTotemBinding),
             Codec.BOOL.fieldOf("potion_can_teleport_mobs").forGetter(config -> config.canTeleportMobs),
             Codec.FLOAT.fieldOf("potion_duration_factor").forGetter(config -> config.potionDurationFactor),
             Codec.INT.fieldOf("bundle_size").forGetter(config -> config.bundleSize),
-            Codec.INT.fieldOf("wandering_trader_spawn_frequency").forGetter(config -> config.wanderingSpawnFrequency)
+            Codec.INT.fieldOf("wandering_trader_spawn_frequency").forGetter(config -> config.wanderingSpawnFrequency),
+            Codec.BOOL.fieldOf("disable_zombie_targeting_villagers").forGetter(config -> config.zombiesDontTargetVillagers),
+            Codec.BOOL.fieldOf("force_reduced_debug_info_in_survival").forGetter(config -> config.forceReducedDebugInfo),
+            Codec.INT.fieldOf("max_map_size").forGetter(config -> config.maxMapSize)
             ).apply(instance, MechanicsConfig::new));
     }
 
