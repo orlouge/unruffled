@@ -27,6 +27,7 @@ import net.minecraft.potion.Potions;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.tag.TagKey;
+import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonSerializer;
 import net.minecraft.world.gen.feature.ConfiguredFeature;
@@ -132,6 +133,8 @@ public class UnruffledMod {
             if (player.getHungerManager() instanceof ExtendedHungerManager ext) {
                 ext.addStaminaIfCanAttack(-0.02f, player);
             }
+            player.updateLastActionTime();
+            player.swingHand(Hand.MAIN_HAND, false);
         });
         for (Item item : Registries.ITEM.stream().toList()) {
             if (item.isFood() && item.getMaxCount() > 16) {

@@ -17,8 +17,8 @@ import net.minecraft.world.dimension.DimensionType;
 public interface ExtendedHungerManager {
     default float getAttackExhaustion(PlayerEntity player, float cooldownProgress) {
         double attackSpeed = player.getAttributeValue(EntityAttributes.GENERIC_ATTACK_SPEED);
-        cooldownProgress = (float) Math.pow(cooldownProgress, 3f);
-        return (float) Math.min(6f, Math.max(0.02, Config.INSTANCE.get().hungerConfig.attackExhaustionFactor() *  20 * getStaminaRegenerationRate(0f) / (cooldownProgress * attackSpeed * getStaminaDepletionRate())));
+        cooldownProgress = (float) Math.pow(cooldownProgress, 2.5f);
+        return (float) Math.min(6f, Math.max(0.02, Config.INSTANCE.get().hungerConfig.attackExhaustionFactor() * 20 * getStaminaRegenerationRate(0f) / (cooldownProgress * attackSpeed * getStaminaDepletionRate())));
     }
 
     static boolean canAttack(PlayerEntity player, float stamina) {
@@ -37,15 +37,15 @@ public interface ExtendedHungerManager {
     default float getTargetWeariness() {
         float malus = this.getWearinessMalus();
         return Math.max(0f, Math.min(1f,
-                (float) Math.tanh(2f * this.getBaseWeariness() * (1f + 0.5f * malus)) + 0.3f * malus
+                (float) Math.tanh(2f * this.getBaseWeariness() * (1f + 0.5f * malus)) + 0.4f * malus
         ));
     }
 
     default float getWearinessMalus() {
         return Math.max(0f, Math.min(1f,
                1f - 1f / this.getWeight() +
-               1f - Math.min(Math.min(this.getHealth(), this.getFoodLevel()) + 2f, 10f) / 10f +
-               (!(getDimension() == null || getDimension().bedWorks()) || isNight() || isUnderground() ? 0.5f : 0f)
+               1f - Math.min(Math.min(this.getHealth(), this.getFoodLevel()) + 1f, 10f) / 10f +
+               (!(getDimension() == null || getDimension().bedWorks()) || isNight() || isUnderground() ? 0.4f : 0f)
         ));
     }
 

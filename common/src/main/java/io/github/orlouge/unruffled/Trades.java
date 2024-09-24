@@ -35,9 +35,9 @@ import java.util.stream.IntStream;
 
 public class Trades {
     private static final ConfiguredTrade[] WANDERING_TRADER_BUY = new ConfiguredTrade[] {
-            buyItemForOneEmerald(Items.DIAMOND, 1, 64, 12),
-            buyItem(Items.DIAMOND, 1, 2, 32, 12),
-            buyItem(Items.DIAMOND, 1, 3, 32, 12),
+            buyItemForOneEmerald(Items.DIAMOND, 1, 128, 12),
+            buyItem(Items.DIAMOND, 1, 3, 42, 12),
+            buyItem(Items.DIAMOND, 1, 4, 32, 12),
             buyItem(CustomItems.EVIL_TOTEM, 1, 64, 12, 12)
     };
     private static final ConfiguredTrade[] WANDERING_TRADER_CODEX = IntStream.rangeClosed(1, 50).mapToObj(
@@ -81,8 +81,8 @@ public class Trades {
             sellItem(Items.PHANTOM_MEMBRANE, 4, 1, 4, 1),
             sellItem(Items.RECOVERY_COMPASS, 16, 1, 1, 1),
             sellItem(Items.ENDER_EYE, 1, 1, 12, 1),
-            sellWithItemEnchantments(CustomItems.SACRED_SWORD, 32, 1, 1, 10),
-            sellItem(Items.LODESTONE, 8, 1, 12, 10, 0.2F),
+            sellWithItemEnchantments(CustomItems.SACRED_SWORD, 48, 1, 1, 10),
+            sellItem(Items.LODESTONE, 24, 1, 1, 10, 0.2F),
     };
     private static final ConfiguredTrade[] WANDERING_TRADER_POTIONS = new ConfiguredTrade[] {
             sellWithPotion(Items.SPLASH_POTION, Potions.STRONG_HEALING, 1, 1, 16, 1),
@@ -150,7 +150,7 @@ public class Trades {
                             buyAncientCodex(30, 64, 1, 10)
                     },
                     new ConfiguredTrade[] {
-                            sellItem(Items.LODESTONE,  4, 1, 12, 10, 0.2F),
+                            sellItem(Items.LODESTONE,  32, 1, 2, 10, 0.2F),
                             buyAncientCodex(40, 64, 1, 10),
                     },
                     new ConfiguredTrade[] {
