@@ -583,10 +583,10 @@ public class UndergroundCabinFeature extends Feature<DefaultFeatureConfig> {
     static {
         WALL_TEMPLATES.add(8, BREWING_ROOM);
         WALL_TEMPLATES.add(6, CART_ROOM);
+        WALL_TEMPLATES.add(6, LODESTONE_ROOM);
         WALL_TEMPLATES.add(5, BED_ROOM);
         WALL_TEMPLATES.add(4, FURNACE_ROOM);
         WALL_TEMPLATES.add(4, SMITHING_ROOM);
-        WALL_TEMPLATES.add(4, LODESTONE_ROOM);
         WALL_TEMPLATES.add(3, ARCHAEOLOGY_ROOM);
         WALL_TEMPLATES.add(2, LIBRARY_ROOM);
         WALL_TEMPLATES.add(2, CAULDRON_ROOM);
