@@ -155,8 +155,10 @@ public class UndergroundPondFeature extends Feature<DefaultFeatureConfig> {
         }
 
 
-        for (int y = world.getSeaLevel(); y < world.getHeight(); y++) {
-            if (world.getBlockState(new BlockPos(origin.getX(), y, origin.getZ())).isAir()) {
+        boolean replaceOnWater = random.nextInt(5) == 0;
+        for (int y = replaceOnWater ? 40 : world.getSeaLevel(); y < world.getHeight(); y++) {
+            BlockState topBlock = world.getBlockState(new BlockPos(origin.getX(), y, origin.getZ()));
+            if (topBlock.isAir() || (replaceOnWater && topBlock.isLiquid())) {
                 BlockPos surfacePos = new BlockPos(origin.getX(), y - 1, origin.getZ());
                 BlockState surfaceBlock = world.getBlockState(surfacePos);
                 boolean replace = true;

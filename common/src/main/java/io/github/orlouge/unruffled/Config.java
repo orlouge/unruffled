@@ -10,6 +10,7 @@ import com.mojang.serialization.codecs.ListCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.Item;
+import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Lazy;
@@ -31,6 +32,7 @@ public class Config {
     public final WorldgenConfig worldgenConfig;
     public final LootConfig lootConfig;
     public final Trades.TradesConfig tradesConfig;
+    public final StackSizeConfig stackSizeConfig;
 
     public static final String CONFIG_FNAME = Platform.getConfigDirectory() + "/" + UnruffledMod.MOD_ID + ".json";
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
@@ -72,13 +74,13 @@ public class Config {
     public Config() {
         this(
             new HungerConfig(), new EnchantmentsConfig(), new ElytraConfig(), new MechanicsConfig(),
-            new WorldgenConfig(), new LootConfig(), Trades.DEFAULT_CONFIG
+            new WorldgenConfig(), new LootConfig(), Trades.DEFAULT_CONFIG, new StackSizeConfig()
         );
     }
 
     public Config(
         HungerConfig hungerConfig, EnchantmentsConfig enchantmentsConfig, ElytraConfig elytraConfig, MechanicsConfig mechanicsConfig,
-        WorldgenConfig worldgenConfig, LootConfig lootConfig, Trades.TradesConfig tradesConfig) {
+        WorldgenConfig worldgenConfig, LootConfig lootConfig, Trades.TradesConfig tradesConfig, StackSizeConfig stackSizeConfig) {
         this.hungerConfig = hungerConfig;
         this.tradesConfig = tradesConfig;
         this.worldgenConfig = worldgenConfig;
@@ -86,6 +88,7 @@ public class Config {
         this.mechanicsConfig = mechanicsConfig;
         this.enchantmentsConfig = enchantmentsConfig;
         this.lootConfig = lootConfig;
+        this.stackSizeConfig = stackSizeConfig;
     }
 
     public static Codec<Config> CODEC = RecordCodecBuilder.create(instance -> instance.group(
@@ -95,7 +98,8 @@ public class Config {
             MechanicsConfig.CODEC.fieldOf("mechanics").forGetter(config -> config.mechanicsConfig),
             WorldgenConfig.CODEC.fieldOf("worldgen").forGetter(config -> config.worldgenConfig),
             LootConfig.CODEC.fieldOf("loot").forGetter(config -> config.lootConfig),
-            Trades.TradesConfig.CODEC.fieldOf("trades").forGetter(config -> config.tradesConfig)
+            Trades.TradesConfig.CODEC.fieldOf("trades").forGetter(config -> config.tradesConfig),
+            StackSizeConfig.CODEC.fieldOf("stack_size").forGetter(config -> config.stackSizeConfig)
     ).apply(instance, Config::new));
 
     public static final Lazy<Config> INSTANCE = new Lazy<>(Config::read);
@@ -182,7 +186,7 @@ public class Config {
                 true, 16000, 0.2f,
                 true, true, true, false,
                 true,
-                true, 2f, 256, 5,
+                true, 2f, 256, 3,
                 true,
                 false, 4
             );
@@ -227,5 +231,21 @@ public class Config {
             Codec.unboundedMap(Identifier.CODEC, new ListCodec<>(Codecs.rangedInt(1, 50))).fieldOf("ancient_codices_numbers_chest").forGetter(config -> config.lootCodicesAdd),
             Codec.unboundedMap(Identifier.CODEC, new ListCodec<>(Codecs.rangedInt(1, 50))).fieldOf("ancient_codices_numbers_archaeology").forGetter(config -> config.lootCodicesModify)
         ).apply(instance, LootConfig::new));
+    }
+
+    public record StackSizeConfig(int foodStackSize, Map<Item, Integer> itemStackSize) {
+        public StackSizeConfig() {
+            this(16, Map.of(
+                Items.ROTTEN_FLESH, 64, Items.SPIDER_EYE, 64,
+                Items.PUFFERFISH, 64, Items.CHORUS_FRUIT, 64,
+                Items.DRIED_KELP, 64, Items.POTION, 16
+                )
+            );
+        }
+
+        public static final Codec<StackSizeConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+            Codec.INT.fieldOf("food").forGetter(config -> config.foodStackSize),
+            Codec.unboundedMap(Registries.ITEM.getCodec(), Codec.INT).fieldOf("items").forGetter(config -> config.itemStackSize)
+        ).apply(instance, StackSizeConfig::new));
     }
 }

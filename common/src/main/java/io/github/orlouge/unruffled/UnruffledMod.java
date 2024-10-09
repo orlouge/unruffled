@@ -136,12 +136,18 @@ public class UnruffledMod {
             player.updateLastActionTime();
             player.swingHand(Hand.MAIN_HAND, false);
         });
-        for (Item item : Registries.ITEM.stream().toList()) {
-            if (item.isFood() && item.getMaxCount() > 16) {
-                ((ItemAccessor) item).setMaxCount(16);
+        Config.StackSizeConfig stackSizeConfig = Config.INSTANCE.get().stackSizeConfig;
+        if (stackSizeConfig.foodStackSize() != 64) {
+            for (Item item : Registries.ITEM.stream().toList()) {
+                if (item.isFood() && item.getMaxCount() > 16) {
+                    ((ItemAccessor) item).setMaxCount(stackSizeConfig.foodStackSize());
+                }
             }
         }
-        ((ItemAccessor) Items.POTION).setMaxCount(16);
+        for (Map.Entry<Item, Integer> itemStackSize : stackSizeConfig.itemStackSize().entrySet()) {
+            ((ItemAccessor) itemStackSize.getKey()).setMaxCount(itemStackSize.getValue());
+        }
+        //((ItemAccessor) Items.POTION).setMaxCount(16);
         //((ToolMaterialsAccessor) (Object) ToolMaterials.GOLD).setItemDurability(200);
     }
 

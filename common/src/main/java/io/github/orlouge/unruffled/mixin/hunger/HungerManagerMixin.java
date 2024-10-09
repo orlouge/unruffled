@@ -113,7 +113,7 @@ public abstract class HungerManagerMixin implements ExtendedHungerManager {
         }
         if (player.hasStatusEffect(StatusEffects.SLOWNESS)) {
             staminaRegeneration = Math.max(
-                    this.getStaminaRegenerationRate(0),
+                    this.getStaminaRegenerationRate(1),
                     staminaRegeneration / (1.5f + 0.5f * (float) player.getStatusEffect(StatusEffects.SLOWNESS).getAmplifier())
             );
         }

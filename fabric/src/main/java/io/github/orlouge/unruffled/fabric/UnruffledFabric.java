@@ -119,8 +119,19 @@ public class UnruffledFabric implements ModInitializer {
                             ).build()
                     ).toList();
                     tableBuilder.modifyPools(pool -> pool.with(entries));
-                } else if (id.equals(LootTables.RUINED_PORTAL_CHEST)) {
+                }
+                if (id.equals(LootTables.RUINED_PORTAL_CHEST)) {
                     tableBuilder.pools(List.of(lootManager.getLootTable(new Identifier(UnruffledMod.MOD_ID, "chests/ruined_portal_extra")).pools));
+                } else if (id.equals(LootTables.SHIPWRECK_MAP_CHEST)) {
+                    tableBuilder.pools(List.of(lootManager.getLootTable(new Identifier(UnruffledMod.MOD_ID, "chests/shipwreck_map")).pools));
+                } else if (id.equals(LootTables.BASTION_TREASURE_CHEST)) {
+                    tableBuilder.pools(List.of(lootManager.getLootTable(new Identifier(UnruffledMod.MOD_ID, "chests/bastion_treasure")).pools));
+                } else if (id.equals(LootTables.UNDERWATER_RUIN_BIG_CHEST)) {
+                    tableBuilder.pools(List.of(lootManager.getLootTable(new Identifier(UnruffledMod.MOD_ID, "chests/underwater_ruin_big")).pools));
+                } else if (id.equals(LootTables.JUNGLE_TEMPLE_CHEST)) {
+                    tableBuilder.pools(List.of(lootManager.getLootTable(new Identifier(UnruffledMod.MOD_ID, "chests/jungle_temple")).pools));
+                } else if (id.equals(LootTables.VILLAGE_CARTOGRAPHER_CHEST)) {
+                    tableBuilder.pools(List.of(lootManager.getLootTable(new Identifier(UnruffledMod.MOD_ID, "chests/village_cartographer")).pools));
                 }
             }
         });

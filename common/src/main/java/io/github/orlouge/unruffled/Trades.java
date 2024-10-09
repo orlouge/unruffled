@@ -71,6 +71,7 @@ public class Trades {
             sellItem(Items.LIGHT_GRAY_GLAZED_TERRACOTTA, 1, 12, 64, 1)
     };
     private static final ConfiguredTrade[] WANDERING_TRADER_ASSORTED = new ConfiguredTrade[] {
+            sellItem(Items.SALMON, 1, 12, 12, 1),
             sellItem(Items.FEATHER, 1, 16, 12, 1),
             sellItem(Items.FERMENTED_SPIDER_EYE, 1, 4, 12, 1),
             sellItem(Items.BUNDLE, 1, 1, 12, 1),
@@ -81,15 +82,16 @@ public class Trades {
             sellItem(Items.PHANTOM_MEMBRANE, 4, 1, 4, 1),
             sellItem(Items.RECOVERY_COMPASS, 16, 1, 1, 1),
             sellItem(Items.ENDER_EYE, 1, 1, 12, 1),
-            sellWithItemEnchantments(CustomItems.SACRED_SWORD, 48, 1, 1, 10),
-            sellItem(Items.LODESTONE, 24, 1, 1, 10, 0.2F),
+            sellWithItemEnchantments(CustomItems.SACRED_SWORD, 48, 1, 1, 12),
+            sellItem(Items.LODESTONE, 24, 1, 1, 12, 0.2F),
     };
     private static final ConfiguredTrade[] WANDERING_TRADER_POTIONS = new ConfiguredTrade[] {
             sellWithPotion(Items.SPLASH_POTION, Potions.STRONG_HEALING, 1, 1, 16, 1),
-            sellWithPotion(Items.POTION, Potions.STRONG_HEALING, 1, 1, 16, 1),
-            sellWithPotion(Items.POTION, Potions.REGENERATION, 1, 1, 16, 1),
-            sellWithPotion(Items.POTION, Potions.STRONG_REGENERATION, 2, 1, 16, 1),
-            sellWithPotion(Items.POTION, Potions.LONG_REGENERATION, 2, 1, 16, 1)
+            sellWithPotion(Items.POTION, Potions.STRONG_HEALING, 1, 3, 16, 1),
+            sellWithPotion(Items.POTION, Potions.REGENERATION, 1, 3, 16, 1),
+            sellWithPotion(Items.POTION, UnruffledMod.TELEPORTATION_POTION, 1, 2, 12, 1),
+            sellWithPotion(Items.POTION, Potions.STRONG_REGENERATION, 2, 3, 16, 2),
+            sellWithPotion(Items.POTION, Potions.LONG_REGENERATION, 1, 3, 16, 1)
     };
     private static final Map<VillagerProfession, List<ConfiguredTrade[]>> VILLAGER_TRADES = Map.ofEntries(
             Map.entry(VillagerProfession.ARMORER, List.of(
@@ -161,22 +163,22 @@ public class Trades {
             Map.entry(VillagerProfession.CLERIC, List.of(
                     new ConfiguredTrade[] {
                             sellItem(Items.GLOWSTONE, 1, 16, 12, 1, 0.2F),
-                            sellWithPotion(Items.POTION, Potions.STRONG_HEALING, 2, 1, 12, 2),
+                            sellWithPotion(Items.POTION, Potions.STRONG_HEALING, 1, 3, 12, 2),
                     },
                     new ConfiguredTrade[] {
                             sellItem(Items.NETHER_WART,  4, 16, 12, 2, 0.2F),
-                            sellWithPotion(Items.POTION, Potions.LONG_FIRE_RESISTANCE, 1, 1, 12, 5),
+                            sellWithPotion(Items.POTION, Potions.LONG_FIRE_RESISTANCE, 1, 3, 12, 5),
                     },
                     new ConfiguredTrade[] {
-                            sellWithPotion(Items.POTION, Potions.LONG_REGENERATION, 2, 1, 12, 10),
-                            sellWithPotion(Items.POTION, Potions.LONG_WATER_BREATHING, 1, 1, 12, 10),
+                            sellWithPotion(Items.POTION, Potions.LONG_REGENERATION, 1, 3, 12, 10),
+                            sellWithPotion(Items.POTION, Potions.LONG_WATER_BREATHING, 1, 3, 12, 10),
                     },
                     new ConfiguredTrade[] {
-                            sellWithPotion(Items.POTION, Potions.STRONG_REGENERATION, 2, 1, 12, 10),
-                            sellWithPotion(Items.POTION, Potions.LONG_NIGHT_VISION, 2, 1, 12, 10),
+                            sellWithPotion(Items.POTION, Potions.STRONG_REGENERATION, 2, 3, 12, 10),
+                            sellWithPotion(Items.POTION, Potions.LONG_NIGHT_VISION, 1, 3, 12, 10),
                     },
                     new ConfiguredTrade[] {
-                            sellWithPotion(Items.POTION, Potions.LONG_SLOW_FALLING, 1, 1, 12, 10),
+                            sellWithPotion(Items.POTION, Potions.LONG_SLOW_FALLING, 1, 3, 12, 10),
                             buyItem(CustomItems.EVIL_TOTEM, 1, 32, 12, 10),
                     }
             )),
@@ -396,10 +398,10 @@ public class Trades {
             ))
         ).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))),
         Optional.of(new ConfiguredWanderingTraderTrades(true, new ConfiguredWanderingTraderPool[]{
-            new ConfiguredWanderingTraderPool(2, Trades.WANDERING_TRADER_DECORATION),
-            new ConfiguredWanderingTraderPool(4, Trades.WANDERING_TRADER_ASSORTED),
-            new ConfiguredWanderingTraderPool(1, Trades.WANDERING_TRADER_POTIONS),
             new ConfiguredWanderingTraderPool(1, Trades.WANDERING_TRADER_BUY),
+            new ConfiguredWanderingTraderPool(2, Trades.WANDERING_TRADER_DECORATION),
+            new ConfiguredWanderingTraderPool(5, Trades.WANDERING_TRADER_ASSORTED),
+            new ConfiguredWanderingTraderPool(1, Trades.WANDERING_TRADER_POTIONS),
             new ConfiguredWanderingTraderPool(1, Trades.WANDERING_TRADER_CODEX)
         }))
     );

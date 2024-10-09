@@ -22,3 +22,5 @@ accessible method net/minecraft/entity/Entity setRotation (FF)V
 accessible method net/minecraft/entity/decoration/ItemFrameEntity setRotation (IZ)V
 accessible field net/minecraft/block/entity/ChiseledBookshelfBlockEntity inventory Lnet/minecraft/util/collection/DefaultedList;
 accessible method net/minecraft/item/CompassItem getLodestoneDimension (Lnet/minecraft/nbt/NbtCompound;)Ljava/util/Optional;
+accessible field net/minecraft/world/WanderingTraderManager spawnChance I
+accessible field net/minecraft/world/WanderingTraderManager spawnDelay I

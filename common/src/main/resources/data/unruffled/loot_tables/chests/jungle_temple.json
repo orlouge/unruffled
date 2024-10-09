@@ -6,25 +6,30 @@
       "entries": [
         {
           "type": "minecraft:item",
+          "name": "unruffled:sacred_sword",
           "functions": [
             {
-              "function": "minecraft:set_potion",
-              "id": "minecraft:strong_healing"
+              "function": "unruffled:item_enchantments"
             }
-          ],
-          "name": "minecraft:potion",
-          "weight": 5
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:lodestone"
         },
         {
           "type": "minecraft:item",
           "functions": [
             {
               "function": "minecraft:set_potion",
-              "id": "minecraft:fire_resistance"
+              "id": "unruffled:teleportation"
             }
           ],
-          "name": "minecraft:potion",
-          "weight": 10
+          "name": "minecraft:potion"
+        },
+        {
+            "type": "minecraft:item",
+            "name": "minecraft:wild_armor_trim_smithing_template"
         },
         {
           "type": "minecraft:item",
@@ -33,32 +38,25 @@
               "add": false,
               "count": {
                 "type": "minecraft:uniform",
-                "max": 8.0,
-                "min": 4.0
+                "max": 2.0,
+                "min": 1.0
               },
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:obsidian",
-          "weight": 20
+          "name": "minecraft:diamond"
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:blaze_rod",
-          "weight": 10
-        },
-        {
-          "type": "minecraft:item",
-          "name": "minecraft:lodestone",
-          "weight": 5
+          "name": "minecraft:recovery_compass"
         }
       ],
       "rolls": {
         "type": "minecraft:uniform",
         "max": 8.0,
-        "min": 4.0
+        "min": 3.0
       }
     }
   ],
-  "random_sequence": "minecraft:chests/ruined_portal"
+  "random_sequence": "minecraft:chests/jungle_temple"
 }
