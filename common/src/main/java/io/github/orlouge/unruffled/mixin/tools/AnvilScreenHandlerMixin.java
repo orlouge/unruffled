@@ -1,10 +1,14 @@
 package io.github.orlouge.unruffled.mixin.tools;
 
 import io.github.orlouge.unruffled.Config;
+import io.github.orlouge.unruffled.utils.TradedCompasses;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.item.CompassItem;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.screen.*;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Final;
@@ -53,6 +57,12 @@ public abstract class AnvilScreenHandlerMixin extends ForgingScreenHandler {
     @Inject(method = "onTakeOutput", at = @At("HEAD"))
     public void checkIfRenaming(PlayerEntity player, ItemStack stack, CallbackInfo ci) {
         this.isRenaming = this.input.getStack(1).isEmpty();
+
+        if (player instanceof ServerPlayerEntity serverPlayer && CompassItem.hasLodestone(stack)) {
+            ItemStack buyStack = new ItemStack(Items.COMPASS);
+            buyStack.setNbt(stack.getNbt().copy());
+            TradedCompasses.get(serverPlayer.getServerWorld().getPersistentStateManager()).addBuy(serverPlayer, buyStack);
+        }
     }
 
     @Redirect(method = "onTakeOutput", at = @At(value = "INVOKE", target = "Lnet/minecraft/screen/ScreenHandlerContext;run(Ljava/util/function/BiConsumer;)V"))

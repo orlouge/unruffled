@@ -2,10 +2,13 @@ package io.github.orlouge.unruffled;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import io.github.orlouge.unruffled.interfaces.NearbyPlayersTracker;
 import io.github.orlouge.unruffled.items.CustomItems;
 import io.github.orlouge.unruffled.items.AncientCodexItem;
 import io.github.orlouge.unruffled.items.ItemEnchantmentsHelper;
+import io.github.orlouge.unruffled.utils.TradedCompasses;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemStack;
@@ -19,6 +22,7 @@ import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.tag.StructureTags;
 import net.minecraft.registry.tag.TagKey;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.village.*;
@@ -402,7 +406,13 @@ public class Trades {
             new ConfiguredWanderingTraderPool(2, Trades.WANDERING_TRADER_DECORATION),
             new ConfiguredWanderingTraderPool(5, Trades.WANDERING_TRADER_ASSORTED),
             new ConfiguredWanderingTraderPool(1, Trades.WANDERING_TRADER_POTIONS),
-            new ConfiguredWanderingTraderPool(1, Trades.WANDERING_TRADER_CODEX)
+            new ConfiguredWanderingTraderPool(1, Trades.WANDERING_TRADER_CODEX),
+            new ConfiguredWanderingTraderPool(1, new ConfiguredTrade[]{buyLodestoneCompass(0, 1, 1, 1)}),
+            new ConfiguredWanderingTraderPool(1, new ConfiguredTrade[]{buyLodestoneCompass(1, 1, 1, 1)}),
+            new ConfiguredWanderingTraderPool(1, new ConfiguredTrade[]{buyLodestoneCompass(2, 1, 1, 1)}),
+            new ConfiguredWanderingTraderPool(1, new ConfiguredTrade[]{buyLodestoneCompass(3, 1, 1, 1)}),
+            new ConfiguredWanderingTraderPool(1, new ConfiguredTrade[]{buyLodestoneCompass(4, 1, 1, 1)}),
+            new ConfiguredWanderingTraderPool(1, new ConfiguredTrade[]{sellLodestoneCompass(8, 12, 10)})
         }))
     );
 
@@ -415,7 +425,7 @@ public class Trades {
             Optional.of(item), false, price, count, maxUses, experience, multiplier,
             Optional.empty(), Optional.empty(),
             Optional.empty(), Optional.empty(), Optional.empty(),
-            Optional.empty(), Optional.empty(), Optional.empty());
+            Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
     }
 
     private static ConfiguredTrade sellMap(TagKey<Structure> structureTag, String nameKey, MapIcon.Type icon, int price, int maxUses, int experience) {
@@ -423,7 +433,7 @@ public class Trades {
             Optional.empty(), false, price, 1, maxUses, experience, 0.05f,
             Optional.empty(), Optional.empty(),
             Optional.of(structureTag), Optional.of(nameKey), Optional.of(icon),
-            Optional.empty(), Optional.empty(), Optional.empty());
+            Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
     }
 
     private static ConfiguredTrade sellWithPotion(Item item, Potion potion, int price, int count, int maxUses, int experience) {
@@ -431,7 +441,7 @@ public class Trades {
             Optional.of(item), false, price, count, maxUses, experience, 0.05f,
             Optional.empty(), Optional.empty(),
             Optional.empty(), Optional.empty(), Optional.empty(),
-            Optional.of(potion), Optional.empty(), Optional.empty());
+            Optional.of(potion), Optional.empty(), Optional.empty(), Optional.empty());
     }
 
     private static ConfiguredTrade sellWithItemEnchantments(Item item, int price, int count, int maxUses, int experience) {
@@ -439,7 +449,7 @@ public class Trades {
             Optional.of(item), false, price, count, maxUses, experience, 0.05f,
             Optional.empty(), Optional.empty(),
             Optional.empty(), Optional.empty(), Optional.empty(),
-            Optional.empty(), Optional.empty(), Optional.of(true));
+            Optional.empty(), Optional.empty(), Optional.of(true), Optional.empty());
     }
 
     private static ConfiguredTrade sellDyedArmor(Item item, int price, int maxUses, int experience) {
@@ -447,7 +457,7 @@ public class Trades {
             Optional.of(item), false, price, 1, maxUses, experience, 0.05f,
             Optional.empty(), Optional.empty(),
             Optional.empty(), Optional.empty(), Optional.empty(),
-            Optional.empty(), Optional.of(true), Optional.empty());
+            Optional.empty(), Optional.of(true), Optional.empty(), Optional.empty());
     }
 
     private static ConfiguredTrade buyItemForOneEmerald(Item item, int count, int maxUses, int experience) {
@@ -456,7 +466,7 @@ public class Trades {
             Optional.of(item), true, 1, count, maxUses, experience, 0.05f,
             Optional.empty(), Optional.empty(),
             Optional.empty(), Optional.empty(), Optional.empty(),
-            Optional.empty(), Optional.empty(), Optional.empty());
+            Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
     }
 
     private static ConfiguredTrade buyItem(Item item, int count, int payment, int maxUses, int experience) {
@@ -464,7 +474,7 @@ public class Trades {
             Optional.of(item), true, payment, count, maxUses, experience, 0.05f,
             Optional.empty(), Optional.empty(),
             Optional.empty(), Optional.empty(), Optional.empty(),
-            Optional.empty(), Optional.empty(), Optional.empty());
+            Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
     }
 
     private static ConfiguredTrade buyAncientCodex(int number, int payment, int maxUses, int experience) {
@@ -472,7 +482,7 @@ public class Trades {
             Optional.empty(), true, payment, 1, maxUses, experience, 0.05f,
             Optional.of(number), Optional.empty(),
             Optional.empty(), Optional.empty(), Optional.empty(),
-            Optional.empty(), Optional.empty(), Optional.empty());
+            Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
     }
 
     private static ConfiguredTrade buyBiomeBasedAncientCodex(int number, int payment, int maxUses, int experience) {
@@ -480,7 +490,23 @@ public class Trades {
             Optional.empty(), true, payment, 1, maxUses, experience, 0.05f,
             Optional.empty(), Optional.of(number),
             Optional.empty(), Optional.empty(), Optional.empty(),
-            Optional.empty(), Optional.empty(), Optional.empty());
+            Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
+    }
+
+    public static ConfiguredTrade buyLodestoneCompass(int index, int payment, int maxUses, int experience) {
+        return new ConfiguredTrade(
+            Optional.empty(), true, payment, 1, maxUses, experience, 0.05f,
+            Optional.empty(), Optional.empty(),
+            Optional.empty(), Optional.empty(), Optional.empty(),
+            Optional.empty(), Optional.empty(), Optional.empty(), Optional.of(index));
+    }
+
+    public static ConfiguredTrade sellLodestoneCompass(int payment, int maxUses, int experience) {
+        return new ConfiguredTrade(
+            Optional.empty(), false, payment, 1, maxUses, experience, 0.05f,
+            Optional.empty(), Optional.empty(),
+            Optional.empty(), Optional.empty(), Optional.empty(),
+            Optional.empty(), Optional.empty(), Optional.empty(), Optional.of(0));
     }
 
     private static ItemStack process(ItemConvertible item, Function<ItemStack, ItemStack> processor) {
@@ -516,10 +542,17 @@ public class Trades {
         Optional<MapIcon.Type> mapIcon,
         Optional<Potion> potion,
         Optional<Boolean> randomDyed,
-        Optional<Boolean> applyItemEnchantments
+        Optional<Boolean> applyItemEnchantments,
+        Optional<Integer> lodestoneCompass
     ) {
         public TradeOffers.Factory toFactory() {
-            if (mapStructureTag.isPresent()) {
+            if (lodestoneCompass.isPresent()) {
+                if (buy) {
+                    return new BuyLodestoneCompassFactory(lodestoneCompass.get(), count, payment, maxUses, experience, multiplier);
+                } else {
+                    return new SellLodestoneCompassFactory(payment, maxUses, experience, multiplier);
+                }
+            } if (mapStructureTag.isPresent()) {
                 return new TradeOffers.SellMapFactory(payment, mapStructureTag.get(), mapNameKey.orElse(""), mapIcon.orElse(MapIcon.Type.RED_X), maxUses, experience);
             } else if (randomDyed().orElse(false) && item.isPresent()) {
                 return new TradeOffers.SellDyedArmorFactory(item.get(), payment, maxUses, experience);
@@ -574,7 +607,8 @@ public class Trades {
             Codec.INT.optionalFieldOf("map_icon").xmap(o -> o.map(id -> MapIcon.Type.byId((byte) (int) id)), o -> o.map(icon -> (int) icon.getId())).forGetter(ConfiguredTrade::mapIcon),
             Registries.POTION.getCodec().optionalFieldOf("potion").forGetter(ConfiguredTrade::potion),
             Codec.BOOL.optionalFieldOf("random_dyed").forGetter(ConfiguredTrade::randomDyed),
-            Codec.BOOL.optionalFieldOf("apply_item_enchantments").forGetter(ConfiguredTrade::applyItemEnchantments)
+            Codec.BOOL.optionalFieldOf("apply_item_enchantments").forGetter(ConfiguredTrade::applyItemEnchantments),
+            Codec.INT.optionalFieldOf("lodestone_compass").forGetter(ConfiguredTrade::lodestoneCompass)
             ).apply(instance, ConfiguredTrade::new));
     }
 
@@ -611,6 +645,69 @@ public class Trades {
             Codec.unboundedMap(Registries.VILLAGER_PROFESSION.getCodec(), ConfiguredVillagerTrades.CODEC).optionalFieldOf("villagers").forGetter(TradesConfig::villagerTrades),
             ConfiguredWanderingTraderTrades.CODEC.optionalFieldOf("wandering_trader").forGetter(TradesConfig::wanderingTraderTrades)
         ).apply(instance, TradesConfig::new));
+    }
+
+    static class SellLodestoneCompassFactory implements TradeOffers.Factory {
+        private final int price;
+        private final int maxUses;
+        private final int experience;
+        private final float multiplier;
+
+        public SellLodestoneCompassFactory(int price, int maxUses, int experience, float multiplier) {
+            this.price = price;
+            this.maxUses = maxUses;
+            this.experience = experience;
+            this.multiplier = multiplier;
+        }
+
+        @Override
+        public TradeOffer create(Entity entity, Random random) {
+            if (entity.getWorld() instanceof ServerWorld world) {
+                TradedCompasses compasses = TradedCompasses.get(world.getPersistentStateManager());
+                ItemStack compass = compasses.getRandomSell(5, world, random, entity.getPos());
+                if (compass == null) return null;
+                compass.setCount(1);
+                return new TradeOffer(new ItemStack(Items.EMERALD, this.price), compass, this.maxUses, this.experience, this.multiplier);
+            }
+            return null;
+        }
+    }
+
+    static class BuyLodestoneCompassFactory implements TradeOffers.Factory {
+        private final int index;
+        private final int count;
+        private final int payment;
+        private final int maxUses;
+        private final int experience;
+        private final float multiplier;
+
+        public BuyLodestoneCompassFactory(int index, int count, int payment, int maxUses, int experience, float multiplier) {
+            this.index = index;
+            this.count = count;
+            this.payment = payment;
+            this.maxUses = maxUses;
+            this.experience = experience;
+            this.multiplier = multiplier;
+        }
+
+        @Override
+        public TradeOffer create(Entity entity, Random random) {
+            if (entity.getWorld() instanceof ServerWorld world && entity instanceof NearbyPlayersTracker nearbyPlayersTracker) {
+                TradedCompasses compasses = TradedCompasses.get(world.getPersistentStateManager());
+                PlayerEntity player = nearbyPlayersTracker.getNearbyPlayer(index);
+                if (player != null) {
+                    for (int i = 0; i < 5; i++) {
+                        ItemStack compass = compasses.getBuy(world, player);
+                        if (compass != null) {
+                            compass = compass.copy();
+                            compass.setCount(this.count);
+                            return new TradeOffer(compass, new ItemStack(Items.EMERALD, this.payment), this.maxUses, this.experience, this.multiplier);
+                        }
+                    }
+                }
+            }
+            return null;
+        }
     }
 
     static class SellNbtItemFactory implements TradeOffers.Factory {
