@@ -10,6 +10,7 @@ import io.github.orlouge.unruffled.items.ItemEnchantmentsLootFunction;
 import io.github.orlouge.unruffled.mixin.accessors.ItemAccessor;
 import io.github.orlouge.unruffled.potions.BrewingPotionRecipe;
 import io.github.orlouge.unruffled.potions.TeleportEffect;
+import io.github.orlouge.unruffled.worldgen.NorthboundGateStructure;
 import io.github.orlouge.unruffled.worldgen.UndergroundCabinFeature;
 import io.github.orlouge.unruffled.worldgen.UndergroundPondFeature;
 import net.minecraft.advancement.criterion.Criteria;
@@ -27,13 +28,15 @@ import net.minecraft.loot.function.LootFunctionType;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.Potions;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.tag.TagKey;
+import net.minecraft.structure.StructurePieceType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonSerializer;
-import net.minecraft.world.gen.feature.ConfiguredFeature;
 import net.minecraft.world.gen.feature.DefaultFeatureConfig;
+import net.minecraft.world.gen.structure.StructureType;
 
 import java.util.List;
 import java.util.Map;
@@ -63,10 +66,14 @@ public class UnruffledMod {
 
     public static final UndergroundPondFeature UNDERGROUND_POND_FEATURE = new UndergroundPondFeature(DefaultFeatureConfig.CODEC);
     public static final UndergroundCabinFeature UNDERGROUND_CABIN_FEATURE = new UndergroundCabinFeature(DefaultFeatureConfig.CODEC);
+    /*
     public static final ConfiguredFeature<DefaultFeatureConfig, UndergroundPondFeature> UNDERGROUND_POND_CONFIGURED_FEATURE =
             new ConfiguredFeature<>(UNDERGROUND_POND_FEATURE, new DefaultFeatureConfig());
     public static final ConfiguredFeature<DefaultFeatureConfig, UndergroundCabinFeature> UNDERGROUND_CABIN_CONFIGURED_FEATURE =
             new ConfiguredFeature<>(UNDERGROUND_CABIN_FEATURE, new DefaultFeatureConfig());
+     */
+    public static StructureType<NorthboundGateStructure> NORTHBOUND_GATE_STRUCTURE = Registry.register(Registries.STRUCTURE_TYPE, new Identifier(UnruffledMod.MOD_ID, "northbound_gate"), () -> NorthboundGateStructure.CODEC);
+    public static StructurePieceType NORTHBOUND_GATE_STRUCTURE_PIECE = Registry.register(Registries.STRUCTURE_PIECE, new Identifier(UnruffledMod.MOD_ID, "northbound_gate_piece"), (StructurePieceType.Simple) NorthboundGateStructure.Piece::new);
 
     public static final StatusEffect TELEPORTATION_EFFECT = new TeleportEffect()
         .addAttributeModifier(EntityAttributes.GENERIC_MOVEMENT_SPEED, "a6032b73-feef-4d6d-ba59-2b701b5e71e0", -0.50, EntityAttributeModifier.Operation.MULTIPLY_TOTAL)
@@ -106,6 +113,7 @@ public class UnruffledMod {
     public static final float DEFAULT_STRUCTURE_SPREAD_CORRECTION = 64f;
 
     public static final Identifier BOOKSHELF_LOOT_TABLE = new Identifier(UnruffledMod.MOD_ID, "chests/bookshelf");
+    public static final Identifier NORTHBOUND_GATE_LOOT_TABLE = new Identifier(UnruffledMod.MOD_ID, "archaeology/northbound_gate");
     static {
         DEFAULT_LOOT_CODICES_ADD = Map.ofEntries(
                 Map.entry(LootTables.BURIED_TREASURE_CHEST, List.of(1, 4, 6)),
@@ -127,7 +135,8 @@ public class UnruffledMod {
     public static Map<Identifier, List<Integer>> DEFAULT_LOOT_CODICES_MODIFY = Map.ofEntries(
             Map.entry(LootTables.DESERT_PYRAMID_ARCHAEOLOGY, List.of(32, 37, 40)),
             Map.entry(LootTables.TRAIL_RUINS_COMMON_ARCHAEOLOGY, List.of(43, 46, 49)),
-            Map.entry(LootTables.TRAIL_RUINS_RARE_ARCHAEOLOGY, List.of(42, 44, 50))
+            Map.entry(LootTables.TRAIL_RUINS_RARE_ARCHAEOLOGY, List.of(42, 44, 50)),
+            Map.entry(NORTHBOUND_GATE_LOOT_TABLE, List.of(8, 12, 28))
     );
 
     public static void init() {

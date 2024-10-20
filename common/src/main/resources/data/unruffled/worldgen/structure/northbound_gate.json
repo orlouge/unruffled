@@ -1,0 +1,6 @@
+{
+  "type": "unruffled:northbound_gate",
+  "biomes": "#is_overworld",
+  "step": "surface_structures",
+  "spawn_overrides": {}
+}

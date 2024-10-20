@@ -1,0 +1,16 @@
+{
+  "structures": [
+    {
+      "structure": "unruffled:northbound_gate",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "salt": 8978654,
+    "type": "concentric_rings",
+    "distance": 16,
+    "count": 512,
+    "spread": 1,
+    "preferred_biomes": "#unruffled:northbound_gate_biased_to"
+  }
+}

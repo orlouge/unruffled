@@ -1,0 +1,12 @@
+{
+  "values": [
+    "#has_structure/trail_ruins",
+    "#has_structure/ruined_portal_desert",
+    "#allows_surface_slime_spawns",
+    "#has_structure/village_plains",
+    "#has_structure/village_snowy",
+    "#has_structure/woodland_mansion",
+    "minecraft:flower_forest",
+    "minecraft:birch_forest"
+  ]
+}
