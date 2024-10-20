@@ -10,6 +10,8 @@ import io.github.orlouge.unruffled.items.ItemEnchantmentsLootFunction;
 import io.github.orlouge.unruffled.mixin.accessors.ItemAccessor;
 import io.github.orlouge.unruffled.potions.BrewingPotionRecipe;
 import io.github.orlouge.unruffled.potions.TeleportEffect;
+import io.github.orlouge.unruffled.worldgen.UndergroundCabinFeature;
+import io.github.orlouge.unruffled.worldgen.UndergroundPondFeature;
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.Block;
 import net.minecraft.enchantment.Enchantment;

@@ -1,6 +1,7 @@
-package io.github.orlouge.unruffled;
+package io.github.orlouge.unruffled.worldgen;
 
 import com.mojang.serialization.Codec;
+import io.github.orlouge.unruffled.UnruffledMod;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BrushableBlockEntity;
@@ -10,6 +11,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.random.Random;
+import net.minecraft.world.Heightmap;
 import net.minecraft.world.StructureWorldAccess;
 import net.minecraft.world.gen.feature.DefaultFeatureConfig;
 import net.minecraft.world.gen.feature.Feature;
@@ -154,28 +156,26 @@ public class UndergroundPondFeature extends Feature<DefaultFeatureConfig> {
             }
         }
 
+        int topY = world.getTopY(Heightmap.Type.OCEAN_FLOOR_WG, origin.getX(), origin.getZ());
 
-        boolean replaceOnWater = random.nextInt(5) == 0;
-        for (int y = replaceOnWater ? 40 : world.getSeaLevel(); y < world.getHeight(); y++) {
-            BlockState topBlock = world.getBlockState(new BlockPos(origin.getX(), y, origin.getZ()));
-            if (topBlock.isAir() || (replaceOnWater && topBlock.isLiquid())) {
-                BlockPos surfacePos = new BlockPos(origin.getX(), y - 1, origin.getZ());
-                BlockState surfaceBlock = world.getBlockState(surfacePos);
-                boolean replace = true;
-                if (surfaceBlock.isOf(Blocks.GRAVEL)) {
-                    this.setBlockStateIf(world, surfacePos, Blocks.SUSPICIOUS_GRAVEL.getDefaultState(), this::canReplace);
-                } else if (surfaceBlock.isOf(Blocks.SAND)) {
-                    this.setBlockStateIf(world, surfacePos, Blocks.SUSPICIOUS_SAND.getDefaultState(), this::canReplace);
-                } else {
-                    replace = false;
+        boolean replaceOnWater = random.nextInt(2) == 0;
+        BlockState topBlock = world.getBlockState(new BlockPos(origin.getX(), topY, origin.getZ()));
+        if (topBlock.isAir() || (replaceOnWater && topBlock.isLiquid())) {
+            BlockPos surfacePos = new BlockPos(origin.getX(), topY - 1, origin.getZ());
+            BlockState surfaceBlock = world.getBlockState(surfacePos);
+            boolean replace = true;
+            if (surfaceBlock.isOf(Blocks.GRAVEL)) {
+                this.setBlockStateIf(world, surfacePos, Blocks.SUSPICIOUS_GRAVEL.getDefaultState(), this::canReplace);
+            } else if (surfaceBlock.isOf(Blocks.SAND)) {
+                this.setBlockStateIf(world, surfacePos, Blocks.SUSPICIOUS_SAND.getDefaultState(), this::canReplace);
+            } else {
+                replace = false;
+            }
+            if (replace) {
+                BlockEntity blockEntity = world.getBlockEntity(surfacePos);
+                if (blockEntity instanceof BrushableBlockEntity) {
+                    ((BrushableBlockEntity) blockEntity).setLootTable(new Identifier(UnruffledMod.MOD_ID, "archaeology/underground_pond"), random.nextLong());
                 }
-                if (replace) {
-                    BlockEntity blockEntity = world.getBlockEntity(surfacePos);
-                    if (blockEntity instanceof BrushableBlockEntity) {
-                        ((BrushableBlockEntity) blockEntity).setLootTable(new Identifier(UnruffledMod.MOD_ID, "archaeology/underground_pond"), random.nextLong());
-                    }
-                }
-                break;
             }
         }
 

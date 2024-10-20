@@ -412,7 +412,7 @@ public class Trades {
             new ConfiguredWanderingTraderPool(1, new ConfiguredTrade[]{buyLodestoneCompass(2, 1, 1, 1)}),
             new ConfiguredWanderingTraderPool(1, new ConfiguredTrade[]{buyLodestoneCompass(3, 1, 1, 1)}),
             new ConfiguredWanderingTraderPool(1, new ConfiguredTrade[]{buyLodestoneCompass(4, 1, 1, 1)}),
-            new ConfiguredWanderingTraderPool(1, new ConfiguredTrade[]{sellLodestoneCompass(8, 12, 10)})
+            new ConfiguredWanderingTraderPool(1, new ConfiguredTrade[]{sellLodestoneCompass(3, 12, 10)})
         }))
     );
 
