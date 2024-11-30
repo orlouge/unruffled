@@ -89,7 +89,7 @@ public class UnruffledMod {
             Enchantments.PROTECTION, Enchantments.FIRE_PROTECTION, Enchantments.PROJECTILE_PROTECTION, Enchantments.BLAST_PROTECTION,
             Enchantments.FEATHER_FALLING, Enchantments.MENDING, Enchantments.EFFICIENCY, Enchantments.UNBREAKING,
             Enchantments.SHARPNESS, Enchantments.SMITE, Enchantments.BANE_OF_ARTHROPODS,
-            Enchantments.QUICK_CHARGE, Enchantments.POWER, Enchantments.IMPALING
+            Enchantments.QUICK_CHARGE, Enchantments.POWER, Enchantments.IMPALING, Enchantments.LURE
     );
 
     public static final Map<Item, Map<Enchantment, Integer>> DEFAULT_ITEM_ENCHANTMENTS = Map.of(

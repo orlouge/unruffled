@@ -59,6 +59,7 @@
     "tools.FilledMapItemMixin",
     "tools.GrindstoneScreenHandlerMixin",
     "tools.GrindstoneScreenHandlerMixin$ResultSlotMixin",
+    "tools.ImpalingEnchantmentMixin",
     "tools.MapExtendingRecipeMixin",
     "tools.MapStateMixin",
     "tools.MiningToolItemMixin",

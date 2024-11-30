@@ -150,7 +150,7 @@ public abstract class PlayerEntityMixin extends LivingEntity {
     @Inject(method = "applyDamage", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;setHealth(F)V"))
     public void addWearinessOnDamage(DamageSource source, float amount, CallbackInfo ci) {
         if (this.getHungerManager() instanceof ExtendedHungerManager extendedHungerManager) {
-            extendedHungerManager.addWeariness(amount / 1000f);
+            extendedHungerManager.addWeariness(amount / 2000f);
         }
     }
 

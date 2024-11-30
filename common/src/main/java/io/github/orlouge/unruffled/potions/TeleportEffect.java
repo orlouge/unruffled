@@ -33,7 +33,7 @@ import java.util.Optional;
 
 public class TeleportEffect extends StatusEffect  {
     public TeleportEffect() {
-        super(StatusEffectCategory.NEUTRAL, 0x40A095);
+        super(StatusEffectCategory.BENEFICIAL, 0x40A095);
     }
 
     @Override

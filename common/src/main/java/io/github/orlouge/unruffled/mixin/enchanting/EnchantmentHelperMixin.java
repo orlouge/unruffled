@@ -5,9 +5,12 @@ import io.github.orlouge.unruffled.items.ItemEnchantmentsHelper;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
+import net.minecraft.enchantment.SweepingEnchantment;
 import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.damage.DamageTypes;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ArmorItem;
 import net.minecraft.item.ArmorMaterials;
 import net.minecraft.item.ItemStack;
@@ -15,7 +18,9 @@ import net.minecraft.registry.tag.DamageTypeTags;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -31,6 +36,25 @@ public class EnchantmentHelperMixin {
             }
         }
         return newEnchantments;
+    }
+
+    @Inject(method = "getLure", at = @At("HEAD"), cancellable = true)
+    private static void setLureIfDisabled(ItemStack stack, CallbackInfoReturnable<Integer> cir) {
+        if (Config.INSTANCE.get().enchantmentsConfig.disabledEnchantments().contains(Enchantments.LURE)) {
+            if (Enchantments.LURE.isAcceptableItem(stack)) {
+                cir.setReturnValue(3);
+            }
+            cir.cancel();
+        }
+    }
+
+    @Inject(method = "getSweepingMultiplier", at = @At("RETURN"), cancellable = true)
+    private static void sweepingEdgeIfMovingHead(LivingEntity entity, CallbackInfoReturnable<Float> cir) {
+        if (entity instanceof PlayerEntity playerEntity) {
+            float originalMultiplier = cir.getReturnValueF();
+            float newMultiplier = SweepingEnchantment.getMultiplier(Math.min(3, (2 + (int) Math.abs(playerEntity.headYaw - playerEntity.prevHeadYaw)) / 10));
+            cir.setReturnValue(Math.max(originalMultiplier, newMultiplier));
+        }
     }
 
     @ModifyVariable(method = "getProtectionAmount", at = @At("STORE"))

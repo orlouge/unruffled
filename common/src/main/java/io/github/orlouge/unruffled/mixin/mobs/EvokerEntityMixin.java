@@ -2,6 +2,8 @@ package io.github.orlouge.unruffled.mixin.mobs;
 
 import io.github.orlouge.unruffled.Config;
 import io.github.orlouge.unruffled.items.CustomItems;
+import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffectInstance;
@@ -9,12 +11,15 @@ import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.EvokerEntity;
 import net.minecraft.entity.mob.SpellcastingIllagerEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.village.raid.Raid;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
+
+import java.util.Map;
 
 @Mixin(EvokerEntity.class)
 public abstract class EvokerEntityMixin extends SpellcastingIllagerEntity {
@@ -46,7 +51,11 @@ public abstract class EvokerEntityMixin extends SpellcastingIllagerEntity {
             }
              */
             if (Config.INSTANCE.get().mechanicsConfig.evokerDropsEvilTotem()) {
-                this.dropItem(CustomItems.EVIL_TOTEM);
+                ItemStack totem = new ItemStack(CustomItems.EVIL_TOTEM);
+                if (Config.INSTANCE.get().mechanicsConfig.badOmenFromEvilTotem()) {
+                    EnchantmentHelper.set(Map.of(Enchantments.BINDING_CURSE, 1), totem);
+                }
+                this.dropStack(totem);
             }
         }
 
