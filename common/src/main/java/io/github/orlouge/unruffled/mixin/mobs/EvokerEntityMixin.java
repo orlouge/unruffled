@@ -2,6 +2,7 @@ package io.github.orlouge.unruffled.mixin.mobs;
 
 import io.github.orlouge.unruffled.Config;
 import io.github.orlouge.unruffled.items.CustomItems;
+import io.github.orlouge.unruffled.items.ItemEnchantmentsHelper;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.EntityType;
@@ -53,7 +54,7 @@ public abstract class EvokerEntityMixin extends SpellcastingIllagerEntity {
             if (Config.INSTANCE.get().mechanicsConfig.evokerDropsEvilTotem()) {
                 ItemStack totem = new ItemStack(CustomItems.EVIL_TOTEM);
                 if (Config.INSTANCE.get().mechanicsConfig.badOmenFromEvilTotem()) {
-                    EnchantmentHelper.set(Map.of(Enchantments.BINDING_CURSE, 1), totem);
+                    ItemEnchantmentsHelper.setItemEnchantments(totem);
                 }
                 this.dropStack(totem);
             }

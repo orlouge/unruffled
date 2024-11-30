@@ -67,6 +67,7 @@ public class UnruffledFabric implements ModInitializer {
             content.add(ItemEnchantmentsHelper.createWithItemEnchantments(CustomItems.IGNITING_ARROW));
             content.add(ItemEnchantmentsHelper.createWithItemEnchantments(CustomItems.BLAZING_SWORD));
             content.add(ItemEnchantmentsHelper.createWithItemEnchantments(CustomItems.SACRED_SWORD));
+            content.add(ItemEnchantmentsHelper.createWithItemEnchantments(CustomItems.EVIL_TOTEM));
         });
 
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.FOOD_AND_DRINK).register(content -> {

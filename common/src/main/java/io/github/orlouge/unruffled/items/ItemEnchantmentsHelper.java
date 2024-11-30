@@ -3,10 +3,12 @@ package io.github.orlouge.unruffled.items;
 import io.github.orlouge.unruffled.Config;
 import io.github.orlouge.unruffled.UnruffledMod;
 import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.Enchantments;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 public class ItemEnchantmentsHelper {
@@ -19,11 +21,17 @@ public class ItemEnchantmentsHelper {
     }
     public static ItemStack setItemEnchantments(ItemStack stack) {
         Map<Enchantment, Integer> enchantments = Config.INSTANCE.get().enchantmentsConfig.itemEnchantments().get(stack.getItem());
+        boolean hide = true;
+        if (stack.isOf(CustomItems.EVIL_TOTEM) && Config.INSTANCE.get().mechanicsConfig.evokerDropsEvilTotem()) {
+            if (enchantments == null) enchantments = new HashMap<>();
+            enchantments.put(Enchantments.BINDING_CURSE, 1);
+            hide = false;
+        }
         if (enchantments == null) return stack;
         for (Map.Entry<Enchantment, Integer> entry : enchantments.entrySet()) {
             stack.addEnchantment(entry.getKey(), entry.getValue());
         }
-        stack.addHideFlag(ItemStack.TooltipSection.ENCHANTMENTS);
+        if (hide) stack.addHideFlag(ItemStack.TooltipSection.ENCHANTMENTS);
         return stack;
     }
 

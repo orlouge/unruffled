@@ -42,7 +42,7 @@ public class Trades {
             buyItemForOneEmerald(Items.DIAMOND, 1, 128, 12),
             buyItem(Items.DIAMOND, 1, 3, 42, 12),
             buyItem(Items.DIAMOND, 1, 4, 32, 12),
-            buyItem(CustomItems.EVIL_TOTEM, 1, 64, 12, 12)
+            buyWithItemEnchantments(CustomItems.EVIL_TOTEM, 1, 64, 12, 12)
     };
     private static final ConfiguredTrade[] WANDERING_TRADER_CODEX = IntStream.rangeClosed(1, 50).mapToObj(
             number -> buyAncientCodex(number, 32, 12, 12)
@@ -183,7 +183,7 @@ public class Trades {
                     },
                     new ConfiguredTrade[] {
                             sellWithPotion(Items.POTION, Potions.LONG_SLOW_FALLING, 1, 3, 12, 10),
-                            buyItem(CustomItems.EVIL_TOTEM, 1, 32, 12, 10),
+                            buyWithItemEnchantments(CustomItems.EVIL_TOTEM, 1, 32, 12, 10),
                     }
             )),
             Map.entry(VillagerProfession.FARMER, List.of(
@@ -403,6 +403,7 @@ public class Trades {
         ).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))),
         Optional.of(new ConfiguredWanderingTraderTrades(true, new ConfiguredWanderingTraderPool[]{
             new ConfiguredWanderingTraderPool(1, Trades.WANDERING_TRADER_BUY),
+            new ConfiguredWanderingTraderPool(1, Trades.WANDERING_TRADER_GLAZED_TERRACOTTA),
             new ConfiguredWanderingTraderPool(2, Trades.WANDERING_TRADER_DECORATION),
             new ConfiguredWanderingTraderPool(5, Trades.WANDERING_TRADER_ASSORTED),
             new ConfiguredWanderingTraderPool(1, Trades.WANDERING_TRADER_POTIONS),
@@ -475,6 +476,14 @@ public class Trades {
             Optional.empty(), Optional.empty(),
             Optional.empty(), Optional.empty(), Optional.empty(),
             Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
+    }
+
+    private static ConfiguredTrade buyWithItemEnchantments(Item item, int count, int payment, int maxUses, int experience) {
+        return new ConfiguredTrade(
+            Optional.of(item), true, payment, count, maxUses, experience, 0.05f,
+            Optional.empty(), Optional.empty(),
+            Optional.empty(), Optional.empty(), Optional.empty(),
+            Optional.empty(), Optional.empty(), Optional.of(true), Optional.empty());
     }
 
     private static ConfiguredTrade buyAncientCodex(int number, int payment, int maxUses, int experience) {
