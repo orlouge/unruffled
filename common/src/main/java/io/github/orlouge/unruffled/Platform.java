@@ -22,6 +22,11 @@ public class Platform {
     }
 
     @ExpectPlatform
+    public static boolean isModLoaded(String mod) {
+        throw new AssertionError();
+    }
+
+    @ExpectPlatform
     public static void sendToClient(Packets.Packet packet, ServerPlayerEntity player) {
         throw new AssertionError();
     }

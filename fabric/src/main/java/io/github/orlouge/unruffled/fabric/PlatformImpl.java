@@ -26,6 +26,10 @@ public class PlatformImpl {
         return FabricLoader.getInstance().getConfigDir();
     }
 
+    public static boolean isModLoaded(String mod) {
+        return FabricLoader.getInstance().isModLoaded(mod);
+    }
+
     public static void sendToClient(Packets.Packet packet, ServerPlayerEntity player) {
         PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
         packet.write(buf);

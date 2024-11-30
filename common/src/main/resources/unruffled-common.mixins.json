@@ -17,6 +17,7 @@
     "TippedArrowRecipeMixin",
     "accessors.ItemAccessor",
     "accessors.ToolMaterialsAccessor",
+    "enchanting.ChiseledBookshelfBlockEntityMixin",
     "enchanting.EnchantedBookItemMixin",
     "enchanting.EnchantingTableBlockMixin",
     "enchanting.EnchantmentHelperMixin",
