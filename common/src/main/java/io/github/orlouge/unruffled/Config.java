@@ -177,7 +177,7 @@ public class Config {
     }
 
     public record MechanicsConfig(
-        boolean peacefulChunks, int sleepTime, float dropSpreadFactor,
+        boolean peacefulChunks, int sleepTime, int backupSpawnPoints, float dropSpreadFactor,
         boolean disableTotemOfUndying, boolean evokerDropsEvilTotem, boolean badOmenFromEvilTotem, boolean badOmenFromCaptain,
         boolean evilTotemBinding,
         boolean canTeleportMobs, float potionDurationFactor, int bundleSize, int wanderingSpawnFrequency,
@@ -185,7 +185,7 @@ public class Config {
         boolean forceReducedDebugInfo, int maxMapSize) {
         public MechanicsConfig() {
             this(
-                true, 16000, 0.2f,
+                true, 16000, 10, 0.2f,
                 true, true, true, false,
                 true,
                 true, 2f, 256, 3,
@@ -196,6 +196,7 @@ public class Config {
         public static final Codec<MechanicsConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Codec.BOOL.fieldOf("no_hostile_mobs_around_spawn_beds").forGetter(config -> config.peacefulChunks),
             Codec.INT.fieldOf("sleep_time___set_to_negative_to_disable").forGetter(config -> config.sleepTime),
+            Codec.INT.optionalFieldOf("backup_spawn_points", 3).forGetter(config -> config.backupSpawnPoints),
             Codec.FLOAT.fieldOf("drop_spread_factor").forGetter(config -> config.dropSpreadFactor),
             Codec.BOOL.fieldOf("disable_totem_of_undying").forGetter(config -> config.disableTotemOfUndying),
             Codec.BOOL.fieldOf("evil_totem_dropped_by_evoker").forGetter(config -> config.evokerDropsEvilTotem),
