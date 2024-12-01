@@ -4,10 +4,12 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import io.github.orlouge.unruffled.advancements.*;
+import io.github.orlouge.unruffled.interfaces.HasLockedDeathPosition;
 import io.github.orlouge.unruffled.items.CustomItems;
 import io.github.orlouge.unruffled.interfaces.ExtendedHungerManager;
 import io.github.orlouge.unruffled.items.ItemEnchantmentsLootFunction;
 import io.github.orlouge.unruffled.mixin.accessors.ItemAccessor;
+import io.github.orlouge.unruffled.mixin.sleeping.ServerPlayerEntityMixin;
 import io.github.orlouge.unruffled.potions.BrewingPotionRecipe;
 import io.github.orlouge.unruffled.potions.TeleportEffect;
 import io.github.orlouge.unruffled.worldgen.NorthboundGateStructure;
@@ -16,31 +18,34 @@ import io.github.orlouge.unruffled.worldgen.UndergroundPondFeature;
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.Block;
 import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.loot.LootTables;
 import net.minecraft.loot.function.LootFunctionType;
+import net.minecraft.nbt.*;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.Potions;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.tag.TagKey;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.structure.StructurePieceType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonSerializer;
+import net.minecraft.util.math.GlobalPos;
 import net.minecraft.world.gen.feature.DefaultFeatureConfig;
 import net.minecraft.world.gen.structure.StructureType;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -147,6 +152,36 @@ public class UnruffledMod {
             player.updateLastActionTime();
             player.swingHand(Hand.MAIN_HAND, false);
         });
+
+        Packets.LockRecoveryCompass.register(player -> {
+            if (player instanceof HasLockedDeathPosition lockedDeathPosition /* && Config.INSTANCE.get().mechanicsConfig.recoveryCompassLocking().orElse(true) */) {
+                ItemStack compass = player.getMainHandStack();
+                if (!compass.isEmpty() && compass.isOf(Items.RECOVERY_COMPASS)) {
+                    compass = compass.copy();
+                    if (compass.hasNbt() && compass.getNbt().contains("IsLockedCompass")) {
+                        EnchantmentHelper.set(Collections.emptyMap(), compass);
+                        compass.removeSubNbt("display");
+                        compass.removeSubNbt("IsLockedCompass");
+                    } else {
+                        if (!player.isInSneakingPose()) {
+                            lockedDeathPosition.setLockedDeathPosition();
+                        }
+                        compass.addEnchantment(Enchantments.BINDING_CURSE, 1);
+                        // display:{Lore:['{"text":"Locked","color":"blue"}']}
+                        NbtCompound display = new NbtCompound();
+                        NbtList lore = new NbtList();
+                        lore.add(NbtString.of("{\"text\":\"Locked\",\"color\":\"blue\"}"));
+                        display.put("Lore", lore);
+                        compass.setSubNbt("display", display);
+                        compass.addHideFlag(ItemStack.TooltipSection.ENCHANTMENTS);
+                        compass.setSubNbt("IsLockedCompass", NbtByte.of((byte) 1));
+                    }
+                    player.setStackInHand(Hand.MAIN_HAND, compass);
+                }
+            }
+        });
+
+
         Config.StackSizeConfig stackSizeConfig = Config.INSTANCE.get().stackSizeConfig;
         if (stackSizeConfig.foodStackSize() != 64) {
             for (Item item : Registries.ITEM.stream().toList()) {
@@ -160,6 +195,14 @@ public class UnruffledMod {
         }
         //((ItemAccessor) Items.POTION).setMaxCount(16);
         //((ToolMaterialsAccessor) (Object) ToolMaterials.GOLD).setItemDurability(200);
+    }
+
+    public static void sendLockedDeathPosition(ServerPlayerEntity player, Optional<GlobalPos> pos) {
+        new Packets.LockedDeathPositionUpdate(pos).sendToPlayer(player);
+    }
+
+    public static void sendLockedDeathPosition(ServerPlayerEntity player) {
+        if (player instanceof HasLockedDeathPosition pos) sendLockedDeathPosition(player, pos.getLockedDeathPosition());
     }
 
     public static class Serializer implements JsonSerializer<ItemEnchantmentsLootFunction> {

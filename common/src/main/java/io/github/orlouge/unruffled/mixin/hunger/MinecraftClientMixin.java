@@ -11,6 +11,7 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.*;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(MinecraftClient.class)
@@ -18,6 +19,11 @@ public class MinecraftClientMixin {
     @Shadow @Nullable public ClientPlayerEntity player;
 
     @Shadow @Final public Mouse mouse;
+
+    @Inject(method = "doItemUse", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;isRiding()Z"))
+    public void onItemUse(CallbackInfo ci) {
+        UnruffledModClient.onItemUse(this.player);
+    }
 
     @Redirect(method = "doAttack", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;resetLastAttackedTicks()V"))
     public void onAttackMiss(ClientPlayerEntity instance) {

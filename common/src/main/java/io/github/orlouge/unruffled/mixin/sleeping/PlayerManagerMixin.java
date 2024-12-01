@@ -1,7 +1,9 @@
 package io.github.orlouge.unruffled.mixin.sleeping;
 
+import io.github.orlouge.unruffled.UnruffledMod;
 import io.github.orlouge.unruffled.interfaces.HasBackupSpawnPoints;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.network.ClientConnection;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.PlayerManager;
@@ -17,6 +19,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.Optional;
@@ -70,10 +73,21 @@ public class PlayerManagerMixin {
     @Inject(method = "respawnPlayer", at = @At(value = "RETURN"))
     public void clearSpawnPoint(ServerPlayerEntity player, boolean alive, CallbackInfoReturnable<ServerPlayerEntity> cir) {
         this.foundSpawnPoint = null;
+        UnruffledMod.sendLockedDeathPosition(player);
     }
 
     @Redirect(method = "respawnPlayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;findRespawnPosition(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/util/math/BlockPos;FZZ)Ljava/util/Optional;"))
     public Optional<Vec3d> findSpawnOrBackupSpawn(ServerWorld world, BlockPos pos, float angle, boolean forced, boolean alive, ServerPlayerEntity player, boolean alive2) {
         return this.foundSpawnPoint != null ? this.foundSpawnPoint.getRight() : PlayerEntity.findRespawnPosition(world, pos, angle, forced, alive);
+    }
+
+    @Inject(method = "sendPlayerStatus", at = @At("TAIL"))
+    public void updateLockedDeathPosOnPlayerStatus(ServerPlayerEntity player, CallbackInfo ci) {
+        UnruffledMod.sendLockedDeathPosition(player);
+    }
+
+    @Inject(method = "onPlayerConnect", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/MinecraftServer;getResourcePackProperties()Ljava/util/Optional;"))
+    public void updateLockedDeathPosOnConnect(ClientConnection connection, ServerPlayerEntity player, CallbackInfo ci) {
+        UnruffledMod.sendLockedDeathPosition(player);
     }
 }

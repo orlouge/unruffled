@@ -1,20 +1,27 @@
 package io.github.orlouge.unruffled.mixin.sleeping;
 
 import com.mojang.authlib.GameProfile;
+import com.mojang.serialization.DataResult;
 import io.github.orlouge.unruffled.Config;
+import io.github.orlouge.unruffled.UnruffledMod;
 import io.github.orlouge.unruffled.interfaces.HasBackupSpawnPoints;
+import io.github.orlouge.unruffled.interfaces.HasLockedDeathPosition;
 import io.github.orlouge.unruffled.utils.PeacefulChunks;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.recipe.Recipe;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.math.GlobalPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -23,10 +30,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.Collection;
 import java.util.LinkedList;
-import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Mixin(ServerPlayerEntity.class)
-public abstract class ServerPlayerEntityMixin extends PlayerEntity implements HasBackupSpawnPoints {
+public abstract class ServerPlayerEntityMixin extends PlayerEntity implements HasBackupSpawnPoints, HasLockedDeathPosition {
 
     public ServerPlayerEntityMixin(World world, BlockPos pos, float yaw, GameProfile gameProfile) {
         super(world, pos, yaw, gameProfile);
@@ -39,9 +47,13 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements Ha
     @Shadow private float spawnAngle = 0f;
     @Shadow private boolean spawnForced = false;
 
+    private Optional<GlobalPos> unruffled_lockedDeathPos = Optional.empty();
+
     @Shadow public abstract void updateInput(float sidewaysSpeed, float forwardSpeed, boolean jumping, boolean sneaking);
 
     @Shadow public abstract void setSpawnPoint(RegistryKey<World> dimension, @Nullable BlockPos pos, float angle, boolean forced, boolean sendMessage);
+
+    @Shadow public abstract int lockRecipes(Collection<Recipe<?>> recipes);
 
     @Inject(method = "wakeUp", at = @At("HEAD"))
     public void updatePeacefulChunksOnWakeUp(boolean skipSleepTimer, boolean updateSleepingPlayers, CallbackInfo ci) {
@@ -67,6 +79,9 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements Ha
         if (oldPlayer instanceof HasBackupSpawnPoints backupSpawnPoints) {
             this.setBackupSpawnPoints(backupSpawnPoints.getBackupSpawnPoints());
         }
+        if (oldPlayer instanceof HasLockedDeathPosition lockedDeathPosition) {
+            this.unruffled_lockedDeathPos = lockedDeathPosition.getLockedDeathPosition();
+        }
     }
 
     @Inject(method = "readCustomDataFromNbt", at = @At("TAIL"))
@@ -78,7 +93,12 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements Ha
                 unruffled_backupSpawnPoints.add(SpawnPoint.fromNbt((NbtCompound) spawnPointNbt));
             }
         }
-        System.out.println("Read backup spawn points: " + unruffled_backupSpawnPoints);
+        if (nbt.contains("LockedDeathLocation", NbtElement.COMPOUND_TYPE)) {
+            DataResult<GlobalPos> parsedPos = GlobalPos.CODEC.parse(NbtOps.INSTANCE, nbt.get("LockedDeathLocation"));
+            this.unruffled_lockedDeathPos = parsedPos.result();
+        } else {
+            this.unruffled_lockedDeathPos = Optional.empty();
+        }
     }
 
     @Inject(method = "writeCustomDataToNbt", at = @At("TAIL"))
@@ -90,6 +110,8 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements Ha
             }
             nbt.put("BackupSpawn", spawnList);
         }
+        this.unruffled_lockedDeathPos.flatMap((pos) -> GlobalPos.CODEC.encodeStart(NbtOps.INSTANCE, pos).result())
+            .ifPresent((encoded) -> nbt.put("LockedDeathLocation", encoded));
     }
 
     private LinkedList<SpawnPoint> unruffled_backupSpawnPoints = new LinkedList<>();
@@ -101,6 +123,10 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements Ha
 
     @Override
     public void addBackupSpawnPoint(SpawnPoint pos) {
+        if (Config.INSTANCE.get().mechanicsConfig.backupSpawnPoints() == 0) {
+            unruffled_backupSpawnPoints.clear();
+            return;
+        }
         deleteBackupSpawnPoint(pos);
         while (unruffled_backupSpawnPoints.size() >= Config.INSTANCE.get().mechanicsConfig.backupSpawnPoints()) {
             unruffled_backupSpawnPoints.removeLast();
@@ -121,5 +147,16 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements Ha
     @Override
     public Collection<SpawnPoint> getBackupSpawnPoints() {
         return this.unruffled_backupSpawnPoints;
+    }
+
+    @Override
+    public Optional<GlobalPos> getLockedDeathPosition() {
+        return this.unruffled_lockedDeathPos;
+    }
+
+    @Override
+    public void setLockedDeathPosition() {
+        this.unruffled_lockedDeathPos = this.getLastDeathPos();
+        UnruffledMod.sendLockedDeathPosition((ServerPlayerEntity) (Object) this, this.unruffled_lockedDeathPos);
     }
 }
