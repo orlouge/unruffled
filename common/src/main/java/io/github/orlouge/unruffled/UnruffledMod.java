@@ -52,6 +52,7 @@ import java.util.stream.Collectors;
 public class UnruffledMod {
     public static final String MOD_ID = "unruffled";
     public static final TagKey<Block> STEADY = TagKey.of(RegistryKeys.BLOCK, new Identifier(MOD_ID, "steady"));
+    public static final TagKey<Block> UNSTEADY = TagKey.of(RegistryKeys.BLOCK, new Identifier(MOD_ID, "unsteady"));
     public static final int PROTOCOL_VERSION = 0;
 
     public static final BadBrewCriterion BAD_BREW_CRITERION = Criteria.register(new BadBrewCriterion(new Identifier(UnruffledMod.MOD_ID, "bad_brew")));

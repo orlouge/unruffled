@@ -1,0 +1,11 @@
+{
+  "values": [
+    "#minecraft:base_stone_overworld",
+    "#minecraft:base_stone_nether",
+    "#minecraft:dirt",
+    "#minecraft:sand",
+    "#minecraft:nylium",
+    "minecraft:end_stone",
+    "minecraft:soul_sand"
+  ]
+}

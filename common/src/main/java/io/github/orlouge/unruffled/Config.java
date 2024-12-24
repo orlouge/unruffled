@@ -108,25 +108,27 @@ public class Config {
             float staminaDepletionRate, float travelPenaltyFactor, float maxTravelPenalty,
             float hungerDepletionRate, float staminaRegenerationRate, float inventoryWeightPenaltyFactor,
             float attackExhaustionFactor, boolean attackAlwaysAllowInTime,
-            float eatCooldownFactor, float wearinessIncreaseFactor, float wearinessDecreaseFactor, float wearinessDecreaseFactorOnStillEntities
+            float eatCooldownFactor, float wearinessIncreaseFactor, float wearinessDecreaseFactor, float wearinessDecreaseFactorOnStillEntities,
+            boolean steadyBlockBlacklist
     ) {
         public HungerConfig() {
-            this(0.25f, 0.003f, 2.8f, 0.2f, 0.0028f, 1f, 2f, true, 0.2f, 0.1f, 0.9998f, 0.9993f);
+            this(0.25f, 0.003f, 2.8f, 0.2f, 0.0028f, 1f, 2f, true, 0.2f, 0.1f, 0.9998f, 0.9993f, true);
         }
 
         public static Codec<HungerConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-                Codec.FLOAT.fieldOf("stamina_depletion_rate").forGetter(HungerConfig::staminaDepletionRate),
-                Codec.FLOAT.fieldOf("travel_penalty_factor").forGetter(HungerConfig::travelPenaltyFactor),
-                Codec.FLOAT.fieldOf("travel_penalty_max").forGetter(HungerConfig::maxTravelPenalty),
-                Codec.FLOAT.fieldOf("hunger_depletion_rate").forGetter(HungerConfig::hungerDepletionRate),
-                Codec.FLOAT.fieldOf("stamina_regeneration_factor").forGetter(HungerConfig::staminaRegenerationRate),
-                Codec.FLOAT.fieldOf("inventory_weight_penalty_factor").forGetter(HungerConfig::inventoryWeightPenaltyFactor),
-                Codec.FLOAT.fieldOf("attack_exhaustion_factor").forGetter(HungerConfig::attackExhaustionFactor),
-                Codec.BOOL.fieldOf("attack_always_allow_in_time").forGetter(HungerConfig::attackAlwaysAllowInTime),
-                Codec.FLOAT.fieldOf("eat_cooldown_factor").forGetter(HungerConfig::eatCooldownFactor),
-                Codec.FLOAT.fieldOf("weariness_increase_factor").forGetter(HungerConfig::wearinessIncreaseFactor),
+            Codec.FLOAT.fieldOf("stamina_depletion_rate").forGetter(HungerConfig::staminaDepletionRate),
+            Codec.FLOAT.fieldOf("travel_penalty_factor").forGetter(HungerConfig::travelPenaltyFactor),
+            Codec.FLOAT.fieldOf("travel_penalty_max").forGetter(HungerConfig::maxTravelPenalty),
+            Codec.FLOAT.fieldOf("hunger_depletion_rate").forGetter(HungerConfig::hungerDepletionRate),
+            Codec.FLOAT.fieldOf("stamina_regeneration_factor").forGetter(HungerConfig::staminaRegenerationRate),
+            Codec.FLOAT.fieldOf("inventory_weight_penalty_factor").forGetter(HungerConfig::inventoryWeightPenaltyFactor),
+            Codec.FLOAT.fieldOf("attack_exhaustion_factor").forGetter(HungerConfig::attackExhaustionFactor),
+            Codec.BOOL.fieldOf("attack_always_allow_in_time").forGetter(HungerConfig::attackAlwaysAllowInTime),
+            Codec.FLOAT.fieldOf("eat_cooldown_factor").forGetter(HungerConfig::eatCooldownFactor),
+            Codec.FLOAT.fieldOf("weariness_increase_factor").forGetter(HungerConfig::wearinessIncreaseFactor),
             Codec.FLOAT.fieldOf("weariness_decrease_factor").forGetter(HungerConfig::wearinessDecreaseFactor),
-            Codec.FLOAT.fieldOf("weariness_decrease_factor_riding_still_entities").forGetter(HungerConfig::wearinessDecreaseFactorOnStillEntities)
+            Codec.FLOAT.fieldOf("weariness_decrease_factor_riding_still_entities").forGetter(HungerConfig::wearinessDecreaseFactorOnStillEntities),
+            Codec.BOOL.optionalFieldOf("steady_block_blacklist", false).forGetter(HungerConfig::steadyBlockBlacklist)
         ).apply(instance, HungerConfig::new));
     }
 

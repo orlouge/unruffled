@@ -94,7 +94,11 @@ public abstract class PlayerEntityMixin extends LivingEntity {
     public float decreaseSprintingExhaustionOnPaths(float constant) {
         if (!this.lastSprintBlockPos.equals(this.getBlockPos())) {
             this.lastSprintBlockPos = this.getBlockPos();
-            this.isOnPath = this.getWorld().getBlockState(this.getVelocityAffectingPos()).isIn(UnruffledMod.STEADY);
+            if (Config.INSTANCE.get().hungerConfig.steadyBlockBlacklist()) {
+                this.isOnPath = !this.getWorld().getBlockState(this.getVelocityAffectingPos()).isIn(UnruffledMod.UNSTEADY);
+            } else {
+                this.isOnPath = this.getWorld().getBlockState(this.getVelocityAffectingPos()).isIn(UnruffledMod.STEADY);
+            }
         }
         return this.isOnPath ? constant * 0.5f : constant;
     }
