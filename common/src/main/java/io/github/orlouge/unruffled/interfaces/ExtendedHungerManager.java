@@ -31,7 +31,7 @@ public interface ExtendedHungerManager {
     }
 
     default float getStaminaRegenerationRate(float weariness) {
-        return (1 - weariness * 0.9f) * Config.INSTANCE.get().hungerConfig.staminaRegenerationRate();
+        return (1f - (float) Math.tanh(weariness * 1.8) * 0.9f) * Config.INSTANCE.get().hungerConfig.staminaRegenerationRate();
     }
 
     default float getTargetWeariness() {

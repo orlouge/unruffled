@@ -112,7 +112,7 @@ public class Config {
             boolean steadyBlockBlacklist
     ) {
         public HungerConfig() {
-            this(0.25f, 0.003f, 2.8f, 0.2f, 0.0028f, 1f, 2f, true, 0.2f, 0.1f, 0.9998f, 0.9993f, true);
+            this(0.2f, 0.003f, 2.8f, 0.2f, 0.0028f, 1f, 2f, true, 0.2f, 0.1f, 0.99975f, 0.9993f, true);
         }
 
         public static Codec<HungerConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group(

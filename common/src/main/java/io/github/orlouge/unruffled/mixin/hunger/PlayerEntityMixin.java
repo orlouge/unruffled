@@ -115,7 +115,7 @@ public abstract class PlayerEntityMixin extends LivingEntity {
     @Inject(method = "addExperience", at = @At("HEAD"))
     public void experienceToStamina(int experience, CallbackInfo ci) {
         if (this.getHungerManager() instanceof ExtendedHungerManager extendedHungerManager) {
-            extendedHungerManager.addStamina((float) experience / 10f);
+            extendedHungerManager.addStamina((float) experience / 20f);
         }
     }
 
