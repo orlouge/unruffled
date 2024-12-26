@@ -13,6 +13,7 @@
   "mixins": [
     "EyeOfEnderEntityMixin",
     "FireworkRocketEntityMixin",
+    "ItemEntityMixin",
     "LivingEntityMixin",
     "TippedArrowRecipeMixin",
     "accessors.ItemAccessor",

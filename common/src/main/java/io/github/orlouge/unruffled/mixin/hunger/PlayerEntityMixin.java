@@ -4,14 +4,18 @@ import io.github.orlouge.unruffled.Config;
 import io.github.orlouge.unruffled.UnruffledMod;
 import io.github.orlouge.unruffled.UnruffledModClient;
 import io.github.orlouge.unruffled.interfaces.ExtendedHungerManager;
+import io.github.orlouge.unruffled.interfaces.HasFireImmunitySetting;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffectUtil;
+import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.HungerManager;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -161,5 +165,14 @@ public abstract class PlayerEntityMixin extends LivingEntity {
     @ModifyConstant(method = "Lnet/minecraft/entity/player/PlayerEntity;dropItem(Lnet/minecraft/item/ItemStack;ZZ)Lnet/minecraft/entity/ItemEntity;", constant = @Constant(floatValue = 0.5f, ordinal = 0))
     public float modifyDropSpread(float velocity) {
         return velocity * Config.INSTANCE.get().mechanicsConfig.dropSpreadFactor();
+    }
+
+    @ModifyVariable(method = "dropItem(Lnet/minecraft/item/ItemStack;ZZ)Lnet/minecraft/entity/ItemEntity;", at = @At("STORE"))
+    public ItemEntity makeDeathDropsFireImmune(ItemEntity drop, ItemStack stack, boolean throwRandomly, boolean retainOwnership)
+    {
+        if (throwRandomly && !retainOwnership && this.hasStatusEffect(StatusEffects.FIRE_RESISTANCE) && drop instanceof HasFireImmunitySetting immuneDrop) {
+            immuneDrop.setFireImmune(true);
+        }
+        return drop;
     }
 }
