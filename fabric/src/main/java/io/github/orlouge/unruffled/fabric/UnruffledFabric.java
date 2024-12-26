@@ -30,7 +30,9 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.gen.GenerationStep;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 public class UnruffledFabric implements ModInitializer {
     @Override
@@ -120,6 +122,13 @@ public class UnruffledFabric implements ModInitializer {
                             ).build()
                     ).toList();
                     tableBuilder.modifyPools(pool -> pool.with(entries));
+                }
+                if (Config.INSTANCE.get().lootConfig.assortedPotionsAdd().containsKey(id)) {
+                    List<Integer> rolls = Config.INSTANCE.get().lootConfig.assortedPotionsAdd().get(id);
+                    int min_rolls = !rolls.isEmpty() ? rolls.get(0) : 1;
+                    LootPool.Builder assortedPotionsBuilder = LootPool.builder();
+                    assortedPotionsBuilder = assortedPotionsBuilder.with(Arrays.stream(lootManager.getLootTable(new Identifier(UnruffledMod.MOD_ID, "chests/assorted_potions")).pools[0].entries).toList());
+                    tableBuilder.pool(assortedPotionsBuilder.rolls(UniformLootNumberProvider.create(min_rolls, rolls.size() > 1 ? rolls.get(1) : min_rolls)));
                 }
                 if (id.equals(LootTables.RUINED_PORTAL_CHEST)) {
                     tableBuilder.pools(List.of(lootManager.getLootTable(new Identifier(UnruffledMod.MOD_ID, "chests/ruined_portal_extra")).pools));

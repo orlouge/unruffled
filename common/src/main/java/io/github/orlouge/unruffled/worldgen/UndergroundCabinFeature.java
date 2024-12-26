@@ -116,7 +116,7 @@ public class UndergroundCabinFeature extends Feature<DefaultFeatureConfig> {
                 BlockTemplate.lootContainer(Blocks.HOPPER.getDefaultState().with(HopperBlock.FACING, Direction.DOWN), new Identifier(UnruffledMod.MOD_ID, "chests/fermented_spider_eyes"))
             },
             new BlockTemplate[]{
-                BlockTemplate.lootContainer(Blocks.BARREL.getDefaultState().with(BarrelBlock.FACING, Direction.SOUTH), new Identifier(UnruffledMod.MOD_ID, "chests/assorted_potions")),
+                BlockTemplate.lootContainer(Blocks.BARREL.getDefaultState().with(BarrelBlock.FACING, Direction.SOUTH), new Identifier(UnruffledMod.MOD_ID, "chests/assorted_potions_and_ingredients")),
                 BlockTemplate.block(Blocks.HOPPER.getDefaultState().with(HopperBlock.FACING, Direction.WEST).with(HopperBlock.ENABLED, false)),
                 BlockTemplate.lootContainer(Blocks.BARREL.getDefaultState().with(BarrelBlock.FACING, Direction.SOUTH), new Identifier(UnruffledMod.MOD_ID, "chests/mundane_potions")),
             },

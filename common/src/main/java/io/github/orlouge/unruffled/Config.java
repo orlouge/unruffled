@@ -228,14 +228,15 @@ public class Config {
             ).apply(instance, WorldgenConfig::new));
     }
 
-    public record LootConfig(Map<Identifier, List<Integer>> lootCodicesAdd, Map<Identifier, List<Integer>> lootCodicesModify) {
+    public record LootConfig(Map<Identifier, List<Integer>> lootCodicesAdd, Map<Identifier, List<Integer>> lootCodicesModify, Map<Identifier, List<Integer>> assortedPotionsAdd) {
         public LootConfig() {
-            this(UnruffledMod.DEFAULT_LOOT_CODICES_ADD, UnruffledMod.DEFAULT_LOOT_CODICES_MODIFY);
+            this(UnruffledMod.DEFAULT_LOOT_CODICES_ADD, UnruffledMod.DEFAULT_LOOT_CODICES_MODIFY, UnruffledMod.DEFAULT_ASSORTED_POTIONS_ADD);
         }
 
         public static final Codec<LootConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Codec.unboundedMap(Identifier.CODEC, new ListCodec<>(Codecs.rangedInt(1, 50))).fieldOf("ancient_codices_numbers_chest").forGetter(config -> config.lootCodicesAdd),
-            Codec.unboundedMap(Identifier.CODEC, new ListCodec<>(Codecs.rangedInt(1, 50))).fieldOf("ancient_codices_numbers_archaeology").forGetter(config -> config.lootCodicesModify)
+            Codec.unboundedMap(Identifier.CODEC, new ListCodec<>(Codecs.rangedInt(1, 50))).fieldOf("ancient_codices_numbers_archaeology").forGetter(config -> config.lootCodicesModify),
+            Codec.unboundedMap(Identifier.CODEC, new ListCodec<>(Codecs.NONNEGATIVE_INT)).fieldOf("assorted_potions_chest").forGetter(config -> config.assortedPotionsAdd)
         ).apply(instance, LootConfig::new));
     }
 

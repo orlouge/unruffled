@@ -145,6 +145,25 @@ public class UnruffledMod {
             Map.entry(NORTHBOUND_GATE_LOOT_TABLE, List.of(8, 12, 28))
     );
 
+    public static Map<Identifier, List<Integer>> DEFAULT_ASSORTED_POTIONS_ADD = Map.ofEntries(
+        Map.entry(LootTables.ABANDONED_MINESHAFT_CHEST, List.of(0, 2)),
+        Map.entry(LootTables.SIMPLE_DUNGEON_CHEST, List.of(0, 2)),
+        Map.entry(LootTables.BASTION_OTHER_CHEST, List.of(0, 2)),
+        Map.entry(LootTables.DESERT_PYRAMID_CHEST, List.of(0, 1)),
+        Map.entry(LootTables.IGLOO_CHEST_CHEST, List.of(0, 2)),
+        Map.entry(LootTables.NETHER_BRIDGE_CHEST, List.of(0, 1)),
+        Map.entry(LootTables.SHIPWRECK_TREASURE_CHEST, List.of(0, 1)),
+        Map.entry(LootTables.STRONGHOLD_CORRIDOR_CHEST, List.of(0, 2)),
+        Map.entry(LootTables.UNDERWATER_RUIN_SMALL_CHEST, List.of(0, 2)),
+        Map.entry(LootTables.WOODLAND_MANSION_CHEST, List.of(0, 3)),
+        Map.entry(LootTables.PILLAGER_OUTPOST_CHEST, List.of(1, 3)),
+        Map.entry(LootTables.JUNGLE_TEMPLE_CHEST, List.of(0, 7)),
+        Map.entry(LootTables.END_CITY_TREASURE_CHEST, List.of(0, 2)),
+        Map.entry(LootTables.ANCIENT_CITY_ICE_BOX_CHEST, List.of(0, 2)),
+        Map.entry(LootTables.VILLAGE_TEMPLE_CHEST, List.of(1, 3)),
+        Map.entry(LootTables.VILLAGE_SAVANNA_HOUSE_CHEST, List.of(0, 2))
+    );
+
     public static void init() {
         Packets.AttackMiss.register(player -> {
             if (player.getHungerManager() instanceof ExtendedHungerManager ext) {
