@@ -1,6 +1,6 @@
 package io.github.orlouge.unruffled.mixin;
 
-import io.github.orlouge.unruffled.Config;
+import io.github.orlouge.unruffled.config.Config;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.projectile.FireworkRocketEntity;
 import net.minecraft.util.math.Vec3d;

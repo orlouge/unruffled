@@ -1,7 +1,6 @@
 package io.github.orlouge.unruffled.mixin.enchanting;
 
-import io.github.orlouge.unruffled.Config;
-import io.github.orlouge.unruffled.UnruffledMod;
+import io.github.orlouge.unruffled.config.Config;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.ItemGroups;
 import org.spongepowered.asm.mixin.Mixin;

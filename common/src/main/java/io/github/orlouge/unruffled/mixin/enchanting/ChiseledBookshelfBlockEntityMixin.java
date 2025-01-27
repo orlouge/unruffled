@@ -1,6 +1,6 @@
 package io.github.orlouge.unruffled.mixin.enchanting;
 
-import io.github.orlouge.unruffled.Config;
+import io.github.orlouge.unruffled.config.Config;
 import net.minecraft.block.entity.ChiseledBookshelfBlockEntity;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;

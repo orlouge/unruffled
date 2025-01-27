@@ -1,6 +1,6 @@
 package io.github.orlouge.unruffled.mixin.tools;
 
-import io.github.orlouge.unruffled.Config;
+import io.github.orlouge.unruffled.config.Config;
 import io.github.orlouge.unruffled.UnruffledMod;
 import io.github.orlouge.unruffled.items.CustomItems;
 import io.github.orlouge.unruffled.items.ItemEnchantmentsHelper;

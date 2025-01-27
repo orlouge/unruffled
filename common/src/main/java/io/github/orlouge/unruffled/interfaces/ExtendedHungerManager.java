@@ -1,6 +1,6 @@
 package io.github.orlouge.unruffled.interfaces;
 
-import io.github.orlouge.unruffled.Config;
+import io.github.orlouge.unruffled.config.Config;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;

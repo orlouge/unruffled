@@ -143,7 +143,7 @@ public class NorthboundGateStructure extends Structure {
                         if (template != null) {
                             template.process(world, random, pos, Direction.NORTH);
                         }
-                        if (yoff == 0 && !world.getBlockState(pos.add(0, -1, 0)).isSolid() && (support || random.nextInt(2 + gravelHeight) > 1)) {
+                        if (yoff == 0 && !world.getBlockState(pos.add(0, -1, 0)).isSolid() && (support || random.nextInt(2 + gravelHeight - floorY) > 1)) {
                             setBlockStateIf(world, pos.add(0, -1, 0), Blocks.STONE.getDefaultState(), this::canReplace);
                         }
                     }

@@ -1,7 +1,6 @@
 package io.github.orlouge.unruffled.mixin.tools;
 
-import io.github.orlouge.unruffled.Config;
-import io.github.orlouge.unruffled.UnruffledMod;
+import io.github.orlouge.unruffled.config.Config;
 import net.minecraft.block.BlockState;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.item.ItemStack;

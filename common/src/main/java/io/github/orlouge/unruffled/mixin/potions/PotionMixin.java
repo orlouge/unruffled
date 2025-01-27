@@ -1,7 +1,7 @@
 package io.github.orlouge.unruffled.mixin.potions;
 
 import com.google.common.collect.ImmutableList;
-import io.github.orlouge.unruffled.Config;
+import io.github.orlouge.unruffled.config.Config;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.potion.Potion;
 import org.spongepowered.asm.mixin.Mixin;

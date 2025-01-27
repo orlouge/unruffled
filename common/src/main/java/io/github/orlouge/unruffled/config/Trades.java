@@ -1,7 +1,8 @@
-package io.github.orlouge.unruffled;
+package io.github.orlouge.unruffled.config;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import io.github.orlouge.unruffled.UnruffledMod;
 import io.github.orlouge.unruffled.interfaces.NearbyPlayersTracker;
 import io.github.orlouge.unruffled.items.CustomItems;
 import io.github.orlouge.unruffled.items.AncientCodexItem;

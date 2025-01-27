@@ -1,6 +1,6 @@
 package io.github.orlouge.unruffled.mixin.enchanting;
 
-import io.github.orlouge.unruffled.Config;
+import io.github.orlouge.unruffled.config.Config;
 import io.github.orlouge.unruffled.items.ItemEnchantmentsHelper;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.ItemStack;

@@ -1,6 +1,6 @@
 package io.github.orlouge.unruffled.utils;
 
-import io.github.orlouge.unruffled.Config;
+import io.github.orlouge.unruffled.config.Config;
 import io.github.orlouge.unruffled.UnruffledMod;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;

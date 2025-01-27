@@ -1,6 +1,6 @@
 package io.github.orlouge.unruffled.mixin.trading;
 
-import io.github.orlouge.unruffled.Config;
+import io.github.orlouge.unruffled.config.Config;
 import io.github.orlouge.unruffled.interfaces.WanderingTraderManagerTracker;
 import net.minecraft.entity.passive.WanderingTraderEntity;
 import net.minecraft.server.world.ServerWorld;

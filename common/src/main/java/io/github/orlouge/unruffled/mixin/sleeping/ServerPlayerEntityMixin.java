@@ -2,7 +2,7 @@ package io.github.orlouge.unruffled.mixin.sleeping;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.serialization.DataResult;
-import io.github.orlouge.unruffled.Config;
+import io.github.orlouge.unruffled.config.Config;
 import io.github.orlouge.unruffled.UnruffledMod;
 import io.github.orlouge.unruffled.interfaces.HasBackupSpawnPoints;
 import io.github.orlouge.unruffled.interfaces.HasLockedDeathPosition;
@@ -21,7 +21,6 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.GlobalPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -30,7 +29,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.Collection;
 import java.util.LinkedList;
-import java.util.Objects;
 import java.util.Optional;
 
 @Mixin(ServerPlayerEntity.class)

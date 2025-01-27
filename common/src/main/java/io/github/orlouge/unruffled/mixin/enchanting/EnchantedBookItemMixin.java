@@ -1,7 +1,6 @@
 package io.github.orlouge.unruffled.mixin.enchanting;
 
-import io.github.orlouge.unruffled.Config;
-import io.github.orlouge.unruffled.UnruffledMod;
+import io.github.orlouge.unruffled.config.Config;
 import net.minecraft.enchantment.EnchantmentLevelEntry;
 import net.minecraft.item.EnchantedBookItem;
 import net.minecraft.item.ItemStack;

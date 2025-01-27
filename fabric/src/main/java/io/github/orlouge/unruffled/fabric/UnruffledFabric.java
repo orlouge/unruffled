@@ -1,6 +1,6 @@
 package io.github.orlouge.unruffled.fabric;
 
-import io.github.orlouge.unruffled.Config;
+import io.github.orlouge.unruffled.config.Config;
 import io.github.orlouge.unruffled.UnruffledMod;
 import io.github.orlouge.unruffled.fabric.mixin.BrewingRecipeRegistryAccessor;
 import io.github.orlouge.unruffled.items.AncientCodexItem;
@@ -32,7 +32,6 @@ import net.minecraft.world.gen.GenerationStep;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 public class UnruffledFabric implements ModInitializer {
     @Override

@@ -1,6 +1,6 @@
 package io.github.orlouge.unruffled.mixin.mobs;
 
-import io.github.orlouge.unruffled.Config;
+import io.github.orlouge.unruffled.config.Config;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.ai.goal.GoalSelector;
 import net.minecraft.entity.mob.ZombieEntity;

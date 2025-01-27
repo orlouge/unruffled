@@ -1,6 +1,6 @@
 package io.github.orlouge.unruffled.mixin.enchanting;
 
-import io.github.orlouge.unruffled.Config;
+import io.github.orlouge.unruffled.config.Config;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.GrindstoneBlock;
 import net.minecraft.entity.player.PlayerEntity;

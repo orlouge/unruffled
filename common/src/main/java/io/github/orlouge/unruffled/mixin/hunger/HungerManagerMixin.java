@@ -1,6 +1,6 @@
 package io.github.orlouge.unruffled.mixin.hunger;
 
-import io.github.orlouge.unruffled.Config;
+import io.github.orlouge.unruffled.config.Config;
 import io.github.orlouge.unruffled.UnruffledMod;
 import io.github.orlouge.unruffled.Packets;
 import io.github.orlouge.unruffled.interfaces.ExtendedHungerManager;

@@ -1,7 +1,6 @@
 package io.github.orlouge.unruffled.mixin.tools;
 
-import io.github.orlouge.unruffled.Config;
-import io.github.orlouge.unruffled.UnruffledMod;
+import io.github.orlouge.unruffled.config.Config;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.item.CrossbowItem;

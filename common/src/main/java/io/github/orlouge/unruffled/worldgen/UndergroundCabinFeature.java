@@ -1,7 +1,7 @@
 package io.github.orlouge.unruffled.worldgen;
 
 import com.mojang.serialization.Codec;
-import io.github.orlouge.unruffled.Config;
+import io.github.orlouge.unruffled.config.Config;
 import io.github.orlouge.unruffled.UnruffledMod;
 import io.github.orlouge.unruffled.items.AncientCodexItem;
 import io.github.orlouge.unruffled.items.CustomItems;

@@ -1,6 +1,6 @@
 package io.github.orlouge.unruffled.mixin.worldgen;
 
-import io.github.orlouge.unruffled.Config;
+import io.github.orlouge.unruffled.config.Config;
 import net.minecraft.world.gen.chunk.ChunkGeneratorSettings;
 import net.minecraft.world.gen.chunk.ChunkNoiseSampler;
 import org.spongepowered.asm.mixin.Mixin;

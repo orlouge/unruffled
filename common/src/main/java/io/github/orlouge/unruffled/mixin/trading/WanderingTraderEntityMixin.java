@@ -1,7 +1,7 @@
 package io.github.orlouge.unruffled.mixin.trading;
 
-import io.github.orlouge.unruffled.Config;
-import io.github.orlouge.unruffled.Trades;
+import io.github.orlouge.unruffled.config.Config;
+import io.github.orlouge.unruffled.config.Trades;
 import io.github.orlouge.unruffled.interfaces.NearbyPlayersTracker;
 import io.github.orlouge.unruffled.interfaces.WanderingTraderManagerTracker;
 import io.github.orlouge.unruffled.utils.TradedCompasses;
@@ -15,7 +15,6 @@ import net.minecraft.item.Items;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.village.TradeOffer;
 import net.minecraft.village.TradeOffers;
-import net.minecraft.world.EntityView;
 import net.minecraft.world.WanderingTraderManager;
 import net.minecraft.world.World;
 import net.minecraft.world.level.ServerWorldProperties;
