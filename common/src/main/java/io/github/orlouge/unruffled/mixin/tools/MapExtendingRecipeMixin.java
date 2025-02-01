@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.injection.ModifyConstant;
 
 @Mixin(MapExtendingRecipe.class)
 public class MapExtendingRecipeMixin {
-    @ModifyConstant(method = "matches(Lnet/minecraft/inventory/RecipeInputInventory;Lnet/minecraft/world/World;)Z", constant = @Constant(intValue = 4, ordinal = 0))
+    @ModifyConstant(method = "matches(Lnet/minecraft/recipe/input/CraftingRecipeInput;Lnet/minecraft/world/World;)Z", constant = @Constant(intValue = 4, ordinal = 0))
     public int overrideMaxMapSize(int constant) {
         return Config.INSTANCE.get().mechanicsConfig.maxMapSize();
     }

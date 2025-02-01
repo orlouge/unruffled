@@ -12,7 +12,11 @@ import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.ChiseledBookshelfBlockEntity;
 import net.minecraft.block.entity.DecoratedPotBlockEntity;
+import net.minecraft.block.entity.Sherds;
 import net.minecraft.block.enums.*;
+import net.minecraft.component.ComponentChanges;
+import net.minecraft.component.ComponentMapImpl;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.decoration.ItemFrameEntity;
@@ -25,6 +29,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.util.BlockRotation;
@@ -113,12 +118,12 @@ public class UndergroundCabinFeature extends Feature<DefaultFeatureConfig> {
             new BlockTemplate[]{
                 BlockTemplate.block(Blocks.SPRUCE_FENCE_GATE.getDefaultState().with(FenceGateBlock.FACING, Direction.NORTH)),
                 BlockTemplate.block(Blocks.BREWING_STAND),
-                BlockTemplate.lootContainer(Blocks.HOPPER.getDefaultState().with(HopperBlock.FACING, Direction.DOWN), new Identifier(UnruffledMod.MOD_ID, "chests/fermented_spider_eyes"))
+                BlockTemplate.lootContainer(Blocks.HOPPER.getDefaultState().with(HopperBlock.FACING, Direction.DOWN), Identifier.of(UnruffledMod.MOD_ID, "chests/fermented_spider_eyes"))
             },
             new BlockTemplate[]{
-                BlockTemplate.lootContainer(Blocks.BARREL.getDefaultState().with(BarrelBlock.FACING, Direction.SOUTH), new Identifier(UnruffledMod.MOD_ID, "chests/assorted_potions_and_ingredients")),
+                BlockTemplate.lootContainer(Blocks.BARREL.getDefaultState().with(BarrelBlock.FACING, Direction.SOUTH), Identifier.of(UnruffledMod.MOD_ID, "chests/assorted_potions_and_ingredients")),
                 BlockTemplate.block(Blocks.HOPPER.getDefaultState().with(HopperBlock.FACING, Direction.WEST).with(HopperBlock.ENABLED, false)),
-                BlockTemplate.lootContainer(Blocks.BARREL.getDefaultState().with(BarrelBlock.FACING, Direction.SOUTH), new Identifier(UnruffledMod.MOD_ID, "chests/mundane_potions")),
+                BlockTemplate.lootContainer(Blocks.BARREL.getDefaultState().with(BarrelBlock.FACING, Direction.SOUTH), Identifier.of(UnruffledMod.MOD_ID, "chests/mundane_potions")),
             },
             new BlockTemplate[]{
                 null,
@@ -137,11 +142,11 @@ public class UndergroundCabinFeature extends Feature<DefaultFeatureConfig> {
         new BlockTemplate[][] {
             new BlockTemplate[] {null, null, BlockTemplate.block(Blocks.CAVE_VINES.getDefaultState())},
             new BlockTemplate[] {
-                BlockTemplate.lootContainer(Blocks.BARREL.getDefaultState().with(BarrelBlock.FACING, Direction.SOUTH), new Identifier(UnruffledMod.MOD_ID, "chests/glow_berries")),
+                BlockTemplate.lootContainer(Blocks.BARREL.getDefaultState().with(BarrelBlock.FACING, Direction.SOUTH), Identifier.of(UnruffledMod.MOD_ID, "chests/glow_berries")),
                 BlockTemplate.block(Blocks.SPRUCE_TRAPDOOR.getDefaultState().with(TrapdoorBlock.FACING, Direction.NORTH))
             },
             new BlockTemplate[] {
-                BlockTemplate.lootContainer(Blocks.BARREL.getDefaultState().with(BarrelBlock.FACING, Direction.SOUTH), new Identifier(UnruffledMod.MOD_ID, "chests/golden_berries")),
+                BlockTemplate.lootContainer(Blocks.BARREL.getDefaultState().with(BarrelBlock.FACING, Direction.SOUTH), Identifier.of(UnruffledMod.MOD_ID, "chests/golden_berries")),
                 BlockTemplate.block(Blocks.SPRUCE_TRAPDOOR.getDefaultState().with(TrapdoorBlock.FACING, Direction.NORTH))
             },
             new BlockTemplate[] {null, null, BlockTemplate.block(Blocks.CAVE_VINES.getDefaultState())},
@@ -165,7 +170,7 @@ public class UndergroundCabinFeature extends Feature<DefaultFeatureConfig> {
             new BlockTemplate[] {
                 BlockTemplate.block(Blocks.TNT),
                 BlockTemplate.block(Blocks.TNT),
-                BlockTemplate.lootContainer(Blocks.BARREL.getDefaultState().with(BarrelBlock.FACING, Direction.SOUTH), new Identifier(UnruffledMod.MOD_ID, "chests/explosives")),
+                BlockTemplate.lootContainer(Blocks.BARREL.getDefaultState().with(BarrelBlock.FACING, Direction.SOUTH), Identifier.of(UnruffledMod.MOD_ID, "chests/explosives")),
             },
             new BlockTemplate[] {
                 BlockTemplate.block(Blocks.TNT),
@@ -199,7 +204,7 @@ public class UndergroundCabinFeature extends Feature<DefaultFeatureConfig> {
                 BlockTemplate.block(Blocks.SPRUCE_WALL_SIGN.getDefaultState().with(WallSignBlock.FACING, Direction.EAST))
             },
             new BlockTemplate[]{
-                BlockTemplate.lootContainer(Blocks.BARREL.getDefaultState().with(BarrelBlock.FACING, Direction.SOUTH), new Identifier(UnruffledMod.MOD_ID, "chests/rails")),
+                BlockTemplate.lootContainer(Blocks.BARREL.getDefaultState().with(BarrelBlock.FACING, Direction.SOUTH), Identifier.of(UnruffledMod.MOD_ID, "chests/rails")),
                 BlockTemplate.block(Blocks.POWERED_RAIL.getDefaultState().with(PoweredRailBlock.SHAPE, RailShape.EAST_WEST))
             },
             new BlockTemplate[]{
@@ -283,7 +288,7 @@ public class UndergroundCabinFeature extends Feature<DefaultFeatureConfig> {
                         itemFrame.setInvisible(true);
                         itemFrame.setHeldItemStack(switch (ctx.random().nextInt(9)) {
                             case 0 -> Items.IRON_AXE.getDefaultStack();
-                            case 1 -> ItemEnchantmentsHelper.createWithItemEnchantments(CustomItems.SACRED_SWORD);
+                            case 1 -> ItemEnchantmentsHelper.createWithItemEnchantments(CustomItems.SACRED_SWORD, ctx.world().getRegistryManager().createRegistryLookup());
                             case 2 -> Items.DIAMOND_SWORD.getDefaultStack();
                             case 3 -> Items.DIAMOND_AXE.getDefaultStack();
                             default -> Items.IRON_SWORD.getDefaultStack();
@@ -302,7 +307,7 @@ public class UndergroundCabinFeature extends Feature<DefaultFeatureConfig> {
             new BlockTemplate[] {
                 BlockTemplate.block(Blocks.SMITHING_TABLE),
                 BlockTemplate.block(Blocks.SPRUCE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.TOP)),
-                BlockTemplate.lootContainer(Blocks.BARREL.getDefaultState().with(BarrelBlock.FACING, Direction.SOUTH), new Identifier(UnruffledMod.MOD_ID, "chests/smithing")),
+                BlockTemplate.lootContainer(Blocks.BARREL.getDefaultState().with(BarrelBlock.FACING, Direction.SOUTH), Identifier.of(UnruffledMod.MOD_ID, "chests/smithing")),
             },
             new BlockTemplate[] {
                 BlockTemplate.sideEffect(BlockTemplate.empty(), (ctx) -> {
@@ -324,14 +329,14 @@ public class UndergroundCabinFeature extends Feature<DefaultFeatureConfig> {
     public static final WallDecorationTemplate BED_ROOM = new FixedWallTemplate(
         new BlockTemplate[][]{
             new BlockTemplate[] {
-                BlockTemplate.lootContainer(Blocks.BARREL.getDefaultState().with(BarrelBlock.FACING, Direction.SOUTH), new Identifier(UnruffledMod.MOD_ID, "chests/bedroom")),
+                BlockTemplate.lootContainer(Blocks.BARREL.getDefaultState().with(BarrelBlock.FACING, Direction.SOUTH), Identifier.of(UnruffledMod.MOD_ID, "chests/bedroom")),
                 BlockTemplate.block(Blocks.BLACK_CANDLE.getDefaultState().with(CandleBlock.LIT, true).with(CandleBlock.CANDLES, 2))
             },
             new BlockTemplate[] {
                 BlockTemplate.block(Blocks.BROWN_BED.getDefaultState().with(BedBlock.PART, BedPart.HEAD).with(BedBlock.FACING, Direction.WEST)),
                 null,
                 BlockTemplate.sideEffect(BlockTemplate.empty(), (ctx) -> {
-                    Optional<RegistryEntry.Reference<PaintingVariant>> variant = Registries.PAINTING_VARIANT.getEntry(switch (ctx.random().nextInt(4)) {
+                    Optional<RegistryEntry.Reference<PaintingVariant>> variant = ctx.world().getRegistryManager().createRegistryLookup().getOptionalEntry(RegistryKeys.PAINTING_VARIANT, switch (ctx.random().nextInt(4)) {
                         case 0 -> PaintingVariants.POOL;
                         case 1 -> PaintingVariants.COURBET;
                         case 2 -> PaintingVariants.SUNSET;
@@ -351,7 +356,7 @@ public class UndergroundCabinFeature extends Feature<DefaultFeatureConfig> {
             new BlockTemplate[] {
                 BlockTemplate.empty(),
                 BlockTemplate.block(Blocks.SPRUCE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.TOP)),
-                BlockTemplate.lootContainer(Blocks.BARREL.getDefaultState().with(BarrelBlock.FACING, Direction.SOUTH), new Identifier(UnruffledMod.MOD_ID, "chests/lodestone")),
+                BlockTemplate.lootContainer(Blocks.BARREL.getDefaultState().with(BarrelBlock.FACING, Direction.SOUTH), Identifier.of(UnruffledMod.MOD_ID, "chests/lodestone")),
             },
             new BlockTemplate[] {
                 BlockTemplate.block(Blocks.POLISHED_ANDESITE_STAIRS.getDefaultState().with(StairsBlock.FACING, Direction.EAST)),
@@ -381,21 +386,21 @@ public class UndergroundCabinFeature extends Feature<DefaultFeatureConfig> {
     public static final WallDecorationTemplate ARCHAEOLOGY_ROOM = new FixedWallTemplate(
         new BlockTemplate[][] {
             new BlockTemplate[] {
-                BlockTemplate.lootBrushable(Blocks.SUSPICIOUS_SAND, new Identifier(UnruffledMod.MOD_ID, "archaeology/underground_pond")),
+                BlockTemplate.lootBrushable(Blocks.SUSPICIOUS_SAND, Identifier.of(UnruffledMod.MOD_ID, "archaeology/underground_pond")),
                 BlockTemplate.random(new BlockState[] {Blocks.SAND.getDefaultState()}, 1),
             },
             new BlockTemplate[] {
-                BlockTemplate.lootBrushable(Blocks.SUSPICIOUS_SAND, new Identifier(UnruffledMod.MOD_ID, "archaeology/underground_pond")),
-                BlockTemplate.lootBrushable(Blocks.SUSPICIOUS_SAND, new Identifier(UnruffledMod.MOD_ID, "archaeology/underground_pond")),
+                BlockTemplate.lootBrushable(Blocks.SUSPICIOUS_SAND, Identifier.of(UnruffledMod.MOD_ID, "archaeology/underground_pond")),
+                BlockTemplate.lootBrushable(Blocks.SUSPICIOUS_SAND, Identifier.of(UnruffledMod.MOD_ID, "archaeology/underground_pond")),
                 BlockTemplate.random(new BlockState[] {Blocks.SAND.getDefaultState()}, 1),
             },
             new BlockTemplate[] {
-                BlockTemplate.lootBrushable(Blocks.SUSPICIOUS_SAND, new Identifier(UnruffledMod.MOD_ID, "archaeology/underground_pond")),
-                BlockTemplate.lootBrushable(Blocks.SUSPICIOUS_SAND, new Identifier(UnruffledMod.MOD_ID, "archaeology/underground_pond")),
+                BlockTemplate.lootBrushable(Blocks.SUSPICIOUS_SAND, Identifier.of(UnruffledMod.MOD_ID, "archaeology/underground_pond")),
+                BlockTemplate.lootBrushable(Blocks.SUSPICIOUS_SAND, Identifier.of(UnruffledMod.MOD_ID, "archaeology/underground_pond")),
                 BlockTemplate.random(new BlockState[] {Blocks.SAND.getDefaultState()}, 1),
             },
             new BlockTemplate[] {
-                BlockTemplate.lootBrushable(Blocks.SUSPICIOUS_SAND, new Identifier(UnruffledMod.MOD_ID, "archaeology/underground_pond")),
+                BlockTemplate.lootBrushable(Blocks.SUSPICIOUS_SAND, Identifier.of(UnruffledMod.MOD_ID, "archaeology/underground_pond")),
                 BlockTemplate.random(new BlockState[] {Blocks.SAND.getDefaultState()}, 1),
             },
             new BlockTemplate[] {
@@ -411,7 +416,7 @@ public class UndergroundCabinFeature extends Feature<DefaultFeatureConfig> {
                 )
             },
             new BlockTemplate[] {
-                BlockTemplate.lootBrushable(Blocks.SUSPICIOUS_SAND, new Identifier(UnruffledMod.MOD_ID, "archaeology/underground_pond")),
+                BlockTemplate.lootBrushable(Blocks.SUSPICIOUS_SAND, Identifier.of(UnruffledMod.MOD_ID, "archaeology/underground_pond")),
                 BlockTemplate.random(new BlockState[] {Blocks.SAND.getDefaultState()}, 1),
             },
         }
@@ -430,7 +435,7 @@ public class UndergroundCabinFeature extends Feature<DefaultFeatureConfig> {
             },
             new BlockTemplate[] {
                 BlockTemplate.block(Blocks.LEVER.getDefaultState().with(LeverBlock.FACING, Direction.SOUTH).with(LeverBlock.POWERED, false)),
-                BlockTemplate.lootContainer(Blocks.BARREL.getDefaultState().with(BarrelBlock.FACING, Direction.SOUTH), new Identifier(UnruffledMod.MOD_ID, "chests/redstone")),
+                BlockTemplate.lootContainer(Blocks.BARREL.getDefaultState().with(BarrelBlock.FACING, Direction.SOUTH), Identifier.of(UnruffledMod.MOD_ID, "chests/redstone")),
                 BlockTemplate.block(Blocks.REDSTONE_BLOCK)
             },
             new BlockTemplate[] {
@@ -553,7 +558,7 @@ public class UndergroundCabinFeature extends Feature<DefaultFeatureConfig> {
                 BlockTemplate.block(Blocks.CHAIN.getDefaultState().with(ChainBlock.AXIS, Direction.Axis.Y))
             },
             new BlockTemplate[] {
-                BlockTemplate.lootContainer(Blocks.BARREL.getDefaultState().with(BarrelBlock.FACING, Direction.SOUTH), new Identifier(UnruffledMod.MOD_ID, "chests/arrows")),
+                BlockTemplate.lootContainer(Blocks.BARREL.getDefaultState().with(BarrelBlock.FACING, Direction.SOUTH), Identifier.of(UnruffledMod.MOD_ID, "chests/arrows")),
                 BlockTemplate.block(Blocks.TARGET),
                 BlockTemplate.block(Blocks.STRIPPED_SPRUCE_LOG.getDefaultState().with(PillarBlock.AXIS, Direction.Axis.Y))
             },
@@ -819,19 +824,21 @@ public class UndergroundCabinFeature extends Feature<DefaultFeatureConfig> {
     }
 
     protected static void setRandomSherds(BlockEntity blockEntity, Random random) {
-        final Item[] sherds = {
+        final Item[] possibleSherds = {
                 Items.BRICK, Items.MINER_POTTERY_SHERD, Items.MINER_POTTERY_SHERD,
                 Items.BURN_POTTERY_SHERD, Items.DANGER_POTTERY_SHERD, Items.BREWER_POTTERY_SHERD,
                 Items.BREWER_POTTERY_SHERD, Items.PRIZE_POTTERY_SHERD, Items.BLADE_POTTERY_SHERD
         };
-        Item sherd = sherds[random.nextInt(sherds.length)];
+        Item sherd = possibleSherds[random.nextInt(possibleSherds.length)];
         if (blockEntity instanceof DecoratedPotBlockEntity decoratedPot) {
-            decoratedPot.sherds = switch (random.nextInt(4)) {
-                case 0 -> new DecoratedPotBlockEntity.Sherds(sherd, sherd, sherd, sherd);
-                case 1 -> new DecoratedPotBlockEntity.Sherds(sherd, Items.BRICK, Items.BRICK, sherd);
-                case 2 -> new DecoratedPotBlockEntity.Sherds(Items.BRICK, sherd, sherd, Items.BRICK);
-                default -> new DecoratedPotBlockEntity.Sherds(Items.BRICK, Items.BRICK, Items.BRICK, sherd);
+            Sherds sherds = switch (random.nextInt(4)) {
+                case 0 -> new Sherds(sherd, sherd, sherd, sherd);
+                case 1 -> new Sherds(sherd, Items.BRICK, Items.BRICK, sherd);
+                case 2 -> new Sherds(Items.BRICK, sherd, sherd, Items.BRICK);
+                default -> new Sherds(Items.BRICK, Items.BRICK, Items.BRICK, sherd);
             };
+            decoratedPot.sherds = sherds;
+            decoratedPot.setComponents(ComponentMapImpl.create(decoratedPot.getComponents(), ComponentChanges.builder().add(DataComponentTypes.POT_DECORATIONS, sherds).build()));
             decoratedPot.markDirty();
         }
     }

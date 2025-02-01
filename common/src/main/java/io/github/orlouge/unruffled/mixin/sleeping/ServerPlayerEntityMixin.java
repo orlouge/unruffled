@@ -51,8 +51,6 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements Ha
 
     @Shadow public abstract void setSpawnPoint(RegistryKey<World> dimension, @Nullable BlockPos pos, float angle, boolean forced, boolean sendMessage);
 
-    @Shadow public abstract int lockRecipes(Collection<Recipe<?>> recipes);
-
     @Inject(method = "wakeUp", at = @At("HEAD"))
     public void updatePeacefulChunksOnWakeUp(boolean skipSleepTimer, boolean updateSleepingPlayers, CallbackInfo ci) {
         if (skipSleepTimer || updateSleepingPlayers || this.spawnPointPosition == null || !this.isSleeping()) return;

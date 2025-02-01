@@ -46,7 +46,7 @@ public abstract class EvokerEntityMixin extends SpellcastingIllagerEntity {
             if (Config.INSTANCE.get().mechanicsConfig.evokerDropsEvilTotem()) {
                 ItemStack totem = new ItemStack(CustomItems.EVIL_TOTEM);
                 if (Config.INSTANCE.get().mechanicsConfig.badOmenFromEvilTotem()) {
-                    ItemEnchantmentsHelper.setItemEnchantments(totem);
+                    ItemEnchantmentsHelper.setItemEnchantments(totem, this.getRegistryManager().createRegistryLookup());
                 }
                 this.dropStack(totem);
             }

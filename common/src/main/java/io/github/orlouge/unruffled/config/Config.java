@@ -13,7 +13,12 @@ import io.github.orlouge.unruffled.UnruffledMod;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
+import net.minecraft.loot.LootTable;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Lazy;
 import net.minecraft.util.dynamic.Codecs;
@@ -49,7 +54,7 @@ public class Config {
         Config defaultConfig = new Config();
         if (file.isFile()) {
             try (FileReader in = new FileReader(file)) {
-                return CODEC.parse(JsonOps.INSTANCE, JsonParser.parseReader(in)).getOrThrow(false, System.out::println);
+                return CODEC.parse(JsonOps.INSTANCE, JsonParser.parseReader(in)).getOrThrow();
             } catch (Exception e) {
                 e.printStackTrace();
                 try {
@@ -138,14 +143,14 @@ public class Config {
     public record EnchantmentsConfig(
         boolean disableEnchantingTable, boolean disableGrindstone, boolean disableRepairXpCost, boolean disableGlint, boolean showLevelNumber,
         Optional<Boolean> disenchantChiseledBookshelfBooks,
-        Set<Enchantment> unobtainableEnchantments, Set<Enchantment> disabledEnchantments, Map<Item, Map<Enchantment, Integer>> itemEnchantments) {
+        Set<RegistryKey<Enchantment>> disabledEnchantments, Map<Item, Map<RegistryKey<Enchantment>, Integer>> itemEnchantments) {
 
         public EnchantmentsConfig() {
-            this(true, true, true, true, false, Optional.of(Platform.isModLoaded("betterarcheology")), UnruffledMod.DEFAULT_UNOBTAINABLE_ENCHANTMENTS, UnruffledMod.DEFAULT_DISABLED_ENCHANTMENTS, UnruffledMod.DEFAULT_ITEM_ENCHANTMENTS);
+            this(true, true, true, true, false, Optional.of(Platform.isModLoaded("betterarcheology")), UnruffledMod.DEFAULT_DISABLED_ENCHANTMENTS, UnruffledMod.DEFAULT_ITEM_ENCHANTMENTS);
         }
 
-        public static Codec<Set<Enchantment>> ENCHANTMENT_SET_CODEC = new ListCodec<>(Registries.ENCHANTMENT.getCodec()).xmap(HashSet::new, LinkedList::new);
-        public static Codec<Map<Enchantment, Integer>> ENCHANTMENT_MAP_CODEC = Codec.unboundedMap(Registries.ENCHANTMENT.getCodec(), Codecs.POSITIVE_INT);
+        public static Codec<Set<RegistryKey<Enchantment>>> ENCHANTMENT_SET_CODEC = RegistryKey.createCodec(RegistryKeys.ENCHANTMENT).listOf().xmap(HashSet::new, LinkedList::new);
+        public static Codec<Map<RegistryKey<Enchantment>, Integer>> ENCHANTMENT_MAP_CODEC = Codec.unboundedMap(RegistryKey.createCodec(RegistryKeys.ENCHANTMENT), Codecs.POSITIVE_INT);
         public static final Codec<EnchantmentsConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Codec.BOOL.fieldOf("disable_enchanting_table").forGetter(EnchantmentsConfig::disableEnchantingTable),
             Codec.BOOL.fieldOf("disable_grindstone").forGetter(EnchantmentsConfig::disableGrindstone),
@@ -153,7 +158,6 @@ public class Config {
             Codec.BOOL.fieldOf("disable_glint").forGetter(EnchantmentsConfig::disableGlint),
             Codec.BOOL.fieldOf("display_xp_level_over_bar").forGetter(EnchantmentsConfig::showLevelNumber),
             Codec.BOOL.optionalFieldOf("disenchant_chiseled_bookshelf_books").forGetter(EnchantmentsConfig::disenchantChiseledBookshelfBooks),
-            ENCHANTMENT_SET_CODEC.fieldOf("unselectable_enchantments").forGetter(config -> config.unobtainableEnchantments),
             ENCHANTMENT_SET_CODEC.fieldOf("disabled_enchantments").forGetter(config -> config.disabledEnchantments),
             Codec.unboundedMap(Registries.ITEM.getCodec(), ENCHANTMENT_MAP_CODEC).fieldOf("intrinsic_enchantments").forGetter(config -> config.itemEnchantments)
             ).apply(instance, EnchantmentsConfig::new)
@@ -182,7 +186,7 @@ public class Config {
 
     public record MechanicsConfig(
         boolean peacefulChunks, int sleepTime, int backupSpawnPoints, /* Optional<Boolean> recoveryCompassLocking, */ float dropSpreadFactor,
-        boolean disableTotemOfUndying, boolean evokerDropsEvilTotem, boolean badOmenFromEvilTotem, boolean badOmenFromCaptain,
+        boolean disableTotemOfUndying, boolean evokerDropsEvilTotem, boolean badOmenFromEvilTotem,
         boolean evilTotemBinding,
         boolean canTeleportMobs, float potionDurationFactor, int bundleSize, int wanderingSpawnFrequency,
         boolean zombiesDontTargetVillagers,
@@ -190,7 +194,7 @@ public class Config {
         public MechanicsConfig() {
             this(
                 true, 16000, 10, /* Optional.of(true), */ 0.2f,
-                true, true, true, false,
+                true, true, true,
                 true,
                 true, 2f, 256, 3,
                 true,
@@ -206,7 +210,6 @@ public class Config {
             Codec.BOOL.fieldOf("disable_totem_of_undying").forGetter(config -> config.disableTotemOfUndying),
             Codec.BOOL.fieldOf("evil_totem_dropped_by_evoker").forGetter(config -> config.evokerDropsEvilTotem),
             Codec.BOOL.fieldOf("evil_totem_bad_omen").forGetter(config -> config.badOmenFromEvilTotem),
-            Codec.BOOL.fieldOf("illager_captain_gives_bad_omen").forGetter(config -> config.badOmenFromCaptain),
             Codec.BOOL.fieldOf("evil_totem_binding").forGetter(config -> config.evilTotemBinding),
             Codec.BOOL.fieldOf("potion_can_teleport_mobs").forGetter(config -> config.canTeleportMobs),
             Codec.FLOAT.fieldOf("potion_duration_factor").forGetter(config -> config.potionDurationFactor),
@@ -230,15 +233,15 @@ public class Config {
             ).apply(instance, WorldgenConfig::new));
     }
 
-    public record LootConfig(Map<Identifier, List<Integer>> lootCodicesAdd, Map<Identifier, List<Integer>> lootCodicesModify, Map<Identifier, List<Integer>> assortedPotionsAdd) {
+    public record LootConfig(Map<RegistryKey<LootTable>, List<Integer>> lootCodicesAdd, Map<RegistryKey<LootTable>, List<Integer>> lootCodicesModify, Map<RegistryKey<LootTable>, List<Integer>> assortedPotionsAdd) {
         public LootConfig() {
             this(UnruffledMod.DEFAULT_LOOT_CODICES_ADD, UnruffledMod.DEFAULT_LOOT_CODICES_MODIFY, UnruffledMod.DEFAULT_ASSORTED_POTIONS_ADD);
         }
 
         public static final Codec<LootConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            Codec.unboundedMap(Identifier.CODEC, new ListCodec<>(Codecs.rangedInt(1, 50))).fieldOf("ancient_codices_numbers_chest").forGetter(config -> config.lootCodicesAdd),
-            Codec.unboundedMap(Identifier.CODEC, new ListCodec<>(Codecs.rangedInt(1, 50))).fieldOf("ancient_codices_numbers_archaeology").forGetter(config -> config.lootCodicesModify),
-            Codec.unboundedMap(Identifier.CODEC, new ListCodec<>(Codecs.NONNEGATIVE_INT)).fieldOf("assorted_potions_chest").forGetter(config -> config.assortedPotionsAdd)
+            Codec.unboundedMap(RegistryKey.createCodec(RegistryKeys.LOOT_TABLE), new ListCodec<>(Codecs.rangedInt(1, 50), 0, 50)).fieldOf("ancient_codices_numbers_chest").forGetter(config -> config.lootCodicesAdd),
+            Codec.unboundedMap(RegistryKey.createCodec(RegistryKeys.LOOT_TABLE), new ListCodec<>(Codecs.rangedInt(1, 50), 0, 50)).fieldOf("ancient_codices_numbers_archaeology").forGetter(config -> config.lootCodicesModify),
+            Codec.unboundedMap(RegistryKey.createCodec(RegistryKeys.LOOT_TABLE), new ListCodec<>(Codecs.NONNEGATIVE_INT, 0, 2)).fieldOf("assorted_potions_chest").forGetter(config -> config.assortedPotionsAdd)
         ).apply(instance, LootConfig::new));
     }
 

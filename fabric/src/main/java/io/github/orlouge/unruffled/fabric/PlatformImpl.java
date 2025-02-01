@@ -1,5 +1,6 @@
 package io.github.orlouge.unruffled.fabric;
 
+import com.mojang.serialization.MapCodec;
 import io.github.orlouge.unruffled.Packets;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -9,11 +10,11 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.loot.function.LootFunction;
 import net.minecraft.loot.function.LootFunctionType;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.JsonSerializer;
 
 import java.nio.file.Path;
 import java.util.function.BiConsumer;
@@ -31,39 +32,33 @@ public class PlatformImpl {
     }
 
     public static void sendToClient(Packets.Packet packet, ServerPlayerEntity player) {
-        PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
-        packet.write(buf);
-        ServerPlayNetworking.send(player, packet.getIdentifier(), buf);
+        ServerPlayNetworking.send(player, packet);
     }
 
     public static void sendToServer(Packets.Packet packet) {
-        PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
-        packet.write(buf);
-        ClientPlayNetworking.send(packet.getIdentifier(), buf);
+        ClientPlayNetworking.send(packet);
     }
 
-    public static <T extends Packets.Packet> void registerServerReceiver(Class<T> type, Identifier id, Function<PacketByteBuf, T> decoder, BiConsumer<T, PlayerEntity> receiver) {
-        ServerPlayNetworking.registerGlobalReceiver(id, (server, player, handler, buffer, sender) -> {
-            T packet = decoder.apply(buffer);
-            server.execute(() -> receiver.accept(packet, player));
+    public static <T extends Packets.Packet> void registerServerReceiver(CustomPayload.Id<T> type, BiConsumer<T, PlayerEntity> receiver) {
+        ServerPlayNetworking.registerGlobalReceiver(type, (payload, context) -> {
+            context.server().execute(() -> receiver.accept(payload, context.player()));
         });
     }
 
-    public static <T extends Packets.Packet> void registerClientReceiver(Class<T> type, Identifier id, Function<PacketByteBuf, T> decoder, Consumer<T> receiver) {
-        ClientImpl.registerClientReceiver(id, decoder, receiver);
+    public static <T extends Packets.Packet> void registerClientReceiver(CustomPayload.Id<T> type, Consumer<T> receiver) {
+        ClientImpl.registerClientReceiver(type, receiver);
     }
 
-    public static Supplier<LootFunctionType> registerLootFunctionType(Identifier id, JsonSerializer<? extends LootFunction> serializer) {
+    public static <T extends LootFunction> Supplier<LootFunctionType<T>> registerLootFunctionType(Identifier id, MapCodec<T> codec) {
         System.out.println("Registering " + id);
-        LootFunctionType type = Registry.register(Registries.LOOT_FUNCTION_TYPE, id, new LootFunctionType(serializer));
+        LootFunctionType<T> type = Registry.register(Registries.LOOT_FUNCTION_TYPE, id, new LootFunctionType<T>(codec));
         return () -> type;
     }
 
     private static class ClientImpl {
-        private static <T extends Packets.Packet> void registerClientReceiver(Identifier id, Function<PacketByteBuf, T> decoder, Consumer<T> receiver) {
-            ClientPlayNetworking.registerGlobalReceiver(id, ((client, handler, buf, responseSender) -> {
-                T packet = decoder.apply(buf);
-                client.execute(() -> receiver.accept(packet));
+        private static <T extends Packets.Packet> void registerClientReceiver(CustomPayload.Id<T> id, Consumer<T> receiver) {
+            ClientPlayNetworking.registerGlobalReceiver(id, ((packet, context) -> {
+                context.client().execute(() -> receiver.accept(packet));
             }));
         }
     }

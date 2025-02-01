@@ -1,6 +1,7 @@
 package io.github.orlouge.unruffled.mixin.tools;
 
 import io.github.orlouge.unruffled.items.ItemEnchantmentsHelper;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.GrindstoneScreenHandler;
 import org.spongepowered.asm.mixin.Mixin;
@@ -11,14 +12,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(GrindstoneScreenHandler.class)
 public class GrindstoneScreenHandlerMixin {
     @Inject(method = "grind", at = @At("HEAD"), cancellable = true)
-    public void keepItemEnchantments(ItemStack item, int damage, int amount, CallbackInfoReturnable<ItemStack> cir) {
+    public void keepItemEnchantments(ItemStack item, CallbackInfoReturnable<ItemStack> cir) {
         if (ItemEnchantmentsHelper.hasItemEnchantments(item)) {
-            ItemStack stack = item.copyWithCount(amount);
-            if (damage > 0) {
-                stack.setDamage(damage);
-            } else {
-                stack.removeSubNbt("Damage");
-            }
+            ItemStack stack = item.copy();
             cir.setReturnValue(stack);
             cir.cancel();
         }

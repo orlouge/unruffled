@@ -32,7 +32,7 @@ public abstract class VillagerEntityMixin extends MerchantEntity {
             if (villagerTrades != null && villagerTrades.enabled() && villagerTrades.pools().length >= villagerData.getLevel()) {
                 Trades.ConfiguredVillagerPool pool = villagerTrades.pools()[villagerData.getLevel() - 1];
                 this.fillRecipesFromPool(this.getOffers(), Arrays.stream(pool.trades()).map(
-                    Trades.ConfiguredTrade::toFactory
+                    trade -> trade.toFactory(this.getWorld().getRegistryManager())
                 ).toArray(TradeOffers.Factory[]::new), pool.count());
                 ci.cancel();;
             }

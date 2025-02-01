@@ -1,0 +1,34 @@
+{
+  "parent": "minecraft:nether/brew_potion",
+  "criteria": {
+    "potion": {
+      "conditions": {},
+      "trigger": "unruffled:teleportation"
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.nether.teleportation.description"
+    },
+    "frame": "task",
+    "hidden": false,
+    "icon": {
+      "id": "minecraft:potion",
+      "components": {
+        "minecraft:potion_contents": {
+            "potion": "unruffled:teleportation"
+        }
+      }
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.nether.teleportation.title"
+    }
+  },
+  "requirements": [
+    [
+      "potion"
+    ]
+  ]
+}

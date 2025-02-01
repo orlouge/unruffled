@@ -1,0 +1,35 @@
+{
+  "parent": "minecraft:story/smelt_iron",
+  "criteria": {
+    "iron_bolster": {
+      "conditions": {
+        "items": [
+          {
+            "items": "unruffled:iron_bolster"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.story.iron_bolster.description"
+    },
+    "frame": "task",
+    "hidden": false,
+    "icon": {
+      "id": "unruffled:iron_bolster"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.story.iron_bolster.title"
+    }
+  },
+  "requirements": [
+    [
+      "iron_bolster"
+    ]
+  ]
+}

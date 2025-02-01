@@ -80,7 +80,7 @@ public abstract class WanderingTraderEntityMixin extends MerchantEntity implemen
                     if (trades.enabled()) {
                         for (Trades.ConfiguredWanderingTraderPool pool : trades.pools()) {
                             this.fillRecipesFromPool(this.offers, Arrays.stream(pool.trades()).map(
-                                Trades.ConfiguredTrade::toFactory
+                                configuredTrade -> configuredTrade.toFactory(this.getWorld().getRegistryManager())
                             ).toArray(TradeOffers.Factory[]::new), pool.count());
                         }
                     }

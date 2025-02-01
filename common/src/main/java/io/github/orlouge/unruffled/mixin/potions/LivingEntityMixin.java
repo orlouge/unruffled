@@ -9,6 +9,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.item.ItemStack;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
@@ -22,16 +23,13 @@ import java.util.Map;
 
 @Mixin(LivingEntity.class)
 public abstract class LivingEntityMixin extends Entity {
-    @Shadow @Final private Map<StatusEffect, StatusEffectInstance> activeStatusEffects;
-
     @Shadow protected abstract void onStatusEffectApplied(StatusEffectInstance effect, @Nullable Entity source);
-
-    @Shadow public abstract ItemStack eatFood(World world, ItemStack stack);
 
     @Shadow protected abstract void onStatusEffectUpgraded(StatusEffectInstance effect, boolean reapplyEffect, @Nullable Entity source);
 
     @Shadow public abstract boolean canHaveStatusEffect(StatusEffectInstance effect);
 
+    @Shadow @Final private Map<RegistryEntry<StatusEffect>, StatusEffectInstance> activeStatusEffects;
     TeleporterEntity lastTeleporter = null;
 
     public LivingEntityMixin(EntityType<?> type, World world) {

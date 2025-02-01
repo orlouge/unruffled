@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.Mixin;
 
 @Mixin(PlayerScreenHandler.class)
 public class PlayerScreenHandlerMixin {
-    @Mixin(targets = "net.minecraft.screen.PlayerScreenHandler$2")
+    @Mixin(targets = "net.minecraft.screen.PlayerScreenHandler$1")
     public static class OffhandSlotMixin extends Slot {
         public OffhandSlotMixin(Inventory inventory, int index, int x, int y) {
             super(inventory, index, x, y);

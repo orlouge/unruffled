@@ -8,19 +8,25 @@ import io.github.orlouge.unruffled.items.CustomItems;
 import io.github.orlouge.unruffled.items.AncientCodexItem;
 import io.github.orlouge.unruffled.items.ItemEnchantmentsHelper;
 import io.github.orlouge.unruffled.utils.TradedCompasses;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.PotionContentsComponent;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.item.map.MapIcon;
+import net.minecraft.item.map.MapDecoration;
+import net.minecraft.item.map.MapDecorationType;
+import net.minecraft.item.map.MapDecorationTypes;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.potion.Potion;
-import net.minecraft.potion.PotionUtil;
 import net.minecraft.potion.Potions;
+import net.minecraft.predicate.ComponentPredicate;
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.tag.StructureTags;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.server.world.ServerWorld;
@@ -149,19 +155,19 @@ public class Trades {
                             buyAncientCodex(10, 64, 1, 10)
                     },
                     new ConfiguredTrade[] {
-                            sellMap(StructureTags.ON_OCEAN_EXPLORER_MAPS, "filled_map.monument", MapIcon.Type.MONUMENT, 6, 12, 5),
-                            buyAncientCodex(20, 64, 1, 10),
+                            sellMap(StructureTags.ON_OCEAN_EXPLORER_MAPS, "filled_map.monument", MapDecorationTypes.MONUMENT, 6, 12, 5),
+                            buyAncientCodex(20, 64, 1, 20),
                     },
                     new ConfiguredTrade[] {
-                            sellMap(StructureTags.ON_WOODLAND_EXPLORER_MAPS, "filled_map.mansion", MapIcon.Type.MANSION, 8, 12, 10),
-                            buyAncientCodex(30, 64, 1, 10)
+                            sellMap(StructureTags.ON_WOODLAND_EXPLORER_MAPS, "filled_map.mansion", MapDecorationTypes.MANSION, 8, 12, 10),
+                            buyAncientCodex(30, 64, 1, 30)
                     },
                     new ConfiguredTrade[] {
-                            sellItem(Items.LODESTONE,  32, 1, 2, 10, 0.2F),
-                            buyAncientCodex(40, 64, 1, 10),
+                            sellItem(Items.LODESTONE,  32, 1, 2, 40, 0.2F),
+                            buyAncientCodex(40, 64, 1, 40),
                     },
                     new ConfiguredTrade[] {
-                            sellItem(Items.RECOVERY_COMPASS, 16, 1, 12, 1, 0.2F),
+                            sellMap(StructureTags.ON_TRIAL_CHAMBERS_MAPS, "filled_map.trial_chambers", MapDecorationTypes.TRIAL_CHAMBERS, 16, 12, 10),
                             buyAncientCodex(50, 64, 1, 10)
                     }
             )),
@@ -430,15 +436,15 @@ public class Trades {
             Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
     }
 
-    private static ConfiguredTrade sellMap(TagKey<Structure> structureTag, String nameKey, MapIcon.Type icon, int price, int maxUses, int experience) {
+    private static ConfiguredTrade sellMap(TagKey<Structure> structureTag, String nameKey, RegistryEntry<MapDecorationType> decoration, int price, int maxUses, int experience) {
         return new ConfiguredTrade(
             Optional.empty(), false, price, 1, maxUses, experience, 0.05f,
             Optional.empty(), Optional.empty(),
-            Optional.of(structureTag), Optional.of(nameKey), Optional.of(icon),
+            Optional.of(structureTag), Optional.of(nameKey), Optional.of(decoration),
             Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
     }
 
-    private static ConfiguredTrade sellWithPotion(Item item, Potion potion, int price, int count, int maxUses, int experience) {
+    private static ConfiguredTrade sellWithPotion(Item item, RegistryEntry<Potion> potion, int price, int count, int maxUses, int experience) {
         return new ConfiguredTrade(
             Optional.of(item), false, price, count, maxUses, experience, 0.05f,
             Optional.empty(), Optional.empty(),
@@ -521,7 +527,6 @@ public class Trades {
 
     private static ItemStack process(ItemConvertible item, Function<ItemStack, ItemStack> processor) {
         ItemStack stack = new ItemStack(item);
-        stack.setNbt(new NbtCompound());
         stack = processor.apply(stack);
         return stack;
     }
@@ -549,13 +554,13 @@ public class Trades {
         Optional<Integer> biomeBasedCodexNumber,
         Optional<TagKey<Structure>> mapStructureTag,
         Optional<String> mapNameKey,
-        Optional<MapIcon.Type> mapIcon,
-        Optional<Potion> potion,
+        Optional<RegistryEntry<MapDecorationType>> mapDecoration,
+        Optional<RegistryEntry<Potion>> potion,
         Optional<Boolean> randomDyed,
         Optional<Boolean> applyItemEnchantments,
         Optional<Integer> lodestoneCompass
     ) {
-        public TradeOffers.Factory toFactory() {
+        public TradeOffers.Factory toFactory(DynamicRegistryManager registryManager) {
             if (lodestoneCompass.isPresent()) {
                 if (buy) {
                     return new BuyLodestoneCompassFactory(lodestoneCompass.get(), count, payment, maxUses, experience, multiplier);
@@ -563,11 +568,11 @@ public class Trades {
                     return new SellLodestoneCompassFactory(payment, maxUses, experience, multiplier);
                 }
             } if (mapStructureTag.isPresent()) {
-                return new TradeOffers.SellMapFactory(payment, mapStructureTag.get(), mapNameKey.orElse(""), mapIcon.orElse(MapIcon.Type.RED_X), maxUses, experience);
+                return new TradeOffers.SellMapFactory(payment, mapStructureTag.get(), mapNameKey.orElse(""), mapDecoration.orElse(MapDecorationTypes.RED_X), maxUses, experience);
             } else if (randomDyed().orElse(false) && item.isPresent()) {
                 return new TradeOffers.SellDyedArmorFactory(item.get(), payment, maxUses, experience);
             } else if (biomeBasedCodexNumber.isPresent()) {
-                return new TypeAwareBuyNbtItemFactory(CustomItems.ANCIENT_CODEX, setCodexBasedOnBiome(biomeBasedCodexNumber.get()), count, payment, maxUses, experience);
+                return new TypeAwareBuyComponentsItemFactory(CustomItems.ANCIENT_CODEX, setCodexBasedOnBiome(biomeBasedCodexNumber.get()), count, payment, maxUses, experience);
             } else {
                 Item tradeItem = null;
                 Function<ItemStack, ItemStack> itemFunction = null;
@@ -577,24 +582,23 @@ public class Trades {
                 } else if (item.isPresent()) {
                     tradeItem = item.get();
                     if (potion.isPresent()) {
-                        itemFunction = stack -> PotionUtil.setPotion(stack, potion.get());
+                        itemFunction = stack -> { stack = stack.copy(); stack.set(DataComponentTypes.POTION_CONTENTS, new PotionContentsComponent(potion.get())); return stack; };
                     } else if (applyItemEnchantments.orElse(false)) {
-                        itemFunction = ItemEnchantmentsHelper::setItemEnchantments;
+                        itemFunction = item -> ItemEnchantmentsHelper.setItemEnchantments(item, registryManager.createRegistryLookup());
                     }
                 }
                 if (tradeItem != null) {
                     if (buy) {
                         if (itemFunction == null) {
-                            if (payment == 1) return new TradeOffers.BuyForOneEmeraldFactory(tradeItem, count, maxUses, experience);
-                            return new Trades.BuyNbtItemFactory(tradeItem, count, payment, maxUses, experience);
+                            return new TradeOffers.BuyItemFactory(tradeItem, count, maxUses, experience, payment);
                         } else {
-                            return new Trades.BuyNbtItemFactory(tradeItem, itemFunction, count, payment, maxUses, experience);
+                            return new BuyComponentItemFactory(tradeItem, itemFunction, count, payment, maxUses, experience);
                         }
                     } else {
                         if (itemFunction == null) {
                             return new TradeOffers.SellItemFactory(tradeItem, payment, count, maxUses, experience);
                         } else {
-                            return new SellNbtItemFactory(tradeItem, itemFunction, payment, count, maxUses, experience);
+                            return new SellComponentItemFactory(tradeItem, itemFunction, payment, count, maxUses, experience);
                         }
                     }
                 }
@@ -614,8 +618,8 @@ public class Trades {
             Codec.INT.optionalFieldOf("biome_based_codex_number").forGetter(ConfiguredTrade::biomeBasedCodexNumber),
             Identifier.CODEC.optionalFieldOf("map_structure_tag").xmap(o -> o.map(identifier -> TagKey.of(RegistryKeys.STRUCTURE, identifier)), o -> o.map(TagKey::id)).forGetter(ConfiguredTrade::mapStructureTag),
             Codec.STRING.optionalFieldOf("map_name_key").forGetter(ConfiguredTrade::mapNameKey),
-            Codec.INT.optionalFieldOf("map_icon").xmap(o -> o.map(id -> MapIcon.Type.byId((byte) (int) id)), o -> o.map(icon -> (int) icon.getId())).forGetter(ConfiguredTrade::mapIcon),
-            Registries.POTION.getCodec().optionalFieldOf("potion").forGetter(ConfiguredTrade::potion),
+            MapDecorationType.CODEC.optionalFieldOf("map_decoration").forGetter(ConfiguredTrade::mapDecoration),
+            Potion.CODEC.optionalFieldOf("potion").forGetter(ConfiguredTrade::potion),
             Codec.BOOL.optionalFieldOf("random_dyed").forGetter(ConfiguredTrade::randomDyed),
             Codec.BOOL.optionalFieldOf("apply_item_enchantments").forGetter(ConfiguredTrade::applyItemEnchantments),
             Codec.INT.optionalFieldOf("lodestone_compass").forGetter(ConfiguredTrade::lodestoneCompass)
@@ -677,7 +681,7 @@ public class Trades {
                 ItemStack compass = compasses.getRandomSell(5, world, random, entity.getPos());
                 if (compass == null) return null;
                 compass.setCount(1);
-                return new TradeOffer(new ItemStack(Items.EMERALD, this.price), compass, this.maxUses, this.experience, this.multiplier);
+                return new TradeOffer(new TradedItem(Items.EMERALD, this.price), compass, this.maxUses, this.experience, this.multiplier);
             }
             return null;
         }
@@ -709,9 +713,8 @@ public class Trades {
                     for (int i = 0; i < 5; i++) {
                         ItemStack compass = compasses.getBuy(world, player);
                         if (compass != null) {
-                            compass = compass.copy();
-                            compass.setCount(this.count);
-                            return new TradeOffer(compass, new ItemStack(Items.EMERALD, this.payment), this.maxUses, this.experience, this.multiplier);
+                            TradedItem offerCompass = new TradedItem(compass.getRegistryEntry(), this.count, ComponentPredicate.of(compass.getComponents()));
+                            return new TradeOffer(offerCompass, new ItemStack(Items.EMERALD, this.payment), this.maxUses, this.experience, this.multiplier);
                         }
                     }
                 }
@@ -720,7 +723,7 @@ public class Trades {
         }
     }
 
-    static class SellNbtItemFactory implements TradeOffers.Factory {
+    static class SellComponentItemFactory implements TradeOffers.Factory {
         private final ItemStack sell;
         private final int price;
         private final int count;
@@ -728,11 +731,11 @@ public class Trades {
         private final int experience;
         private final float multiplier;
 
-        public SellNbtItemFactory(ItemConvertible item, Function<ItemStack, ItemStack> processor, int price, int count, int maxUses, int experience) {
+        public SellComponentItemFactory(ItemConvertible item, Function<ItemStack, ItemStack> processor, int price, int count, int maxUses, int experience) {
             this(process(item, processor), price, count, maxUses, experience, 0.05F);
         }
 
-        public SellNbtItemFactory(ItemStack stack, int price, int count, int maxUses, int experience, float multiplier) {
+        public SellComponentItemFactory(ItemStack stack, int price, int count, int maxUses, int experience, float multiplier) {
             this.sell = stack;
             this.price = price;
             this.count = count;
@@ -742,14 +745,13 @@ public class Trades {
         }
 
         public TradeOffer create(Entity entity, Random random) {
-            ItemStack sellStack = new ItemStack(this.sell.getItem());
-            sellStack.setNbt(this.sell.getNbt());
+            ItemStack sellStack = this.sell.copy();
             sellStack.setCount(this.count);
-            return new TradeOffer(new ItemStack(Items.EMERALD, this.price), sellStack, this.maxUses, this.experience, this.multiplier);
+            return new TradeOffer(new TradedItem(Items.EMERALD, this.price), sellStack, this.maxUses, this.experience, this.multiplier);
         }
     }
 
-    public static class BuyNbtItemFactory implements TradeOffers.Factory {
+    public static class BuyComponentItemFactory implements TradeOffers.Factory {
         private final ItemStack buy;
         private final int count;
         private final int payment;
@@ -757,15 +759,15 @@ public class Trades {
         private final int experience;
         private final float multiplier;
 
-        public BuyNbtItemFactory(ItemConvertible item, Function<ItemStack, ItemStack> processor, int count, int payment, int maxUses, int experience) {
+        public BuyComponentItemFactory(ItemConvertible item, Function<ItemStack, ItemStack> processor, int count, int payment, int maxUses, int experience) {
             this(process(item, processor), count, payment, maxUses, experience);
         }
 
-        public BuyNbtItemFactory(ItemConvertible item, int count, int payment, int maxUses, int experience) {
+        public BuyComponentItemFactory(ItemConvertible item, int count, int payment, int maxUses, int experience) {
             this(new ItemStack(item), count, payment, maxUses, experience);
         }
 
-        public BuyNbtItemFactory(ItemStack item, int count, int payment, int maxUses, int experience) {
+        public BuyComponentItemFactory(ItemStack item, int count, int payment, int maxUses, int experience) {
             this.buy = item;
             this.count = count;
             this.payment = payment;
@@ -775,14 +777,13 @@ public class Trades {
         }
 
         public TradeOffer create(Entity entity, Random random) {
-            ItemStack buyStack = new ItemStack(this.buy.getItem());
-            buyStack.setNbt(this.buy.getNbt());
+            ItemStack buyStack = this.buy.copy();
             buyStack.setCount(this.count);
-            return new TradeOffer(buyStack, new ItemStack(Items.EMERALD, this.payment), this.maxUses, this.experience, this.multiplier);
+            return new TradeOffer(new TradedItem(this.buy.getRegistryEntry(), this.count, ComponentPredicate.of(this.buy.getComponents())), new ItemStack(Items.EMERALD, this.payment), this.maxUses, this.experience, this.multiplier);
         }
     }
 
-    public static class TypeAwareBuyNbtItemFactory implements TradeOffers.Factory {
+    public static class TypeAwareBuyComponentsItemFactory implements TradeOffers.Factory {
         private final Map<VillagerType, ItemStack> buy;
         private final int count;
         private final int payment;
@@ -790,7 +791,7 @@ public class Trades {
         private final int experience;
         private final float multiplier;
 
-        public TypeAwareBuyNbtItemFactory(ItemConvertible item, BiFunction<VillagerType, ItemStack, ItemStack> processor, int count, int payment, int maxUses, int experience) {
+        public TypeAwareBuyComponentsItemFactory(ItemConvertible item, BiFunction<VillagerType, ItemStack, ItemStack> processor, int count, int payment, int maxUses, int experience) {
             this(
                     Registries.VILLAGER_TYPE.stream().map(
                             type -> Map.entry(type, process(item, stack -> processor.apply(type, stack)))
@@ -798,7 +799,7 @@ public class Trades {
             );
         }
 
-        public TypeAwareBuyNbtItemFactory(Map<VillagerType, ItemStack> item, int count, int payment, int maxUses, int experience) {
+        public TypeAwareBuyComponentsItemFactory(Map<VillagerType, ItemStack> item, int count, int payment, int maxUses, int experience) {
             this.buy = item;
             this.count = count;
             this.payment = payment;
@@ -815,7 +816,7 @@ public class Trades {
                 buyStack = this.buy.values().stream().findFirst().get().copy();
             }
             buyStack.setCount(this.count);
-            return new TradeOffer(buyStack, new ItemStack(Items.EMERALD, this.payment), this.maxUses, this.experience, this.multiplier);
+            return new TradeOffer(new TradedItem(buyStack.getRegistryEntry(), this.count, ComponentPredicate.of(buyStack.getComponents())), new ItemStack(Items.EMERALD, this.payment), this.maxUses, this.experience, this.multiplier);
         }
     }
 }

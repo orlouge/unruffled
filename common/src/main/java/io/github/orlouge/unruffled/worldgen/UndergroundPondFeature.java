@@ -6,6 +6,8 @@ import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BrushableBlockEntity;
 import net.minecraft.fluid.Fluids;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
@@ -53,7 +55,7 @@ public class UndergroundPondFeature extends Feature<DefaultFeatureConfig> {
     public static final BlockState[] FLOOR_BLOCKS = {
             Blocks.MOSS_CARPET.getDefaultState(),
             Blocks.ANDESITE_SLAB.getDefaultState(),
-            Blocks.GRASS.getDefaultState()
+            Blocks.SHORT_GRASS.getDefaultState()
     };
     public static final BlockState[] SUBMERGED_FLOOR_BLOCKS = {
             Blocks.SEAGRASS.getDefaultState(),
@@ -174,7 +176,7 @@ public class UndergroundPondFeature extends Feature<DefaultFeatureConfig> {
             if (replace) {
                 BlockEntity blockEntity = world.getBlockEntity(surfacePos);
                 if (blockEntity instanceof BrushableBlockEntity) {
-                    ((BrushableBlockEntity) blockEntity).setLootTable(new Identifier(UnruffledMod.MOD_ID, "archaeology/underground_pond"), random.nextLong());
+                    ((BrushableBlockEntity) blockEntity).setLootTable(RegistryKey.of(RegistryKeys.LOOT_TABLE, Identifier.of(UnruffledMod.MOD_ID, "archaeology/underground_pond")), random.nextLong());
                 }
             }
         }
@@ -252,7 +254,7 @@ public class UndergroundPondFeature extends Feature<DefaultFeatureConfig> {
                             this.setBlockStateIf(world, floor, Blocks.SUSPICIOUS_GRAVEL.getDefaultState(), this::canReplace);
                             BlockEntity blockEntity = world.getBlockEntity(floor);
                             if (blockEntity instanceof BrushableBlockEntity) {
-                                ((BrushableBlockEntity) blockEntity).setLootTable(new Identifier(UnruffledMod.MOD_ID, "archaeology/underground_pond"), random.nextLong());
+                                ((BrushableBlockEntity) blockEntity).setLootTable(RegistryKey.of(RegistryKeys.LOOT_TABLE, Identifier.of(UnruffledMod.MOD_ID, "archaeology/underground_pond")), random.nextLong());
                             }
                         } else {
                             this.setRandomBlock(world, random, floor, SUBMERGED_BLOCKS, 1);

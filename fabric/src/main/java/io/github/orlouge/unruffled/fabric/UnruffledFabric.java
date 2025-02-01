@@ -1,8 +1,8 @@
 package io.github.orlouge.unruffled.fabric;
 
+import io.github.orlouge.unruffled.Packets;
 import io.github.orlouge.unruffled.config.Config;
 import io.github.orlouge.unruffled.UnruffledMod;
-import io.github.orlouge.unruffled.fabric.mixin.BrewingRecipeRegistryAccessor;
 import io.github.orlouge.unruffled.items.AncientCodexItem;
 import io.github.orlouge.unruffled.items.CustomItems;
 import io.github.orlouge.unruffled.items.ItemEnchantmentsHelper;
@@ -12,19 +12,24 @@ import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
 import net.fabricmc.fabric.api.biome.v1.BiomeSelectors;
 import net.fabricmc.fabric.api.entity.event.v1.EntitySleepEvents;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
-import net.fabricmc.fabric.api.loot.v2.LootTableEvents;
+import net.fabricmc.fabric.api.loot.v3.LootTableEvents;
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+import net.fabricmc.fabric.api.registry.FabricBrewingRecipeRegistryBuilder;
 import net.fabricmc.fabric.api.registry.FuelRegistry;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.item.ItemGroups;
 import net.minecraft.item.Items;
 import net.minecraft.loot.LootPool;
+import net.minecraft.loot.LootTable;
 import net.minecraft.loot.LootTables;
 import net.minecraft.loot.entry.ItemEntry;
 import net.minecraft.loot.entry.LootPoolEntry;
-import net.minecraft.loot.function.SetNbtLootFunction;
+import net.minecraft.loot.entry.LootTableEntry;
+import net.minecraft.loot.function.SetComponentsLootFunction;
 import net.minecraft.loot.provider.number.UniformLootNumberProvider;
 import net.minecraft.registry.*;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.tag.BiomeTags;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Identifier;
@@ -32,116 +37,100 @@ import net.minecraft.world.gen.GenerationStep;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 public class UnruffledFabric implements ModInitializer {
     @Override
     public void onInitialize() {
-        Registry.register(Registries.FEATURE, new Identifier(UnruffledMod.MOD_ID, "underground_pond"), UnruffledMod.UNDERGROUND_POND_FEATURE);
-        Registry.register(Registries.FEATURE, new Identifier(UnruffledMod.MOD_ID, "underground_cabin"), UnruffledMod.UNDERGROUND_CABIN_FEATURE);
+        PayloadTypeRegistry.playC2S().register(Packets.AttackMiss.PACKET_ID, Packets.AttackMiss.CODEC);
+        PayloadTypeRegistry.playC2S().register(Packets.LockRecoveryCompass.PACKET_ID, Packets.LockRecoveryCompass.CODEC);
+        PayloadTypeRegistry.playS2C().register(Packets.LockedDeathPositionUpdate.PACKET_ID, Packets.LockedDeathPositionUpdate.CODEC);
+        PayloadTypeRegistry.playS2C().register(Packets.ExtendedHungerUpdate.PACKET_ID, Packets.ExtendedHungerUpdate.CODEC);
 
-        Registry.register(Registries.STATUS_EFFECT, new Identifier(UnruffledMod.MOD_ID, "teleportation"), UnruffledMod.TELEPORTATION_EFFECT);
-        Registry.register(Registries.POTION, new Identifier(UnruffledMod.MOD_ID, "teleportation"), UnruffledMod.TELEPORTATION_POTION);
+        Registry.register(Registries.FEATURE, Identifier.of(UnruffledMod.MOD_ID, "underground_pond"), UnruffledMod.UNDERGROUND_POND_FEATURE);
+        Registry.register(Registries.FEATURE, Identifier.of(UnruffledMod.MOD_ID, "underground_cabin"), UnruffledMod.UNDERGROUND_CABIN_FEATURE);
 
-        Registry.register(Registries.ITEM, new Identifier(UnruffledMod.MOD_ID, "golden_berries"), CustomItems.GOLDEN_BERRIES);
-        Registry.register(Registries.ITEM, new Identifier(UnruffledMod.MOD_ID, "iron_bolster"), CustomItems.IRON_BOLSTER);
-        Registry.register(Registries.ITEM, new Identifier(UnruffledMod.MOD_ID, "diamond_bolster"), CustomItems.DIAMOND_BOLSTER);
-        Registry.register(Registries.ITEM, new Identifier(UnruffledMod.MOD_ID, "netherite_bolster"), CustomItems.NETHERITE_BOLSTER);
-        Registry.register(Registries.ITEM, new Identifier(UnruffledMod.MOD_ID, "charged_trident"), CustomItems.CHARGED_TRIDENT);
-        Registry.register(Registries.ITEM, new Identifier(UnruffledMod.MOD_ID, "magnetic_trident"), CustomItems.MAGNETIC_TRIDENT);
-        Registry.register(Registries.ITEM, new Identifier(UnruffledMod.MOD_ID, "piercing_arrow"), CustomItems.PIERCING_ARROW);
-        Registry.register(Registries.ITEM, new Identifier(UnruffledMod.MOD_ID, "igniting_arrow"), CustomItems.IGNITING_ARROW);
-        Registry.register(Registries.ITEM, new Identifier(UnruffledMod.MOD_ID, "ancient_codex"), CustomItems.ANCIENT_CODEX);
-        Registry.register(Registries.ITEM, new Identifier(UnruffledMod.MOD_ID, "evil_totem"), CustomItems.EVIL_TOTEM);
-        Registry.register(Registries.ITEM, new Identifier(UnruffledMod.MOD_ID, "blazing_sword"), CustomItems.BLAZING_SWORD);
-        Registry.register(Registries.ITEM, new Identifier(UnruffledMod.MOD_ID, "sacred_sword"), CustomItems.SACRED_SWORD);
+        //Registry.register(Registries.STATUS_EFFECT, Identifier.of(UnruffledMod.MOD_ID, "teleportation"), UnruffledMod.TELEPORTATION_EFFECT);
+        //Registry.register(Registries.POTION, Identifier.of(UnruffledMod.MOD_ID, "teleportation"), UnruffledMod.TELEPORTATION_POTION);
+
+        Registry.register(Registries.DATA_COMPONENT_TYPE, Identifier.of(UnruffledMod.MOD_ID, "codex_number"), AncientCodexItem.NUMBER);
+        Registry.register(Registries.DATA_COMPONENT_TYPE, Identifier.of(UnruffledMod.MOD_ID, "locked_compass"), UnruffledMod.LOCKED_COMPASS_COMPONENT);
+
+        Registry.register(Registries.ITEM, Identifier.of(UnruffledMod.MOD_ID, "golden_berries"), CustomItems.GOLDEN_BERRIES);
+        Registry.register(Registries.ITEM, Identifier.of(UnruffledMod.MOD_ID, "iron_bolster"), CustomItems.IRON_BOLSTER);
+        Registry.register(Registries.ITEM, Identifier.of(UnruffledMod.MOD_ID, "diamond_bolster"), CustomItems.DIAMOND_BOLSTER);
+        Registry.register(Registries.ITEM, Identifier.of(UnruffledMod.MOD_ID, "netherite_bolster"), CustomItems.NETHERITE_BOLSTER);
+        Registry.register(Registries.ITEM, Identifier.of(UnruffledMod.MOD_ID, "charged_trident"), CustomItems.CHARGED_TRIDENT);
+        Registry.register(Registries.ITEM, Identifier.of(UnruffledMod.MOD_ID, "magnetic_trident"), CustomItems.MAGNETIC_TRIDENT);
+        Registry.register(Registries.ITEM, Identifier.of(UnruffledMod.MOD_ID, "piercing_arrow"), CustomItems.PIERCING_ARROW);
+        Registry.register(Registries.ITEM, Identifier.of(UnruffledMod.MOD_ID, "igniting_arrow"), CustomItems.IGNITING_ARROW);
+        Registry.register(Registries.ITEM, Identifier.of(UnruffledMod.MOD_ID, "ancient_codex"), CustomItems.ANCIENT_CODEX);
+        Registry.register(Registries.ITEM, Identifier.of(UnruffledMod.MOD_ID, "evil_totem"), CustomItems.EVIL_TOTEM);
+        Registry.register(Registries.ITEM, Identifier.of(UnruffledMod.MOD_ID, "blazing_sword"), CustomItems.BLAZING_SWORD);
+        Registry.register(Registries.ITEM, Identifier.of(UnruffledMod.MOD_ID, "sacred_sword"), CustomItems.SACRED_SWORD);
 
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.TOOLS).register(content -> {
-            content.add(ItemEnchantmentsHelper.createWithItemEnchantments(CustomItems.IRON_BOLSTER));
-            content.add(ItemEnchantmentsHelper.createWithItemEnchantments(CustomItems.DIAMOND_BOLSTER));
-            content.add(ItemEnchantmentsHelper.createWithItemEnchantments(CustomItems.NETHERITE_BOLSTER));
+            RegistryEntryLookup.RegistryLookup lookup = content.getContext().lookup().createRegistryLookup();
+            content.add(ItemEnchantmentsHelper.createWithItemEnchantments(CustomItems.IRON_BOLSTER, lookup));
+            content.add(ItemEnchantmentsHelper.createWithItemEnchantments(CustomItems.DIAMOND_BOLSTER, lookup));
+            content.add(ItemEnchantmentsHelper.createWithItemEnchantments(CustomItems.NETHERITE_BOLSTER, lookup));
         });
 
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.COMBAT).register(content -> {
-            content.add(ItemEnchantmentsHelper.createWithItemEnchantments(CustomItems.CHARGED_TRIDENT));
-            content.add(ItemEnchantmentsHelper.createWithItemEnchantments(CustomItems.MAGNETIC_TRIDENT));
-            content.add(ItemEnchantmentsHelper.createWithItemEnchantments(CustomItems.PIERCING_ARROW));
-            content.add(ItemEnchantmentsHelper.createWithItemEnchantments(CustomItems.IGNITING_ARROW));
-            content.add(ItemEnchantmentsHelper.createWithItemEnchantments(CustomItems.BLAZING_SWORD));
-            content.add(ItemEnchantmentsHelper.createWithItemEnchantments(CustomItems.SACRED_SWORD));
-            content.add(ItemEnchantmentsHelper.createWithItemEnchantments(CustomItems.EVIL_TOTEM));
+            RegistryEntryLookup.RegistryLookup lookup = content.getContext().lookup().createRegistryLookup();
+            content.add(ItemEnchantmentsHelper.createWithItemEnchantments(CustomItems.CHARGED_TRIDENT, lookup));
+            content.add(ItemEnchantmentsHelper.createWithItemEnchantments(CustomItems.MAGNETIC_TRIDENT, lookup));
+            content.add(ItemEnchantmentsHelper.createWithItemEnchantments(CustomItems.PIERCING_ARROW, lookup));
+            content.add(ItemEnchantmentsHelper.createWithItemEnchantments(CustomItems.IGNITING_ARROW, lookup));
+            content.add(ItemEnchantmentsHelper.createWithItemEnchantments(CustomItems.BLAZING_SWORD, lookup));
+            content.add(ItemEnchantmentsHelper.createWithItemEnchantments(CustomItems.SACRED_SWORD, lookup));
+            content.add(ItemEnchantmentsHelper.createWithItemEnchantments(CustomItems.EVIL_TOTEM, lookup));
         });
 
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.FOOD_AND_DRINK).register(content -> {
             content.add(CustomItems.GOLDEN_BERRIES);
         });
 
-        LootTableEvents.REPLACE.register((resourceManager, lootManager, id, original, source) -> {
+        LootTableEvents.MODIFY.register((key, tableBuilder, source, registries) -> {
             if (source.isBuiltin()) {
-                if (id.equals(LootTables.PIGLIN_BARTERING_GAMEPLAY)) {
-                    return lootManager.getLootTable(new Identifier(UnruffledMod.MOD_ID, "gameplay/piglin_bartering"));
-                } else if (id.equals(LootTables.FISHING_TREASURE_GAMEPLAY)) {
-                    return lootManager.getLootTable(new Identifier(UnruffledMod.MOD_ID, "gameplay/fishing/treasure"));
-                } else if (id.equals(LootTables.END_CITY_TREASURE_CHEST)) {
-                    return lootManager.getLootTable(new Identifier(UnruffledMod.MOD_ID, "chests/end_city_treasure"));
-                } else if (id.equals(new Identifier(Identifier.DEFAULT_NAMESPACE, "entities/iron_golem"))) {
-                    return lootManager.getLootTable(new Identifier(UnruffledMod.MOD_ID, "entities/iron_golem"));
-                } else if (id.equals(new Identifier(Identifier.DEFAULT_NAMESPACE, "entities/spider"))) {
-                    return lootManager.getLootTable(new Identifier(UnruffledMod.MOD_ID, "entities/spider"));
-                } else if (id.equals(new Identifier(Identifier.DEFAULT_NAMESPACE, "entities/evoker")) && Config.INSTANCE.get().mechanicsConfig.disableTotemOfUndying()) {
-                    return lootManager.getLootTable(new Identifier(UnruffledMod.MOD_ID, "entities/evoker"));
-                } else if (id.equals(new Identifier(Identifier.DEFAULT_NAMESPACE, "entities/wither_skeleton"))) {
-                    return lootManager.getLootTable(new Identifier(UnruffledMod.MOD_ID, "entities/wither_skeleton"));
-                } else if (id.equals(new Identifier(Identifier.DEFAULT_NAMESPACE, "entities/skeleton"))) {
-                    return lootManager.getLootTable(new Identifier(UnruffledMod.MOD_ID, "entities/skeleton"));
-                } else if (id.equals(new Identifier(Identifier.DEFAULT_NAMESPACE, "entities/zombie"))) {
-                    return lootManager.getLootTable(new Identifier(UnruffledMod.MOD_ID, "entities/zombie"));
-                } else if (id.equals(new Identifier(Identifier.DEFAULT_NAMESPACE, "blocks/nether_quartz_ore"))) {
-                    return lootManager.getLootTable(new Identifier(UnruffledMod.MOD_ID, "blocks/nether_quartz_ore"));
-                } else if (id.equals(new Identifier(Identifier.DEFAULT_NAMESPACE, "blocks/ender_chest"))) {
-                    return lootManager.getLootTable(new Identifier(UnruffledMod.MOD_ID, "blocks/ender_chest"));
-                }
-            }
-            return null;
-        });
-
-        LootTableEvents.MODIFY.register((resourceManager, lootManager, id, tableBuilder, source) -> {
-            if (source.isBuiltin()) {
-                if (Config.INSTANCE.get().lootConfig.lootCodicesAdd().containsKey(id)) {
-                    List<LootPoolEntry> entries = Config.INSTANCE.get().lootConfig.lootCodicesAdd().get(id).stream().map(
+                if (Config.INSTANCE.get().lootConfig.lootCodicesAdd().containsKey(key)) {
+                    List<LootPoolEntry> entries = Config.INSTANCE.get().lootConfig.lootCodicesAdd().get(key).stream().map(
                             number -> ItemEntry.builder(CustomItems.ANCIENT_CODEX).apply(
-                                    SetNbtLootFunction.builder(AncientCodexItem.getNumberNbt(number))
+                                    SetComponentsLootFunction.builder(AncientCodexItem.NUMBER, number)
                             ).build()
                     ).toList();
                     LootPool.Builder poolBuilder = LootPool.builder().with(entries).rolls(UniformLootNumberProvider.create(0, 1));
                     tableBuilder.pool(poolBuilder);
-                } else if (Config.INSTANCE.get().lootConfig.lootCodicesModify().containsKey(id)) {
-                    List<LootPoolEntry> entries = Config.INSTANCE.get().lootConfig.lootCodicesModify().get(id).stream().map(
+                } else if (Config.INSTANCE.get().lootConfig.lootCodicesModify().containsKey(key)) {
+                    List<LootPoolEntry> entries = Config.INSTANCE.get().lootConfig.lootCodicesModify().get(key).stream().map(
                             number -> ItemEntry.builder(CustomItems.ANCIENT_CODEX).apply(
-                                    SetNbtLootFunction.builder(AncientCodexItem.getNumberNbt(number))
+                                SetComponentsLootFunction.builder(AncientCodexItem.NUMBER, number)
                             ).build()
                     ).toList();
                     tableBuilder.modifyPools(pool -> pool.with(entries));
                 }
-                if (Config.INSTANCE.get().lootConfig.assortedPotionsAdd().containsKey(id)) {
-                    List<Integer> rolls = Config.INSTANCE.get().lootConfig.assortedPotionsAdd().get(id);
+                if (Config.INSTANCE.get().lootConfig.assortedPotionsAdd().containsKey(key)) {
+                    List<Integer> rolls = Config.INSTANCE.get().lootConfig.assortedPotionsAdd().get(key);
                     int min_rolls = !rolls.isEmpty() ? rolls.get(0) : 1;
                     LootPool.Builder assortedPotionsBuilder = LootPool.builder();
-                    assortedPotionsBuilder = assortedPotionsBuilder.with(Arrays.stream(lootManager.getLootTable(new Identifier(UnruffledMod.MOD_ID, "chests/assorted_potions")).pools[0].entries).toList());
+                    assortedPotionsBuilder = assortedPotionsBuilder.with(LootTableEntry.builder(RegistryKey.of(RegistryKeys.LOOT_TABLE, Identifier.of(UnruffledMod.MOD_ID, "chests/assorted_potions"))));
                     tableBuilder.pool(assortedPotionsBuilder.rolls(UniformLootNumberProvider.create(min_rolls, rolls.size() > 1 ? rolls.get(1) : min_rolls)));
                 }
-                if (id.equals(LootTables.RUINED_PORTAL_CHEST)) {
-                    tableBuilder.pools(List.of(lootManager.getLootTable(new Identifier(UnruffledMod.MOD_ID, "chests/ruined_portal_extra")).pools));
-                } else if (id.equals(LootTables.SHIPWRECK_MAP_CHEST)) {
-                    tableBuilder.pools(List.of(lootManager.getLootTable(new Identifier(UnruffledMod.MOD_ID, "chests/shipwreck_map")).pools));
-                } else if (id.equals(LootTables.BASTION_TREASURE_CHEST)) {
-                    tableBuilder.pools(List.of(lootManager.getLootTable(new Identifier(UnruffledMod.MOD_ID, "chests/bastion_treasure")).pools));
-                } else if (id.equals(LootTables.UNDERWATER_RUIN_BIG_CHEST)) {
-                    tableBuilder.pools(List.of(lootManager.getLootTable(new Identifier(UnruffledMod.MOD_ID, "chests/underwater_ruin_big")).pools));
-                } else if (id.equals(LootTables.JUNGLE_TEMPLE_CHEST)) {
-                    tableBuilder.pools(List.of(lootManager.getLootTable(new Identifier(UnruffledMod.MOD_ID, "chests/jungle_temple")).pools));
-                } else if (id.equals(LootTables.VILLAGE_CARTOGRAPHER_CHEST)) {
-                    tableBuilder.pools(List.of(lootManager.getLootTable(new Identifier(UnruffledMod.MOD_ID, "chests/village_cartographer")).pools));
+                Optional<RegistryKey<LootTable>> extraTable = Optional.empty();
+                if (key.equals(LootTables.RUINED_PORTAL_CHEST)) {
+                    extraTable = Optional.ofNullable(RegistryKey.of(RegistryKeys.LOOT_TABLE, Identifier.of(UnruffledMod.MOD_ID, "chests/ruined_portal_extra")));
+                } else if (key.equals(LootTables.SHIPWRECK_MAP_CHEST)) {
+                    extraTable = Optional.ofNullable(RegistryKey.of(RegistryKeys.LOOT_TABLE, Identifier.of(UnruffledMod.MOD_ID, "chests/shipwreck_map")));
+                } else if (key.equals(LootTables.BASTION_TREASURE_CHEST)) {
+                    extraTable = Optional.ofNullable(RegistryKey.of(RegistryKeys.LOOT_TABLE, Identifier.of(UnruffledMod.MOD_ID, "chests/bastion_treasure")));
+                } else if (key.equals(LootTables.UNDERWATER_RUIN_BIG_CHEST)) {
+                    extraTable = Optional.ofNullable(RegistryKey.of(RegistryKeys.LOOT_TABLE, Identifier.of(UnruffledMod.MOD_ID, "chests/underwater_ruin_big")));
+                } else if (key.equals(LootTables.JUNGLE_TEMPLE_CHEST)) {
+                    extraTable = Optional.ofNullable(RegistryKey.of(RegistryKeys.LOOT_TABLE, Identifier.of(UnruffledMod.MOD_ID, "chests/jungle_temple")));
+                } else if (key.equals(LootTables.VILLAGE_CARTOGRAPHER_CHEST)) {
+                    extraTable = Optional.ofNullable(RegistryKey.of(RegistryKeys.LOOT_TABLE, Identifier.of(UnruffledMod.MOD_ID, "chests/village_cartographer")));
                 }
+                extraTable.ifPresent(lootTableRegistryKey -> tableBuilder.pool(LootPool.builder().with(LootTableEntry.builder(lootTableRegistryKey))));
             }
         });
 
@@ -149,30 +138,32 @@ public class UnruffledFabric implements ModInitializer {
             EntitySleepEvents.ALLOW_SLEEP_TIME.register((player, pos, isNight) -> !isNight || (player.getWorld().getLunarTime() % 24000 < Config.INSTANCE.get().mechanicsConfig.sleepTime() /*player.getWorld().getAmbientDarkness() < 11*/ && !player.getWorld().isThundering()) ? ActionResult.FAIL : ActionResult.SUCCESS);
         }
 
-        for (BrewingPotionRecipe brewingPotionRecipe : UnruffledMod.POTION_RECIPES) {
-            BrewingRecipeRegistryAccessor.registerPotionRecipe(brewingPotionRecipe.input(), brewingPotionRecipe.ingredient(), brewingPotionRecipe.output());
-        }
+        FabricBrewingRecipeRegistryBuilder.BUILD.register(builder -> {
+            for (BrewingPotionRecipe brewingPotionRecipe : UnruffledMod.POTION_RECIPES) {
+                builder.registerPotionRecipe(brewingPotionRecipe.input(), brewingPotionRecipe.ingredient(), brewingPotionRecipe.output());
+            }
+        });
 
         UnruffledMod.init();
         BiomeModifications.addSpawn(
-                ctx -> ctx.getBiomeKey().getValue().equals(new Identifier("minecraft", "nether_wastes")),
+                ctx -> ctx.getBiomeKey().getValue().equals(Identifier.ofVanilla("nether_wastes")),
                 SpawnGroup.MONSTER, EntityType.BLAZE, 20, 1, 1
         );
         BiomeModifications.addFeature(
                 BiomeSelectors.foundInOverworld(), GenerationStep.Feature.UNDERGROUND_ORES,
-                RegistryKey.of(RegistryKeys.PLACED_FEATURE, new Identifier(UnruffledMod.MOD_ID, "ore_emerald_lower"))
+                RegistryKey.of(RegistryKeys.PLACED_FEATURE, Identifier.of(UnruffledMod.MOD_ID, "ore_emerald_lower"))
         );
         BiomeModifications.addFeature(
                 BiomeSelectors.foundInOverworld(), GenerationStep.Feature.LAKES,
-                RegistryKey.of(RegistryKeys.PLACED_FEATURE, new Identifier(UnruffledMod.MOD_ID, "underground_pond"))
+                RegistryKey.of(RegistryKeys.PLACED_FEATURE, Identifier.of(UnruffledMod.MOD_ID, "underground_pond"))
         );
         BiomeModifications.addFeature(
                 BiomeSelectors.foundInOverworld(), GenerationStep.Feature.LAKES,
-                RegistryKey.of(RegistryKeys.PLACED_FEATURE, new Identifier(UnruffledMod.MOD_ID, "underground_cabin"))
+                RegistryKey.of(RegistryKeys.PLACED_FEATURE, Identifier.of(UnruffledMod.MOD_ID, "underground_cabin"))
         );
         BiomeModifications.addFeature(
                 BiomeSelectors.tag(BiomeTags.IS_OCEAN), GenerationStep.Feature.UNDERGROUND_ORES,
-                RegistryKey.of(RegistryKeys.PLACED_FEATURE, new Identifier(UnruffledMod.MOD_ID, "ore_prismarine"))
+                RegistryKey.of(RegistryKeys.PLACED_FEATURE, Identifier.of(UnruffledMod.MOD_ID, "ore_prismarine"))
         );
 
         FuelRegistry.INSTANCE.add(Items.LAVA_BUCKET, 200);

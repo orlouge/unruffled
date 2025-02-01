@@ -1,13 +1,14 @@
 package io.github.orlouge.unruffled;
 
+import com.mojang.serialization.MapCodec;
 import dev.architectury.injectables.annotations.ExpectPlatform;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.loot.function.LootFunction;
 import net.minecraft.loot.function.LootFunctionType;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.JsonSerializer;
 
 import java.nio.file.Path;
 import java.util.function.BiConsumer;
@@ -37,17 +38,17 @@ public class Platform {
     }
 
     @ExpectPlatform
-    public static <T extends Packets.Packet> void registerServerReceiver(Class<T> type, Identifier id, Function<PacketByteBuf, T> decoder, BiConsumer<T, PlayerEntity> receiver) {
+    public static <T extends Packets.Packet> void registerServerReceiver(CustomPayload.Id<T> type, BiConsumer<T, PlayerEntity> receiver) {
         throw new AssertionError();
     }
 
     @ExpectPlatform
-    public static <T extends Packets.Packet> void registerClientReceiver(Class<T> type, Identifier id, Function<PacketByteBuf, T> decoder, Consumer<T> receiver) {
+    public static <T extends Packets.Packet> void registerClientReceiver(CustomPayload.Id<T> type, Consumer<T> receiver) {
         throw new AssertionError();
     }
 
     @ExpectPlatform
-    public static Supplier<LootFunctionType> registerLootFunctionType(Identifier id, JsonSerializer<? extends LootFunction> serializer) {
+    public static <T extends LootFunction> Supplier<LootFunctionType<T>> registerLootFunctionType(Identifier id, MapCodec<T> codec) {
         throw new AssertionError();
     }
 }

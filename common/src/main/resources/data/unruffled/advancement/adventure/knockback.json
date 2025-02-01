@@ -1,0 +1,29 @@
+{
+  "parent": "minecraft:adventure/kill_a_mob",
+  "criteria": {
+    "knockback": {
+      "conditions": {},
+      "trigger": "unruffled:knockback"
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.adventure.knockback.description"
+    },
+    "frame": "task",
+    "hidden": false,
+    "icon": {
+      "id": "minecraft:golden_sword"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.adventure.knockback.title"
+    }
+  },
+  "requirements": [
+    [
+      "knockback"
+    ]
+  ]
+}

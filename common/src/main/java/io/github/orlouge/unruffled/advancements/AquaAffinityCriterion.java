@@ -1,37 +1,32 @@
 package io.github.orlouge.unruffled.advancements;
 
 import com.google.gson.JsonObject;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.advancement.criterion.AbstractCriterion;
-import net.minecraft.advancement.criterion.AbstractCriterionConditions;
-import net.minecraft.predicate.entity.AdvancementEntityPredicateDeserializer;
+import net.minecraft.predicate.entity.EntityPredicate;
 import net.minecraft.predicate.entity.LootContextPredicate;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 
+import java.util.Optional;
+
 public class AquaAffinityCriterion extends AbstractCriterion<AquaAffinityCriterion.Conditions> {
-    private final Identifier id;
-
-    public AquaAffinityCriterion(Identifier id) {
-        this.id = id;
-    }
-
-    @Override
-    protected Conditions conditionsFromJson(JsonObject obj, LootContextPredicate playerPredicate, AdvancementEntityPredicateDeserializer predicateDeserializer) {
-        return new Conditions(this.id, playerPredicate);
-    }
-
     public void trigger(ServerPlayerEntity player) {
         this.trigger(player, conditions -> true);
     }
 
     @Override
-    public Identifier getId() {
-        return id;
+    public Codec<Conditions> getConditionsCodec() {
+        return Conditions.CODEC;
     }
 
-    public static class Conditions extends AbstractCriterionConditions {
-        public Conditions(Identifier id, LootContextPredicate entity) {
-            super(id, entity);
+    public record Conditions(Optional<LootContextPredicate> player) implements AbstractCriterion.Conditions {
+        public static final Codec<Conditions> CODEC = RecordCodecBuilder.create((instance) -> instance.group(EntityPredicate.LOOT_CONTEXT_PREDICATE_CODEC.optionalFieldOf("player").forGetter(Conditions::player)).apply(instance, Conditions::new));
+
+        @Override
+        public Optional<LootContextPredicate> player() {
+            return this.player;
         }
     }
 }

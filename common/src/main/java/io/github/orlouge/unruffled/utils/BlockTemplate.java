@@ -6,6 +6,10 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BrushableBlockEntity;
 import net.minecraft.block.entity.LootableContainerBlockEntity;
+import net.minecraft.loot.LootTable;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -41,7 +45,7 @@ public abstract class BlockTemplate {
         return new RandomChoice(Arrays.stream(states).map(Simple::new).toList(), emptyWeight);
     }
 
-    public static BlockTemplate lootContainer(BlockState state, Identifier lootTableId) {
+    public static BlockTemplate lootContainer(BlockState state, RegistryKey<LootTable> lootTableId) {
         return new ProcessBlockEntity(new Simple(state), (entity, random) -> {
             if (entity instanceof LootableContainerBlockEntity) {
                 ((LootableContainerBlockEntity) entity).setLootTable(lootTableId, random.nextLong());
@@ -49,11 +53,15 @@ public abstract class BlockTemplate {
         });
     }
 
-    public static BlockTemplate lootContainer(Block block, Identifier lootTableId) {
+    public static BlockTemplate lootContainer(Block block, RegistryKey<LootTable> lootTableId) {
         return lootContainer(block.getDefaultState(), lootTableId);
     }
 
-    public static BlockTemplate lootBrushable(BlockState state, Identifier lootTableId) {
+    public static BlockTemplate lootContainer(BlockState state, Identifier lootTable) {
+        return lootContainer(state, RegistryKey.of(RegistryKeys.LOOT_TABLE, lootTable));
+    }
+
+    public static BlockTemplate lootBrushable(BlockState state, RegistryKey<LootTable> lootTableId) {
         return new ProcessBlockEntity(new Simple(state), (entity, random) -> {
             if (entity instanceof BrushableBlockEntity) {
                 ((BrushableBlockEntity) entity).setLootTable(lootTableId, random.nextLong());
@@ -62,6 +70,10 @@ public abstract class BlockTemplate {
     }
 
     public static BlockTemplate lootBrushable(Block block, Identifier lootTableId) {
+        return lootBrushable(block, RegistryKey.of(RegistryKeys.LOOT_TABLE, lootTableId));
+    }
+
+    public static BlockTemplate lootBrushable(Block block, RegistryKey<LootTable> lootTableId) {
         return lootBrushable(block.getDefaultState(), lootTableId);
     }
 

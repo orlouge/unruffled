@@ -5,19 +5,20 @@ import io.github.orlouge.unruffled.UnruffledMod;
 import io.github.orlouge.unruffled.UnruffledModClient;
 import io.github.orlouge.unruffled.interfaces.ExtendedHungerManager;
 import io.github.orlouge.unruffled.interfaces.HasFireImmunitySetting;
-import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.attribute.EntityAttribute;
+import net.minecraft.entity.attribute.EntityAttributeInstance;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffectUtil;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.HungerManager;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -27,8 +28,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(PlayerEntity.class)
 public abstract class PlayerEntityMixin extends LivingEntity {
     private float attackExhaustion;
-    private boolean isOnPath = false;
-    private BlockPos lastSprintBlockPos = new BlockPos(0, 0, 0);
 
     protected PlayerEntityMixin(EntityType<? extends LivingEntity> entityType, World world) {
         super(entityType, world);
@@ -72,6 +71,13 @@ public abstract class PlayerEntityMixin extends LivingEntity {
         // instance.addExhaustion(getAttackExhaustion(instance));
     }
 
+    @Redirect(method = "attack", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;getAttributeValue(Lnet/minecraft/registry/entry/RegistryEntry;)D", ordinal = 1))
+    public double increaseSweepingRatio(PlayerEntity playerEntity, RegistryEntry<EntityAttribute> registryEntry) {
+        double normal = playerEntity.getAttributeValue(registryEntry);
+        int mouseSweepLevel = Math.min(3, (2 + (int) Math.abs(playerEntity.headYaw - playerEntity.prevHeadYaw)) / 10);
+        return Math.max(normal, (double) mouseSweepLevel / (mouseSweepLevel + 1));
+    }
+
     @Redirect(method = "attack", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;getAttackCooldownProgress(F)F"))
     public float onAttackCooldownPenalty(PlayerEntity instance, float baseTime) {
         return 1;
@@ -88,25 +94,6 @@ public abstract class PlayerEntityMixin extends LivingEntity {
             return strength;
         }
     }
-
-    @ModifyConstant(method = "increaseTravelMotionStats", constant = @Constant(floatValue = 0.01f, ordinal = 0))
-    public float increaseSwimmingExhaustion(float constant) {
-        return constant * 4f;
-    }
-
-    @ModifyConstant(method = "increaseTravelMotionStats", constant = @Constant(floatValue = 0.1f, ordinal = 0))
-    public float decreaseSprintingExhaustionOnPaths(float constant) {
-        if (!this.lastSprintBlockPos.equals(this.getBlockPos())) {
-            this.lastSprintBlockPos = this.getBlockPos();
-            if (Config.INSTANCE.get().hungerConfig.steadyBlockBlacklist()) {
-                this.isOnPath = !this.getWorld().getBlockState(this.getVelocityAffectingPos()).isIn(UnruffledMod.UNSTEADY);
-            } else {
-                this.isOnPath = this.getWorld().getBlockState(this.getVelocityAffectingPos()).isIn(UnruffledMod.STEADY);
-            }
-        }
-        return this.isOnPath ? constant * 0.5f : constant;
-    }
-
 
     private static float getAttackExhaustion(PlayerEntity player) {
         if (player.getHungerManager() instanceof ExtendedHungerManager extendedHungerManager) {
@@ -128,16 +115,17 @@ public abstract class PlayerEntityMixin extends LivingEntity {
         return time * 6;
     }
 
-    @Redirect(method = "getBlockBreakingSpeed", at = @At(value = "INVOKE", target = "Lnet/minecraft/enchantment/EnchantmentHelper;hasAquaAffinity(Lnet/minecraft/entity/LivingEntity;)Z"))
-    public boolean waterBreathingIsAquaAffinity(LivingEntity entity) {
-        if (EnchantmentHelper.hasAquaAffinity(entity)) return true;
-        if (StatusEffectUtil.hasWaterBreathing(entity)) {
-            if (entity instanceof ServerPlayerEntity player) {
+    @Redirect(method = "getBlockBreakingSpeed", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/attribute/EntityAttributeInstance;getValue()D"))
+    public double waterBreathingIsAquaAffinity(EntityAttributeInstance instance) {
+        double normal = instance.getValue();
+        if (normal >= 1) return normal;
+        if (StatusEffectUtil.hasWaterBreathing(this)) {
+            if (((Object) this) instanceof ServerPlayerEntity player) {
                 UnruffledMod.AQUA_AFFINITY_CRITERION.trigger(player);
             }
-            return true;
+            return Math.max(normal, 1);
         }
-        return false;
+        return normal;
     }
 
     @Inject(method = "wakeUp", at = @At("HEAD"))
@@ -148,7 +136,7 @@ public abstract class PlayerEntityMixin extends LivingEntity {
         }
     }
 
-    @Inject(method = "damageShield", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;damage(ILnet/minecraft/entity/LivingEntity;Ljava/util/function/Consumer;)V"))
+    @Inject(method = "damageShield", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;damage(ILnet/minecraft/entity/LivingEntity;Lnet/minecraft/entity/EquipmentSlot;)V"))
     public void consumeStaminaOnShieldHit(float amount, CallbackInfo ci) {
         if (this.getHungerManager() instanceof ExtendedHungerManager extendedHungerManager) {
             extendedHungerManager.addStamina(Math.min(0.33f, -amount / 30f));

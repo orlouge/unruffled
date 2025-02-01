@@ -32,12 +32,12 @@ public class UnruffledModClient {
 
         Packets.LockedDeathPositionUpdate.register((pos) -> { lockedDeathPosition = pos; });
 
-        ModelPredicateProvider compassProvider = ModelPredicateProviderRegistry.get(Items.RECOVERY_COMPASS, new Identifier("angle"));
+        ModelPredicateProvider compassProvider = ModelPredicateProviderRegistry.get(Items.RECOVERY_COMPASS.getDefaultStack(), Identifier.ofVanilla("angle"));
         if (compassProvider instanceof CompassAnglePredicateProvider compassAnglePredicateProvider) {
             CompassAnglePredicateProvider.CompassTarget originalTarget = compassAnglePredicateProvider.compassTarget;
             compassAnglePredicateProvider.compassTarget = (world, stack, entity) ->
                 lockedDeathPosition.filter((pos) ->
-                    EnchantmentHelper.hasBindingCurse(stack)).orElse(originalTarget.getPos(world, stack, entity)
+                    stack.contains(UnruffledMod.LOCKED_COMPASS_COMPONENT)).orElse(originalTarget.getPos(world, stack, entity)
                 );
         }
 
@@ -47,13 +47,13 @@ public class UnruffledModClient {
     public static void onAttackMiss(ClientPlayerEntity player, boolean alwaysSwing) {
         if (alwaysSwing || ExtendedHungerManager.canAttack(player, UnruffledModClient.stamina)) {
             player.swingHand(Hand.MAIN_HAND, false);
-            new Packets.AttackMiss().sendToServer();
+            Packets.AttackMiss.INSTANCE.sendToServer();
         }
     }
 
     public static void onItemUse(ClientPlayerEntity player) {
         if (player.getStackInHand(Hand.MAIN_HAND).isOf(Items.RECOVERY_COMPASS)) {
-            new Packets.LockRecoveryCompass().sendToServer();
+            Packets.LockRecoveryCompass.INSTANCE.sendToServer();
         }
     }
 }

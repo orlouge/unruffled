@@ -21,7 +21,7 @@ public class PotionMixin {
         if (this.actualEffects == null) {
             List<StatusEffectInstance> effects = new LinkedList<>();
             for (StatusEffectInstance effect : cir.getReturnValue()) {
-                if (!effect.getEffectType().isInstant() && !effect.isInfinite()) {
+                if (effect.duration > 1 && !effect.isInfinite()) {
                     StatusEffectInstance longerEffect = new StatusEffectInstance(effect);
                     longerEffect.duration = longerEffect.mapDuration(duration -> (int) Math.ceil(duration * Config.INSTANCE.get().mechanicsConfig.potionDurationFactor()));
                     effects.add(longerEffect);

@@ -1,6 +1,7 @@
 package io.github.orlouge.unruffled.worldgen;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import io.github.orlouge.unruffled.UnruffledMod;
 import io.github.orlouge.unruffled.utils.BlockTemplate;
 import net.minecraft.block.BlockState;
@@ -13,7 +14,6 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.structure.StructureContext;
 import net.minecraft.structure.StructurePiece;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
@@ -26,12 +26,11 @@ import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.gen.structure.Structure;
 import net.minecraft.world.gen.structure.StructureType;
 
-import java.util.Arrays;
 import java.util.Optional;
 import java.util.function.Predicate;
 
 public class NorthboundGateStructure extends Structure {
-    public static final Codec<NorthboundGateStructure> CODEC = createCodec(NorthboundGateStructure::new);
+    public static final MapCodec<NorthboundGateStructure> CODEC = createCodec(NorthboundGateStructure::new);
 
     protected NorthboundGateStructure(Config config) {
         super(config);

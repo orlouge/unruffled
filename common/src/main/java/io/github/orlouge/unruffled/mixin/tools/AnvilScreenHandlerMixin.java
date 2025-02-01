@@ -2,6 +2,7 @@ package io.github.orlouge.unruffled.mixin.tools;
 
 import io.github.orlouge.unruffled.config.Config;
 import io.github.orlouge.unruffled.utils.TradedCompasses;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.CompassItem;
@@ -58,9 +59,8 @@ public abstract class AnvilScreenHandlerMixin extends ForgingScreenHandler {
     public void checkIfRenaming(PlayerEntity player, ItemStack stack, CallbackInfo ci) {
         this.isRenaming = this.input.getStack(1).isEmpty();
 
-        if (player instanceof ServerPlayerEntity serverPlayer && CompassItem.hasLodestone(stack)) {
-            ItemStack buyStack = new ItemStack(Items.COMPASS);
-            buyStack.setNbt(stack.getNbt().copy());
+        if (player instanceof ServerPlayerEntity serverPlayer && stack.contains(DataComponentTypes.LODESTONE_TRACKER)) {
+            ItemStack buyStack = stack.copyComponentsToNewStack(Items.COMPASS, 1);
             TradedCompasses.get(serverPlayer.getServerWorld().getPersistentStateManager()).addBuy(serverPlayer, buyStack);
         }
     }

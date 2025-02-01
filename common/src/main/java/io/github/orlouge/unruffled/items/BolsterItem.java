@@ -8,7 +8,7 @@ import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.Identifier;
 
 public class BolsterItem extends MiningToolItem {
-    protected BolsterItem(float attackDamage, float attackSpeed, ToolMaterial material, Settings settings) {
-        super(attackDamage, attackSpeed, material, TagKey.of(RegistryKeys.BLOCK, new Identifier(UnruffledMod.MOD_ID, "mineable/bolster")), settings);
+    protected BolsterItem(ToolMaterial material, Settings settings) {
+        super(material, TagKey.of(RegistryKeys.BLOCK, Identifier.of(UnruffledMod.MOD_ID, "mineable/bolster")), settings);
     }
 }

@@ -11,13 +11,13 @@ public class ItemEnchantmentsLootFunction implements LootFunction {
     }
 
     @Override
-    public LootFunctionType getType() {
+    public LootFunctionType<ItemEnchantmentsLootFunction> getType() {
         return UnruffledMod.ITEM_ENCHANTMENTS_LOOT_FUNCTION_TYPE.get();
     }
 
     @Override
     public ItemStack apply(ItemStack itemStack, LootContext lootContext) {
-        return ItemEnchantmentsHelper.setItemEnchantments(itemStack);
+        return ItemEnchantmentsHelper.setItemEnchantments(itemStack, lootContext.getLookup());
     }
 
 }

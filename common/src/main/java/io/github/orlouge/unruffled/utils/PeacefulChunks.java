@@ -6,6 +6,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtHelper;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.PersistentState;
 import net.minecraft.world.PersistentStateManager;
@@ -16,10 +17,13 @@ public class PeacefulChunks extends PersistentState {
     public static final int PEACEFUL_RANGE = 7;
     private final Map<ChunkPos, Set<UUID>> chunkPlayerMap = new HashMap<>();
     private final Map<UUID, ChunkPos> playerCenterMap = new HashMap<>();
+    private static final PersistentState.Type<PeacefulChunks> TYPE = new Type<>(
+        PeacefulChunks::new, PeacefulChunks::new, null
+    );
 
     public PeacefulChunks() {}
 
-    public PeacefulChunks(NbtCompound nbt) {
+    public PeacefulChunks(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
         for (NbtElement chunkElement : nbt.getList("chunks", NbtElement.COMPOUND_TYPE)) {
             NbtCompound chunkEntry = (NbtCompound) chunkElement;
             ChunkPos pos = new ChunkPos(chunkEntry.getInt("x"), chunkEntry.getInt("z"));
@@ -85,11 +89,11 @@ public class PeacefulChunks extends PersistentState {
     }
 
     public static PeacefulChunks get(PersistentStateManager persistentStateManager) {
-        return persistentStateManager.getOrCreate(PeacefulChunks::new, PeacefulChunks::new, UnruffledMod.MOD_ID + "_peaceful_chunks");
+        return persistentStateManager.getOrCreate(TYPE, UnruffledMod.MOD_ID + "_peaceful_chunks");
     }
 
     @Override
-    public NbtCompound writeNbt(NbtCompound nbt) {
+    public NbtCompound writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
         NbtList chunkList = new NbtList();
         for (Map.Entry<ChunkPos, Set<UUID>> entry : this.chunkPlayerMap.entrySet()) {
             if (entry.getValue().size() == 0) continue;

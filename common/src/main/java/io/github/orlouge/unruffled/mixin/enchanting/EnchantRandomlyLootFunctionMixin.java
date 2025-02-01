@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(EnchantRandomlyLootFunction.class)
-public class EnchantRandomlyLootFunctionMixin {
+public class  EnchantRandomlyLootFunctionMixin {
     @Inject(method = "process", at = @At("HEAD"), cancellable = true)
     public void removeBookEnchantments(ItemStack stack, LootContext context, CallbackInfoReturnable<ItemStack> cir) {
         if (stack.isOf(Items.BOOK)) {

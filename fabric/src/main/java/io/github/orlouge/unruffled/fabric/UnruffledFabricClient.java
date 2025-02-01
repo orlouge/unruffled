@@ -46,7 +46,7 @@ public class UnruffledFabricClient implements ClientModInitializer {
         @Override
         public void onInitializeModelLoader(Context pluginContext) {
             pluginContext.addModels(CustomItems.TRIDENTS.keySet().stream().map(
-                    type -> new ModelIdentifier(UnruffledMod.MOD_ID, type + "_trident_gui", "inventory")
+                    type -> Identifier.of(UnruffledMod.MOD_ID, "item/" + type + "_trident_gui")
             ).toList());
         }
     }
@@ -59,8 +59,8 @@ public class UnruffledFabricClient implements ClientModInitializer {
         private ItemRenderer itemRenderer = null;
 
         public CustomTridentItemRenderer(String tridentType) {
-            this.id = new Identifier(UnruffledMod.MOD_ID, tridentType);
-            this.guiModelId = new ModelIdentifier(UnruffledMod.MOD_ID, tridentType + "_trident_gui", "inventory");
+            this.id = Identifier.of(UnruffledMod.MOD_ID, tridentType);
+            this.guiModelId = new ModelIdentifier(Identifier.of(UnruffledMod.MOD_ID, "item/" + tridentType + "_trident_gui"), "inventory");
         }
 
         @Override
@@ -68,9 +68,8 @@ public class UnruffledFabricClient implements ClientModInitializer {
             if (this.tridentEntityModel != null && mode != ModelTransformationMode.GUI && mode != ModelTransformationMode.GROUND && mode != ModelTransformationMode.FIXED) {
                 matrices.push();
                 matrices.scale(1.0F, -1.0F, -1.0F);
-                Identifier inHandTexture = TridentEntityModel.TEXTURE;
-                VertexConsumer vertexConsumer2 = ItemRenderer.getDirectItemGlintConsumer(vertexConsumers, this.tridentEntityModel.getLayer(inHandTexture), false, stack.hasGlint());
-                this.tridentEntityModel.render(matrices, vertexConsumer2, light, overlay, 1.0F, 1.0F, 1.0F, 1.0F);
+                VertexConsumer vertexConsumer2 = ItemRenderer.getDirectItemGlintConsumer(vertexConsumers, this.tridentEntityModel.getLayer(TridentEntityModel.TEXTURE), false, stack.hasGlint());
+                this.tridentEntityModel.render(matrices, vertexConsumer2, light, overlay);
                 matrices.pop();
             } else {
                 matrices.pop();
@@ -88,7 +87,7 @@ public class UnruffledFabricClient implements ClientModInitializer {
         public void reload(ResourceManager manager) {
             this.tridentEntityModel = new TridentEntityModel(MinecraftClient.getInstance().getEntityModelLoader().getModelPart(EntityModelLayers.TRIDENT));
             this.itemRenderer = MinecraftClient.getInstance().getItemRenderer();
-            this.tridentGuiModel = MinecraftClient.getInstance().getBakedModelManager().getModel(this.guiModelId);
+            this.tridentGuiModel = MinecraftClient.getInstance().getBakedModelManager().getModel(this.guiModelId.id());
         }
     }
 }

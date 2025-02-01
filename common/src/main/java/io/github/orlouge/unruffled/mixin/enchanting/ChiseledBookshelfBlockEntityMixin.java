@@ -7,6 +7,9 @@ import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.registry.tag.EnchantmentTags;
 import net.minecraft.util.collection.DefaultedList;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -20,14 +23,14 @@ public class ChiseledBookshelfBlockEntityMixin {
     @Shadow @Final public DefaultedList<ItemStack> inventory;
 
     @Inject(method = "readNbt", at = @At("TAIL"))
-    public void removeUnselectableEnchantedBooks(NbtCompound nbt, CallbackInfo ci) {
+    public void removeUnselectableEnchantedBooks(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup, CallbackInfo ci) {
         if (!Config.INSTANCE.get().enchantmentsConfig.disenchantChiseledBookshelfBooks().orElse(false)) return;
         for (int idx = 0; idx < this.inventory.size(); idx++) {
             ItemStack stack = this.inventory.get(idx);
             if (!stack.isEmpty() && stack.isOf(Items.ENCHANTED_BOOK)) {
                 boolean removeEnchantments = false;
-                for (Enchantment enchantment : EnchantmentHelper.get(stack).keySet()) {
-                    if (Config.INSTANCE.get().enchantmentsConfig.unobtainableEnchantments().contains(enchantment)) {
+                for (RegistryEntry<Enchantment> enchantment : EnchantmentHelper.getEnchantments(stack).getEnchantments()) {
+                    if (!enchantment.isIn(EnchantmentTags.ON_RANDOM_LOOT)) {
                         removeEnchantments = true;
                         break;
                     }

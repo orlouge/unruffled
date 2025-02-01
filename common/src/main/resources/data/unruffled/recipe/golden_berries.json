@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "NGN",
+    "GBG",
+    "NGN"
+  ],
+  "key": {
+    "B": {
+      "item": "minecraft:glow_berries"
+    },
+    "G": {
+      "item": "minecraft:gold_ingot"
+    },
+    "N": {
+      "item": "minecraft:gold_nugget"
+    }
+  },
+  "result": {
+    "id": "unruffled:golden_berries"
+  }
+}

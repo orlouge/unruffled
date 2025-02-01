@@ -144,7 +144,7 @@ public abstract class HungerManagerMixin implements ExtendedHungerManager {
         ci.cancel();
     }
 
-    @Redirect(method = "eat", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/HungerManager;add(IF)V"))
+    @Redirect(method = "eat", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/HungerManager;addInternal(IF)V"))
     public void addFoodWithCooldown(HungerManager instance, int food, float saturationModifier) {
         food = Math.round(food * (1f - foodCooldown));
         this.add(food, Math.round(saturationModifier * (1f - foodCooldown)));

@@ -1,5 +1,6 @@
 package io.github.orlouge.unruffled.mixin;
 
+import io.github.orlouge.unruffled.UnruffledMod;
 import io.github.orlouge.unruffled.config.Config;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
@@ -14,6 +15,9 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffectUtil;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.registry.tag.BlockTags;
+import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
@@ -30,9 +34,7 @@ public abstract class LivingEntityMixin extends Entity {
 
     @Shadow public abstract ItemStack getEquippedStack(EquipmentSlot slot);
 
-    @Shadow protected abstract boolean isOnSoulSpeedBlock();
-
-    @Shadow @Nullable public abstract EntityAttributeInstance getAttributeInstance(EntityAttribute attribute);
+    @Shadow @Nullable public abstract EntityAttributeInstance getAttributeInstance(RegistryEntry<EntityAttribute> attribute);
 
     @ModifyConstant(method = "travel", constant = @Constant(doubleValue = 0.9900000095367432))
     public double decreaseHorizontalElytraSpeed(double speed) {
@@ -49,11 +51,26 @@ public abstract class LivingEntityMixin extends Entity {
         if (Config.INSTANCE.get().mechanicsConfig.disableTotemOfUndying()) cir.cancel();
     }
 
-    @Redirect(method = "travel", at = @At(value = "INVOKE", target = "Lnet/minecraft/enchantment/EnchantmentHelper;getDepthStrider(Lnet/minecraft/entity/LivingEntity;)I"))
-    public int increaseSwimmingSpeedIfWaterBreathing(LivingEntity entity) {
-        return Math.max(StatusEffectUtil.hasWaterBreathing(entity) ? 3 : 0, EnchantmentHelper.getDepthStrider(entity));
+    @Redirect(method = "travel", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;getAttributeValue(Lnet/minecraft/registry/entry/RegistryEntry;)D", ordinal = 0))
+    public double increaseSwimmingSpeedIfWaterBreathing(LivingEntity entity, RegistryEntry<EntityAttribute> attribute) {
+        return Math.max(StatusEffectUtil.hasWaterBreathing(entity) ? 1 : 0, entity.getAttributeValue(attribute));
     }
 
+    private static final Identifier SOUL_BLOCKS_NETHERITE_BOOST = Identifier.of(UnruffledMod.MOD_ID, "soul_blocks_netherite_boost");
+
+    @Inject(method = "tickMovement", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;addPowderSnowSlowIfNeeded()V", shift = At.Shift.AFTER))
+    public void addSoulSpeedBoostWithNetheriteBoots(CallbackInfo ci) {
+        EntityAttributeInstance speedAttribute = this.getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED);
+        if (speedAttribute != null) {
+            boolean isOnSoulBlock = this.getLandingBlockState().isIn(BlockTags.SOUL_SPEED_BLOCKS);
+            boolean hasSpeedBoost = speedAttribute.hasModifier(SOUL_BLOCKS_NETHERITE_BOOST);
+            if (isOnSoulBlock && !hasSpeedBoost && this.isOnGround() && this.getEquippedStack(EquipmentSlot.FEET).isOf(Items.NETHERITE_BOOTS)) speedAttribute.addTemporaryModifier(new EntityAttributeModifier(SOUL_BLOCKS_NETHERITE_BOOST, 0.0615, EntityAttributeModifier.Operation.ADD_VALUE));
+            if (hasSpeedBoost && (!isOnSoulBlock || !this.getEquippedStack(EquipmentSlot.FEET).isOf(Items.NETHERITE_BOOTS))) speedAttribute.removeModifier(SOUL_BLOCKS_NETHERITE_BOOST);
+        }
+    }
+
+    // TODO
+    /*
     @Inject(method = "addSoulSpeedBoostIfNeeded", at = @At("HEAD"), cancellable = true)
     public void addSoulSpeedBoostWithNetherite(CallbackInfo ci) {
         if (!this.getLandingBlockState().isAir() && this.getEquippedStack(EquipmentSlot.FEET).isOf(Items.NETHERITE_BOOTS) && this.isOnSoulSpeedBlock()) {
@@ -73,4 +90,6 @@ public abstract class LivingEntityMixin extends Entity {
             cir.cancel();
         }
     }
+     */
+
 }

@@ -15,11 +15,6 @@ public abstract class TridentItemMixin extends Item {
         super(settings);
     }
 
-    @Inject(method = "<init>", at = @At("RETURN"))
-    public void increaseTridentDurability(Settings settings, CallbackInfo ci) {
-        this.maxDamage *= 4;
-    }
-
     @Override
     public boolean canRepair(ItemStack stack, ItemStack ingredient) {
         return ingredient.isOf(Items.DIAMOND);

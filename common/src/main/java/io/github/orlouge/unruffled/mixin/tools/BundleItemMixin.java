@@ -16,26 +16,6 @@ public abstract class BundleItemMixin extends Item {
         super(settings);
     }
 
-    @ModifyConstant(method = "getAmountFilled", constant = @Constant(floatValue = 64f))
-    private static float modifyGetAmountFilled(float max) {
-        return (float) Config.INSTANCE.get().mechanicsConfig.bundleSize();
-    }
-
-    @ModifyConstant(method = "onStackClicked", constant = @Constant(intValue = 64))
-    public int modifyOnStackClicked(int max) {
-        return Config.INSTANCE.get().mechanicsConfig.bundleSize();
-    }
-
-    @ModifyConstant(method = "getItemBarStep", constant = @Constant(intValue = 64))
-    public int modifyGetItemBarStep(int max) {
-        return Config.INSTANCE.get().mechanicsConfig.bundleSize();
-    }
-
-    @ModifyConstant(method = "addToBundle", constant = @Constant(intValue = 64))
-    private static int modifyAddToBundle(int max) {
-        return Config.INSTANCE.get().mechanicsConfig.bundleSize();
-    }
-
     @ModifyConstant(method = "appendTooltip", constant = @Constant(intValue = 64))
     public int modifyAppendTooltip(int max) {
         return Config.INSTANCE.get().mechanicsConfig.bundleSize();
@@ -54,14 +34,5 @@ public abstract class BundleItemMixin extends Item {
     @Override
     public boolean canBeNested() {
         return Config.INSTANCE.get().mechanicsConfig.bundleSize() <= 64;
-    }
-
-    @ModifyVariable(method = "addToBundle", at = @At("STORE"))
-    private static Optional<NbtCompound> checkStackSize(Optional<NbtCompound> mergedStack, ItemStack bundle, ItemStack stack) {
-        if (mergedStack.isPresent() && ItemStack.fromNbt(mergedStack.get()).getCount() + stack.getCount() > stack.getMaxCount()) {
-            return Optional.empty();
-        } else {
-            return mergedStack;
-        }
     }
 }

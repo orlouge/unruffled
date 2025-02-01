@@ -17,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(GrindstoneBlock.class)
 public class GrindstoneBlockMixin {
     @Inject(method = "onUse", at = @At("HEAD"), cancellable = true)
-    public void onUseTable(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit, CallbackInfoReturnable<ActionResult> cir) {
+    public void onUseTable(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit, CallbackInfoReturnable<ActionResult> cir) {
         if (!Config.INSTANCE.get().enchantmentsConfig.disableGrindstone()) return;
         cir.setReturnValue(ActionResult.PASS);
         cir.cancel();

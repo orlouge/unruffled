@@ -1,0 +1,34 @@
+{
+  "parent": "unruffled:nether/teleportation",
+  "criteria": {
+    "potion": {
+      "conditions": {},
+      "trigger": "unruffled:pig_teleportation"
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.nether.pig_teleportation.description"
+    },
+    "frame": "task",
+    "hidden": false,
+    "icon": {
+      "id": "minecraft:splash_potion",
+      "components": {
+        "minecraft:potion_contents": {
+            "potion": "unruffled:teleportation"
+        }
+      }
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.nether.pig_teleportation.title"
+    }
+  },
+  "requirements": [
+    [
+      "potion"
+    ]
+  ]
+}

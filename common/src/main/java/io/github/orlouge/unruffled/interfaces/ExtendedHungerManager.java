@@ -1,6 +1,9 @@
 package io.github.orlouge.unruffled.interfaces;
 
 import io.github.orlouge.unruffled.config.Config;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.BundleContentsComponent;
+import net.minecraft.component.type.ContainerComponent;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -120,28 +123,28 @@ public interface ExtendedHungerManager {
         return new Pair<>(hasContainers ? weight : 0f, hasEnderChest);
     }
 
-    private static Pair<Float, Boolean> getNbtWeight(NbtCompound nbt) {
+    private static Pair<Float, Boolean> getContainerWeight(ItemStack stack) {
         float weight = 0;
         boolean hasEnderChest = false;
-        for (String key : nbt.getKeys()) {
-            if (key.equals("Items") && nbt.getType("Items") == NbtElement.LIST_TYPE) {
-                NbtList itemList = nbt.getList("Items", 10);
-                for (NbtElement el : itemList) {
-                    if (el.getType() != NbtElement.COMPOUND_TYPE) continue;
-                    ItemStack itemStack = ItemStack.fromNbt((NbtCompound) el);
-                    if (itemStack == null) continue;
-                    Pair<Float, Boolean> subWeight = getItemWeight(itemStack);
-                    weight += subWeight.getLeft();
-                    hasEnderChest |= subWeight.getRight();
-                }
-            } else {
-                NbtElement sub = nbt.get(key);
-                if (sub != null && sub.getType() == NbtElement.COMPOUND_TYPE) {
-                    Pair<Float, Boolean> subWeight = getNbtWeight((NbtCompound) sub);
-                    weight += subWeight.getLeft();
-                    hasEnderChest |= subWeight.getRight();
-                }
-            }
+        ContainerComponent containerComponent = stack.get(DataComponentTypes.CONTAINER);
+        for (ItemStack itemStack : containerComponent.iterateNonEmpty()) {
+            if (itemStack == null) continue;
+            Pair<Float, Boolean> subWeight = getItemWeight(itemStack);
+            weight += subWeight.getLeft();
+            hasEnderChest |= subWeight.getRight();
+        }
+        return new Pair<>(weight, hasEnderChest);
+    }
+
+    private static Pair<Float, Boolean> getBundleWeight(ItemStack stack) {
+        float weight = 0;
+        boolean hasEnderChest = false;
+        BundleContentsComponent containerComponent = stack.get(DataComponentTypes.BUNDLE_CONTENTS);
+        for (ItemStack itemStack : containerComponent.iterate()) {
+            if (itemStack == null) continue;
+            Pair<Float, Boolean> subWeight = getItemWeight(itemStack);
+            weight += subWeight.getLeft();
+            hasEnderChest |= subWeight.getRight();
         }
         return new Pair<>(weight, hasEnderChest);
     }
@@ -149,12 +152,19 @@ public interface ExtendedHungerManager {
     private static Pair<Float, Boolean> getItemWeight(ItemStack itemStack) {
         boolean hasEnderChest = itemStack.isOf(Items.ENDER_CHEST);
         float weight = (float) itemStack.getCount() / itemStack.getMaxCount();
-        if (itemStack.hasNbt()) {
-            Pair<Float, Boolean> containerWeight = getNbtWeight(itemStack.getNbt());
+        if (itemStack.contains(DataComponentTypes.CONTAINER)) {
+            Pair<Float, Boolean> containerWeight = getContainerWeight(itemStack);
             if (containerWeight.getLeft() > 0) {
                 weight += containerWeight.getLeft() + 1;
             }
             hasEnderChest |= containerWeight.getRight();
+        }
+        if (itemStack.contains(DataComponentTypes.BUNDLE_CONTENTS)) {
+            Pair<Float, Boolean> bundleWeight = getBundleWeight(itemStack);
+            if (bundleWeight.getLeft() > 0) {
+                weight += bundleWeight.getLeft() + 1;
+            }
+            hasEnderChest |= bundleWeight.getRight();
         }
         return new Pair<>(weight, hasEnderChest);
     }
