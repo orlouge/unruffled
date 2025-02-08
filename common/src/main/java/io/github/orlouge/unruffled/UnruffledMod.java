@@ -135,6 +135,7 @@ public class UnruffledMod {
     public static final float DEFAULT_STRUCTURE_SPREAD_CORRECTION = 64f;
 
     public static final RegistryKey<LootTable> BOOKSHELF_LOOT_TABLE = RegistryKey.of(RegistryKeys.LOOT_TABLE, Identifier.of(UnruffledMod.MOD_ID, "chests/bookshelf"));
+    public static final RegistryKey<LootTable> DECORATED_POT_LOOT_TABLE = RegistryKey.of(RegistryKeys.LOOT_TABLE, Identifier.of(UnruffledMod.MOD_ID, "decorated_pot"));
     public static final RegistryKey<LootTable> NORTHBOUND_GATE_LOOT_TABLE = RegistryKey.of(RegistryKeys.LOOT_TABLE, Identifier.of(UnruffledMod.MOD_ID, "archaeology/northbound_gate"));
     static {
         DEFAULT_LOOT_CODICES_ADD = Map.ofEntries(

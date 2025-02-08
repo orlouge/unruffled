@@ -129,6 +129,14 @@ public class UnruffledFabric implements ModInitializer {
                     extraTable = Optional.ofNullable(RegistryKey.of(RegistryKeys.LOOT_TABLE, Identifier.of(UnruffledMod.MOD_ID, "chests/jungle_temple")));
                 } else if (key.equals(LootTables.VILLAGE_CARTOGRAPHER_CHEST)) {
                     extraTable = Optional.ofNullable(RegistryKey.of(RegistryKeys.LOOT_TABLE, Identifier.of(UnruffledMod.MOD_ID, "chests/village_cartographer")));
+                } else if (key.equals(LootTables.WOODLAND_MANSION_CHEST)) {
+                    extraTable = Optional.ofNullable(RegistryKey.of(RegistryKeys.LOOT_TABLE, Identifier.of(UnruffledMod.MOD_ID, "chests/woodland_mansion")));
+                } else if (key.equals(LootTables.PILLAGER_OUTPOST_CHEST)) {
+                    extraTable = Optional.ofNullable(RegistryKey.of(RegistryKeys.LOOT_TABLE, Identifier.of(UnruffledMod.MOD_ID, "chests/pillager_outpost")));
+                } else if (key.equals(LootTables.ANCIENT_CITY_CHEST)) {
+                    extraTable = Optional.ofNullable(RegistryKey.of(RegistryKeys.LOOT_TABLE, Identifier.of(UnruffledMod.MOD_ID, "chests/ancient_city")));
+                } else if (key.equals(LootTables.SIMPLE_DUNGEON_CHEST)) {
+                    extraTable = Optional.ofNullable(RegistryKey.of(RegistryKeys.LOOT_TABLE, Identifier.of(UnruffledMod.MOD_ID, "chests/simple_dungeon")));
                 }
                 extraTable.ifPresent(lootTableRegistryKey -> tableBuilder.pool(LootPool.builder().with(LootTableEntry.builder(lootTableRegistryKey))));
             }

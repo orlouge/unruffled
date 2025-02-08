@@ -28,7 +28,6 @@ import net.minecraft.entity.vehicle.TntMinecartEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.tag.BlockTags;
@@ -636,7 +635,7 @@ public class UndergroundCabinFeature extends Feature<DefaultFeatureConfig> {
             Blocks.DECORATED_POT.getDefaultState().with(DecoratedPotBlock.FACING, Direction.SOUTH),
             Blocks.DECORATED_POT.getDefaultState().with(DecoratedPotBlock.FACING, Direction.WEST),
             Blocks.DECORATED_POT.getDefaultState().with(DecoratedPotBlock.FACING, Direction.EAST)
-        }), UndergroundCabinFeature::setRandomSherds), BlockTemplate.random(new BlockState[] {
+        }), UndergroundCabinFeature::setRandomSherdsAndLoot), BlockTemplate.random(new BlockState[] {
             Blocks.FLOWER_POT.getDefaultState(),
             Blocks.FLOWER_POT.getDefaultState(),
             Blocks.FLOWER_POT.getDefaultState(),
@@ -823,7 +822,7 @@ public class UndergroundCabinFeature extends Feature<DefaultFeatureConfig> {
         };
     }
 
-    protected static void setRandomSherds(BlockEntity blockEntity, Random random) {
+    protected static void setRandomSherdsAndLoot(BlockEntity blockEntity, Random random) {
         final Item[] possibleSherds = {
                 Items.BRICK, Items.MINER_POTTERY_SHERD, Items.MINER_POTTERY_SHERD,
                 Items.BURN_POTTERY_SHERD, Items.DANGER_POTTERY_SHERD, Items.BREWER_POTTERY_SHERD,
@@ -839,6 +838,7 @@ public class UndergroundCabinFeature extends Feature<DefaultFeatureConfig> {
             };
             decoratedPot.sherds = sherds;
             decoratedPot.setComponents(ComponentMapImpl.create(decoratedPot.getComponents(), ComponentChanges.builder().add(DataComponentTypes.POT_DECORATIONS, sherds).build()));
+            decoratedPot.setLootTable(UnruffledMod.DECORATED_POT_LOOT_TABLE);
             decoratedPot.markDirty();
         }
     }
