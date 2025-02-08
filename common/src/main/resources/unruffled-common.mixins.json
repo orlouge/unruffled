@@ -83,6 +83,7 @@
     "worldgen.StrongholdGeneratorMixin",
     "worldgen.StrongholdGeneratorMixin$PortalRoomMixin",
     "worldgen.StructurePlacementMixin",
+    "worldgen.StructureTemplateMixin",
     "worldgen.TheEndBiomeSourceMixin"
   ],
   "injectors": {
