@@ -142,11 +142,14 @@ public class Config {
 
     public record EnchantmentsConfig(
         boolean disableEnchantingTable, boolean disableGrindstone, boolean disableRepairXpCost, boolean disableGlint, boolean showLevelNumber,
-        Optional<Boolean> disenchantChiseledBookshelfBooks,
+        Optional<Boolean> disenchantChiseledBookshelfBooks, Optional<Boolean> filterStructureItemFrames, Optional<Boolean> filterStructureChiseledBookshelves, Optional<Boolean> filterStructureDecoratedPots,
         Set<RegistryKey<Enchantment>> disabledEnchantments, Map<Item, Map<RegistryKey<Enchantment>, Integer>> itemEnchantments) {
 
         public EnchantmentsConfig() {
-            this(true, true, true, true, false, Optional.of(Platform.isModLoaded("betterarcheology")), UnruffledMod.DEFAULT_DISABLED_ENCHANTMENTS, UnruffledMod.DEFAULT_ITEM_ENCHANTMENTS);
+            this(
+                true, true, true, true, false,
+                Optional.of(false), Optional.of(true), Optional.of(true), Optional.of(true),
+                UnruffledMod.DEFAULT_DISABLED_ENCHANTMENTS, UnruffledMod.DEFAULT_ITEM_ENCHANTMENTS);
         }
 
         public static Codec<Set<RegistryKey<Enchantment>>> ENCHANTMENT_SET_CODEC = RegistryKey.createCodec(RegistryKeys.ENCHANTMENT).listOf().xmap(HashSet::new, LinkedList::new);
@@ -158,6 +161,9 @@ public class Config {
             Codec.BOOL.fieldOf("disable_glint").forGetter(EnchantmentsConfig::disableGlint),
             Codec.BOOL.fieldOf("display_xp_level_over_bar").forGetter(EnchantmentsConfig::showLevelNumber),
             Codec.BOOL.optionalFieldOf("disenchant_chiseled_bookshelf_books").forGetter(EnchantmentsConfig::disenchantChiseledBookshelfBooks),
+            Codec.BOOL.optionalFieldOf("filter_structure_item_frames").forGetter(EnchantmentsConfig::filterStructureItemFrames),
+            Codec.BOOL.optionalFieldOf("filter_structure_chiseled_bookshelves").forGetter(EnchantmentsConfig::filterStructureChiseledBookshelves),
+            Codec.BOOL.optionalFieldOf("filter_structure_decorated_pots").forGetter(EnchantmentsConfig::filterStructureDecoratedPots),
             ENCHANTMENT_SET_CODEC.fieldOf("disabled_enchantments").forGetter(config -> config.disabledEnchantments),
             Codec.unboundedMap(Registries.ITEM.getCodec(), ENCHANTMENT_MAP_CODEC).fieldOf("intrinsic_enchantments").forGetter(config -> config.itemEnchantments)
             ).apply(instance, EnchantmentsConfig::new)
