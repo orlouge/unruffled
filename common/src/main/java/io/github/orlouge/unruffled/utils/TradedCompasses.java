@@ -101,9 +101,9 @@ public class TradedCompasses extends PersistentState {
 
     public ItemStack getRandomSell(int attempts, ServerWorld world, Random random, Vec3d posToAvoid) {
         List<UUID> players = new ArrayList<>(availableForSell.keySet());
-        if (players.isEmpty()) return null;
         int maxAttempts = attempts;
         for (int i = 0; i < maxAttempts; i++) {
+            if (players.isEmpty()) return null;
             int index = players.size() == 1 ? 0 : random.nextBetweenExclusive(0, players.size());
             UUID uuid = players.get(index);
             List<Compass> sell = availableForSell.getOrDefault(uuid, Collections.emptyList());
