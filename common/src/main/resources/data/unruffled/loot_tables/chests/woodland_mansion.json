@@ -20,38 +20,34 @@
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:compass"
-        },
-        {
-          "type": "minecraft:item",
           "name": "minecraft:lodestone"
         },
         {
           "type": "minecraft:item",
           "functions": [
             {
-              "function": "minecraft:set_potion",
-              "id": "unruffled:teleportation"
-            },
-            {
               "add": false,
               "count": {
                 "type": "minecraft:uniform",
-                "max": 3.0,
-                "min": 1.0
+                "max": 8.0,
+                "min": 2.0
               },
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:potion"
+          "name": "minecraft:diamond"
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:clock"
+          "name": "minecraft:recovery_compass"
         }
       ],
-      "rolls": 2.0
+      "rolls": {
+        "type": "minecraft:uniform",
+        "max": 3.0,
+        "min": 0.0
+      }
     }
   ],
-  "random_sequence": "minecraft:chests/shipwreck_map"
+  "random_sequence": "minecraft:chests/woodland_mansion"
 }

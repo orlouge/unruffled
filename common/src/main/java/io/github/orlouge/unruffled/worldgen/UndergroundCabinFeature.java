@@ -24,7 +24,6 @@ import net.minecraft.entity.vehicle.TntMinecartEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.registry.Registries;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.util.BlockRotation;
@@ -832,7 +831,6 @@ public class UndergroundCabinFeature extends Feature<DefaultFeatureConfig> {
                 case 2 -> new DecoratedPotBlockEntity.Sherds(Items.BRICK, sherd, sherd, Items.BRICK);
                 default -> new DecoratedPotBlockEntity.Sherds(Items.BRICK, Items.BRICK, Items.BRICK, sherd);
             };
-            decoratedPot.markDirty();
         }
     }
 

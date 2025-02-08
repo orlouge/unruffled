@@ -141,6 +141,14 @@ public class UnruffledFabric implements ModInitializer {
                     tableBuilder.pools(List.of(lootManager.getLootTable(new Identifier(UnruffledMod.MOD_ID, "chests/jungle_temple")).pools));
                 } else if (id.equals(LootTables.VILLAGE_CARTOGRAPHER_CHEST)) {
                     tableBuilder.pools(List.of(lootManager.getLootTable(new Identifier(UnruffledMod.MOD_ID, "chests/village_cartographer")).pools));
+                } else if (id.equals(LootTables.WOODLAND_MANSION_CHEST)) {
+                    tableBuilder.pools(List.of(lootManager.getLootTable(new Identifier(UnruffledMod.MOD_ID, "chests/woodland_mansion")).pools));
+                } else if (id.equals(LootTables.PILLAGER_OUTPOST_CHEST)) {
+                    tableBuilder.pools(List.of(lootManager.getLootTable(new Identifier(UnruffledMod.MOD_ID, "chests/pillager_outpost")).pools));
+                } else if (id.equals(LootTables.ANCIENT_CITY_CHEST)) {
+                    tableBuilder.pools(List.of(lootManager.getLootTable(new Identifier(UnruffledMod.MOD_ID, "chests/ancient_city")).pools));
+                } else if (id.equals(LootTables.SIMPLE_DUNGEON_CHEST)) {
+                    tableBuilder.pools(List.of(lootManager.getLootTable(new Identifier(UnruffledMod.MOD_ID, "chests/chests/simple_dungeon")).pools));
                 }
             }
         });

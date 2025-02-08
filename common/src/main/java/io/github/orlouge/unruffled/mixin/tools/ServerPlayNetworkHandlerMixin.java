@@ -18,7 +18,7 @@ public class ServerPlayNetworkHandlerMixin {
 
     @Inject(method = "onPlayerAction", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/server/network/ServerPlayerEntity;getStackInHand(Lnet/minecraft/util/Hand;)Lnet/minecraft/item/ItemStack;"))
     public void preventEvilTotemSwap(PlayerActionC2SPacket packet, CallbackInfo ci) {
-        if (Config.INSTANCE.get().mechanicsConfig.evilTotemBinding() && this.player.getStackInHand(Hand.OFF_HAND).isOf(CustomItems.EVIL_TOTEM)) {
+        if (Config.INSTANCE.get().mechanicsConfig.evilTotemBinding() && !this.player.isCreative() && this.player.getStackInHand(Hand.OFF_HAND).isOf(CustomItems.EVIL_TOTEM)) {
             ci.cancel();
         }
     }

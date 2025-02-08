@@ -119,6 +119,7 @@ public class UnruffledMod {
     public static final float DEFAULT_STRUCTURE_SPREAD_CORRECTION = 64f;
 
     public static final Identifier BOOKSHELF_LOOT_TABLE = new Identifier(UnruffledMod.MOD_ID, "chests/bookshelf");
+    public static final Identifier DECORATED_POT_LOOT_TABLE = new Identifier(UnruffledMod.MOD_ID, "decorated_pot");
     public static final Identifier NORTHBOUND_GATE_LOOT_TABLE = new Identifier(UnruffledMod.MOD_ID, "archaeology/northbound_gate");
     static {
         DEFAULT_LOOT_CODICES_ADD = Map.ofEntries(
