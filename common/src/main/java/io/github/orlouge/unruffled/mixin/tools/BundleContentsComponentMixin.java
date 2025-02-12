@@ -1,14 +1,19 @@
 package io.github.orlouge.unruffled.mixin.tools;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.sugar.Local;
 import io.github.orlouge.unruffled.config.Config;
 import net.minecraft.component.type.BundleContentsComponent;
 import net.minecraft.item.ItemStack;
 import org.apache.commons.lang3.math.Fraction;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+import java.util.List;
 
 @Mixin(BundleContentsComponent.class)
 public class BundleContentsComponentMixin {
@@ -19,6 +24,12 @@ public class BundleContentsComponentMixin {
 
     @Mixin(BundleContentsComponent.Builder.class)
     public static class BuilderMixin {
+        @Shadow @Final private List<ItemStack> stacks;
+
+        @ModifyExpressionValue(method = "addInternal", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;areItemsAndComponentsEqual(Lnet/minecraft/item/ItemStack;Lnet/minecraft/item/ItemStack;)Z"))
+        public boolean preventStackingAbove99(boolean original, ItemStack stack, @Local int slot) {
+            return original && (this.stacks.get(slot).getCount() + stack.getCount() <= 99);
+        }
         /*
         @ModifyVariable(method = "getMaxAllowed", at = @At("STORE"))
         public Fraction spaceLeft(Fraction fraction) {
