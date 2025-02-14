@@ -200,9 +200,12 @@ public class UnruffledMod {
                 if (!compass.isEmpty() && compass.isOf(Items.RECOVERY_COMPASS)) {
                     compass = compass.copy();
                     if (compass.contains(LOCKED_COMPASS_COMPONENT) && compass.get(LOCKED_COMPASS_COMPONENT)) {
+                        /*
                         compass.remove(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE);
                         compass.remove(DataComponentTypes.LORE);
                         compass.remove(LOCKED_COMPASS_COMPONENT);
+                         */
+                        compass = new ItemStack(Items.RECOVERY_COMPASS, compass.getCount());
                     } else {
                         if (!player.isInSneakingPose()) {
                             lockedDeathPosition.setLockedDeathPosition();
