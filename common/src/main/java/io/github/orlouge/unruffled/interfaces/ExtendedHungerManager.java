@@ -99,15 +99,17 @@ public interface ExtendedHungerManager {
     float getWeight();
 
 
-    default float calculateWeight(PlayerEntity player) {
+    default Pair<Float, Float> calculateWeight(PlayerEntity player) {
         PlayerInventory inv = player.getInventory();
         Pair<Float, Boolean> inventoryWeight = getInventoryWeight(inv);
         float weight = inventoryWeight.getLeft() / inv.size();
+        float echestWeight = 0;
         if (inventoryWeight.getRight()) {
             Inventory inv2 = player.getEnderChestInventory();
-            weight += getInventoryWeight(inv2).getLeft() / inv2.size();
+            echestWeight = getInventoryWeight(inv2).getLeft() / inv2.size();
+            weight += echestWeight;
         }
-        return Math.max(1f, weight * weight * Config.INSTANCE.get().hungerConfig.inventoryWeightPenaltyFactor());
+        return new Pair<>(Math.max(1f, weight * weight * Config.INSTANCE.get().hungerConfig.inventoryWeightPenaltyFactor()), echestWeight);
     }
 
     private static Pair<Float, Boolean> getInventoryWeight(Inventory inventory) {

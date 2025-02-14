@@ -9,6 +9,7 @@ import net.minecraft.entity.player.HungerManager;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.Pair;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.dimension.DimensionType;
@@ -74,10 +75,14 @@ public abstract class HungerManagerMixin implements ExtendedHungerManager {
         }
         this.prevFoodLevel = this.foodLevel;
         if (this.inventoryWeightTimer++ >= 50) {
-            this.inventoryWeight = this.calculateWeight(player);
+            Pair<Float, Float> weight = this.calculateWeight(player);
+            this.inventoryWeight = weight.getLeft();
             this.inventoryWeightTimer = 0;
             if (this.inventoryWeight > 1.5 && player instanceof ServerPlayerEntity serverPlayer) {
                 UnruffledMod.HEAVY_INVENTORY_CRITERION.trigger(serverPlayer);
+                if (weight.getRight() > 1f) {
+                    UnruffledMod.HEAVY_ENDER_CHEST_CRITERION.trigger(serverPlayer);
+                }
             }
         }
         if (player.hasStatusEffect(StatusEffects.HUNGER)) {

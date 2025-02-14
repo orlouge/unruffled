@@ -80,6 +80,7 @@ public class UnruffledMod {
     public static final FastAttackCriterion FAST_ATTACK_CRITERION = Registry.register(Registries.CRITERION, Identifier.of(UnruffledMod.MOD_ID, "fast_attack"), new FastAttackCriterion());
     public static final KnockbackCriterion KNOCKBACK_CRITERION = Registry.register(Registries.CRITERION, Identifier.of(UnruffledMod.MOD_ID, "knockback"), new KnockbackCriterion());
     public static final HeavyInventoryCriterion HEAVY_INVENTORY_CRITERION = Registry.register(Registries.CRITERION, Identifier.of(UnruffledMod.MOD_ID, "heavy_inventory"), new HeavyInventoryCriterion());
+    public static final HeavyEnderChestCriterion HEAVY_ENDER_CHEST_CRITERION = Registry.register(Registries.CRITERION, Identifier.of(UnruffledMod.MOD_ID, "heavy_ender_chest"), new HeavyEnderChestCriterion());
     public static final PeacefulChunkCriterion PEACEFUL_CHUNK_CRITERION = Registry.register(Registries.CRITERION, Identifier.of(UnruffledMod.MOD_ID, "peaceful_chunk"), new PeacefulChunkCriterion());
     public static final TeleportationCriterion TELEPORTATION_CRITERION = Registry.register(Registries.CRITERION, Identifier.of(UnruffledMod.MOD_ID, "teleportation"), new TeleportationCriterion());
     public static final PigTeleportationCriterion PIG_TELEPORTATION_CRITERION = Registry.register(Registries.CRITERION, Identifier.of(UnruffledMod.MOD_ID, "pig_teleportation"), new PigTeleportationCriterion());
