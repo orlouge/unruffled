@@ -60,7 +60,8 @@ public class UnruffledMod {
     public static final MagneticTridentCriterion MAGNETIC_TRIDENT_CRITERION = Criteria.register(new MagneticTridentCriterion(new Identifier(UnruffledMod.MOD_ID, "magnetic_trident")));
     public static final FastAttackCriterion FAST_ATTACK_CRITERION = Criteria.register(new FastAttackCriterion(new Identifier(UnruffledMod.MOD_ID, "fast_attack")));
     public static final KnockbackCriterion KNOCKBACK_CRITERION = Criteria.register(new KnockbackCriterion(new Identifier(UnruffledMod.MOD_ID, "knockback")));
-    public static final HeavyInventoryCriterion HEAVY_INVENTORY_CRITERION = Criteria.register(new HeavyInventoryCriterion(new Identifier(UnruffledMod.MOD_ID, "heavy_inventory")));
+    public static final HeavyEnderChestCriterion HEAVY_INVENTORY_CRITERION = Criteria.register(new HeavyEnderChestCriterion(new Identifier(UnruffledMod.MOD_ID, "heavy_inventory")));
+    public static final HeavyEnderChestCriterion HEAVY_ENDER_CHEST_CRITERION = Criteria.register(new HeavyEnderChestCriterion(new Identifier(UnruffledMod.MOD_ID, "heavy_ender_chest")));
     public static final PeacefulChunkCriterion PEACEFUL_CHUNK_CRITERION = Criteria.register(new PeacefulChunkCriterion(new Identifier(UnruffledMod.MOD_ID, "peaceful_chunk")));
     public static final TeleportationCriterion TELEPORTATION_CRITERION = Criteria.register(new TeleportationCriterion(new Identifier(UnruffledMod.MOD_ID, "teleportation")));
     public static final PigTeleportationCriterion PIG_TELEPORTATION_CRITERION = Criteria.register(new PigTeleportationCriterion(new Identifier(UnruffledMod.MOD_ID, "pig_teleportation")));
