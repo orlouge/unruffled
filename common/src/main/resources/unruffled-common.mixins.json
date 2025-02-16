@@ -30,6 +30,7 @@
     "enchanting.ItemMixin",
     "enchanting.ItemStackMixin",
     "hunger.HungerManagerMixin",
+    "hunger.LivingEntityMixin",
     "hunger.PlayerEntityMixin",
     "hunger.ServerPlayerEntityMixin",
     "mobs.BadOmenStatusEffectMixin",
