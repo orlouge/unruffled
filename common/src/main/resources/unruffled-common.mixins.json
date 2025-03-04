@@ -57,6 +57,7 @@
     "tools.BundleContentsComponentMixin$BuilderMixin",
     "tools.BundleItemMixin",
     "tools.CartographyTableScreenHandlerMixin",
+    "tools.CompassItemMixin",
     "tools.CraftingScreenHandlerMixin",
     "tools.DrownedEntityMixin",
     "tools.EnchantmentsHelperMixin",
