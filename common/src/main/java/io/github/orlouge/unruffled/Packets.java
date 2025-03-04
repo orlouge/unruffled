@@ -1,8 +1,6 @@
 package io.github.orlouge.unruffled;
 
-import com.mojang.serialization.Codec;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
@@ -44,12 +42,12 @@ public class Packets {
         }
     }
 
-    public static class LockRecoveryCompass extends Packet {
-        public static final Id<LockRecoveryCompass> PACKET_ID = new Id<>(Identifier.of(UnruffledMod.MOD_ID, "lockrecoverycompass"));
-        public static final LockRecoveryCompass INSTANCE = new LockRecoveryCompass();
-        public static final PacketCodec<RegistryByteBuf, LockRecoveryCompass> CODEC = PacketCodec.unit(INSTANCE);
+    public static class LockCompass extends Packet {
+        public static final Id<LockCompass> PACKET_ID = new Id<>(Identifier.of(UnruffledMod.MOD_ID, "lockrecoverycompass"));
+        public static final LockCompass INSTANCE = new LockCompass();
+        public static final PacketCodec<RegistryByteBuf, LockCompass> CODEC = PacketCodec.unit(INSTANCE);
 
-        private LockRecoveryCompass() {}
+        private LockCompass() {}
 
         public static void register(Consumer<ServerPlayerEntity> receiver) {
             Platform.registerServerReceiver(PACKET_ID,

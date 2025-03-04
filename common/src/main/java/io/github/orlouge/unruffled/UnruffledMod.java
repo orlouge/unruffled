@@ -1,9 +1,5 @@
 package io.github.orlouge.unruffled;
 
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonSerializationContext;
-import com.mojang.datafixers.util.Unit;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.Decoder;
 import com.mojang.serialization.Encoder;
@@ -20,7 +16,6 @@ import io.github.orlouge.unruffled.potions.TeleportEffect;
 import io.github.orlouge.unruffled.worldgen.NorthboundGateStructure;
 import io.github.orlouge.unruffled.worldgen.UndergroundCabinFeature;
 import io.github.orlouge.unruffled.worldgen.UndergroundPondFeature;
-import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.Block;
 import net.minecraft.component.ComponentChanges;
 import net.minecraft.component.ComponentMapImpl;
@@ -28,7 +23,6 @@ import net.minecraft.component.ComponentType;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.LoreComponent;
 import net.minecraft.enchantment.Enchantment;
-import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributes;
@@ -41,7 +35,6 @@ import net.minecraft.item.TridentItem;
 import net.minecraft.loot.LootTable;
 import net.minecraft.loot.LootTables;
 import net.minecraft.loot.function.LootFunctionType;
-import net.minecraft.nbt.*;
 import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.Potions;
@@ -55,18 +48,15 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.structure.StructurePieceType;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
-import net.minecraft.text.TextColor;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.GlobalPos;
 import net.minecraft.world.gen.feature.DefaultFeatureConfig;
 import net.minecraft.world.gen.structure.StructureType;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 public class UnruffledMod {
     public static final String MOD_ID = "unruffled";
@@ -194,7 +184,21 @@ public class UnruffledMod {
             player.swingHand(Hand.MAIN_HAND, false);
         });
 
-        Packets.LockRecoveryCompass.register(player -> {
+        Packets.LockCompass.register(player -> {
+            if (Config.INSTANCE.get().navigationConfig.compassPointsNorth() && Config.INSTANCE.get().navigationConfig.compassToggleSpawn()) {
+                ItemStack compass = player.getMainHandStack();
+                if (!compass.isEmpty() && compass.isOf(Items.COMPASS) && !compass.contains(DataComponentTypes.LODESTONE_TRACKER)) {
+                    compass = compass.copy();
+                    if (compass.contains(LOCKED_COMPASS_COMPONENT) && compass.get(LOCKED_COMPASS_COMPONENT)) {
+                        compass = new ItemStack(Items.COMPASS, compass.getCount());
+                    } else {
+                        compass.set(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE, true);
+                        compass.set(DataComponentTypes.LORE, new LoreComponent(Text.translatable("item.minecraft.compass.spawn").getWithStyle(Style.EMPTY.withColor(Formatting.YELLOW))));
+                        compass.set(LOCKED_COMPASS_COMPONENT, true);
+                    }
+                    player.setStackInHand(Hand.MAIN_HAND, compass);
+                }
+            }
             if (player instanceof HasLockedDeathPosition lockedDeathPosition && Config.INSTANCE.get().navigationConfig.recoveryCompassLocking()) {
                 ItemStack compass = player.getMainHandStack();
                 if (!compass.isEmpty() && compass.isOf(Items.RECOVERY_COMPASS)) {

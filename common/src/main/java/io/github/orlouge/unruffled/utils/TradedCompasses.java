@@ -5,6 +5,7 @@ import com.mojang.serialization.DataResult;
 import io.github.orlouge.unruffled.UnruffledMod;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.LodestoneTrackerComponent;
+import net.minecraft.component.type.LoreComponent;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.CompassItem;
 import net.minecraft.item.ItemStack;
@@ -14,7 +15,9 @@ import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.text.Style;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.GlobalPos;
 import net.minecraft.util.math.Vec3d;
@@ -31,11 +34,13 @@ public class TradedCompasses extends PersistentState {
     public final Map<UUID, List<ItemStack>> availableForBuy = new HashMap<>();
     public final Map<UUID, List<Compass>> availableForSell = new HashMap<>();
     public final Map<Text, Integer> usedNames = new HashMap<>();
+    public final Map<Text, Integer> usedLores = new HashMap<>();
+    private final Map<BlockPos, Text> lodestoneNames = new HashMap<>();
     private static final Type<TradedCompasses> TYPE = new Type<>(
         TradedCompasses::new, TradedCompasses::new, null
     );
 
-    public static final int MAX_BUY_PER_PLAYER = 10;
+    public static final int MAX_BUY_PER_PLAYER = 50;
     public static final int MAX_SELL_PER_PLAYER = 30;
 
     public TradedCompasses() {}
@@ -48,6 +53,7 @@ public class TradedCompasses extends PersistentState {
         compass = compass.copy();
         compass.setCount(1);
         List<ItemStack> buy = availableForBuy.computeIfAbsent(player.getUuid(), k -> new LinkedList<>());
+        if (!buy.isEmpty() && buy.getLast().equals(compass)) return;
         while (buy.size() >= MAX_BUY_PER_PLAYER) {
             buy.remove(0);
         }
@@ -78,13 +84,14 @@ public class TradedCompasses extends PersistentState {
             }
             sell.add(compass.get());
             compass.get().name.ifPresent(text -> usedNames.merge(text, 1, (k, v) -> v + 1));
+            compass.get().lore.ifPresent(text -> usedLores.merge(text, 1, (k, v) -> v + 1));
             markDirty();
         }
     }
 
     public ItemStack getBuy(ServerWorld world, PlayerEntity player) {
         List<ItemStack> buy = availableForBuy.getOrDefault(player.getUuid(), Collections.emptyList());
-        if (!buy.isEmpty()) {
+        for (int attempts = 0; !buy.isEmpty() && attempts < 10; attempts++) {
             int index = buy.size() - 1;
             ItemStack stack = buy.get(index);
             Optional<Compass> topCompass = getCompass(stack);
@@ -138,19 +145,30 @@ public class TradedCompasses extends PersistentState {
                 invalidateCompass(uuid, compass);
                 continue;
             }
-            if (Items.COMPASS instanceof CompassItem compassItem) {
+            if (Items.COMPASS instanceof CompassItem) {
                 ItemStack stack = new ItemStack(Items.COMPASS);
                 stack.set(DataComponentTypes.LODESTONE_TRACKER, new LodestoneTrackerComponent(Optional.of(new GlobalPos(compass.dimension, compass.lodestonePos)), true));
+                Text name = null;
+                List<Text> lore = null;
+                boolean duplicateName = true, duplicateLore = true;
                 if (compass.name.isPresent()) {
-                    Text name = compass.name.get();
-                    if (usedNames.getOrDefault(name, 0) > 1) {
-                        Optional<GameProfile> profile = Optional.ofNullable(world.getServer().getUserCache()).flatMap(cache -> cache.getByUuid(uuid));
-                        if (profile.isPresent()) {
-                            name = Text.literal(name.asTruncatedString(10) + " (" + profile.get().getName() + ")");
-                        }
-                    }
-                    stack.set(DataComponentTypes.CUSTOM_NAME, name);
+                    name = compass.name.get();
+                    duplicateName = usedNames.getOrDefault(name, 0) > 1;
                 }
+                if (compass.lore.isPresent()) {
+                    Text compassLore = compass.lore.get();
+                    lore = new ArrayList<>(List.of(compassLore));
+                    duplicateLore = usedLores.getOrDefault(compassLore, 0) > 1;
+                }
+                if (duplicateName && duplicateLore) {
+                    Optional<GameProfile> profile = Optional.ofNullable(world.getServer().getUserCache()).flatMap(cache -> cache.getByUuid(uuid));
+                    if (profile.isPresent()) {
+                        if (lore == null) lore = new ArrayList<>();
+                        lore.addAll(Text.of(profile.get().getName()).getWithStyle(Style.EMPTY.withColor(Formatting.GRAY)));
+                    }
+                }
+                if (name != null) stack.set(DataComponentTypes.CUSTOM_NAME, name);
+                if (lore != null) stack.set(DataComponentTypes.LORE, new LoreComponent(lore));
                 return stack;
             }
         }
@@ -174,7 +192,49 @@ public class TradedCompasses extends PersistentState {
                 usedNames.remove(name);
             }
         }
+        if (compass.lore.isPresent()) {
+            Text lore = compass.lore.get();
+            Integer used = usedLores.getOrDefault(lore, 0);
+            if (used > 1) {
+                usedLores.put(lore, used - 1);
+            } else if (used == 1) {
+                usedLores.remove(lore);
+            }
+        }
         markDirty();
+    }
+
+    public static Optional<Compass> getCompass(ItemStack stack) {
+        if (stack.isOf(Items.COMPASS) && stack.contains(DataComponentTypes.LODESTONE_TRACKER)) {
+            LodestoneTrackerComponent lodestone = stack.get(DataComponentTypes.LODESTONE_TRACKER);
+
+            if (lodestone == null || lodestone.target().isEmpty()) {
+                return Optional.empty();
+            }
+
+            RegistryKey<World> lodestoneDimension = lodestone.target().get().dimension();
+            BlockPos lodestonePos = lodestone.target().get().pos();
+            return Optional.of(new Compass(
+                stack.contains(DataComponentTypes.CUSTOM_NAME) && !stack.get(DataComponentTypes.CUSTOM_NAME).asTruncatedString(10).isEmpty() ? Optional.of(stack.getName()) : Optional.empty(),
+                stack.contains(DataComponentTypes.LORE) ? Optional.of(stack.get(DataComponentTypes.LORE).lines()).filter(s -> !s.isEmpty()).map(s -> s.get(0)) : Optional.empty(),
+                lodestonePos, lodestoneDimension));
+        }
+        return Optional.empty();
+    }
+
+    public void storeLodestoneName(BlockPos blockPos, Text name) {
+        if (name == null) return;
+        lodestoneNames.put(blockPos, name);
+        markDirty();
+    }
+
+    public void deleteLodestoneName(BlockPos blockPos) {
+        lodestoneNames.remove(blockPos);
+        markDirty();
+    }
+
+    public Text getLodestoneName(BlockPos blockPos) {
+        return lodestoneNames.get(blockPos);
     }
 
     @Override
@@ -220,6 +280,26 @@ public class TradedCompasses extends PersistentState {
         }
         nbt.put("names", nameList);
 
+        NbtList loreList = new NbtList();
+        for (Map.Entry<Text, Integer> entry : this.usedLores.entrySet()) {
+            if (entry.getValue() == 0) continue;
+            NbtCompound loreEntry = new NbtCompound();
+            loreEntry.putString("lore", Text.Serialization.toJsonString(entry.getKey(), lookup));
+            loreEntry.putInt("count", entry.getValue());
+            loreList.add(loreEntry);
+        }
+        nbt.put("lores", loreList);
+
+        NbtList lodestoneNameList = new NbtList();
+        for (Map.Entry<BlockPos, Text> entry : this.lodestoneNames.entrySet()) {
+            if (entry.getValue() == null) continue;
+            NbtCompound lodestoneEntry = new NbtCompound();
+            lodestoneEntry.put("pos", NbtHelper.fromBlockPos(entry.getKey()));
+            lodestoneEntry.putString("name", Text.Serialization.toJsonString(entry.getValue(), lookup));
+            lodestoneNameList.add(lodestoneEntry);
+        }
+        nbt.put("lodestoneNames", lodestoneNameList);
+
         return nbt;
     }
 
@@ -252,25 +332,24 @@ public class TradedCompasses extends PersistentState {
             Text name = Text.Serialization.fromJson(nameEntry.getString("name"), lookup);
             if (name != null) usedNames.put(name, nameEntry.getInt("count"));
         }
-    }
 
-    public static Optional<Compass> getCompass(ItemStack stack) {
-        if (stack.isOf(Items.COMPASS) && stack.contains(DataComponentTypes.LODESTONE_TRACKER)) {
-            LodestoneTrackerComponent lodestone = stack.get(DataComponentTypes.LODESTONE_TRACKER);
-
-            if (lodestone == null || lodestone.target().isEmpty()) {
-                return Optional.empty();
-            }
-
-            RegistryKey<World> lodestoneDimension = lodestone.target().get().dimension();
-            BlockPos lodestonePos = lodestone.target().get().pos();
-            return Optional.of(new Compass(stack.contains(DataComponentTypes.CUSTOM_NAME) ? Optional.of(stack.getName()) : Optional.empty(), lodestonePos, lodestoneDimension));
+        for (NbtElement loreElement : nbt.getList("lores", NbtElement.COMPOUND_TYPE)) {
+            NbtCompound nameEntry = (NbtCompound) loreElement;
+            Text name = Text.Serialization.fromJson(nameEntry.getString("lore"), lookup);
+            if (name != null) usedLores.put(name, nameEntry.getInt("count"));
         }
-        return Optional.empty();
+
+        if (nbt.contains("lodestoneNames", NbtElement.LIST_TYPE)) {
+            for (NbtElement lodestoneElement : nbt.getList("lodestoneNames", NbtElement.COMPOUND_TYPE)) {
+                NbtCompound lodestoneEntry = (NbtCompound) lodestoneElement;
+                NbtHelper.toBlockPos(lodestoneEntry, "pos").ifPresent(pos ->
+                    lodestoneNames.put(pos, Text.Serialization.fromJson(lodestoneEntry.getString("name"), lookup))
+                );
+            }
+        }
     }
 
-
-    public record Compass(Optional<Text> name, BlockPos lodestonePos, RegistryKey<World> dimension) {
+    public record Compass(Optional<Text> name, Optional<Text> lore, BlockPos lodestonePos, RegistryKey<World> dimension) {
         public boolean isValid(MinecraftServer server) {
             ServerWorld targetWorld = server.getWorld(dimension);
             if (targetWorld == null) return false;
@@ -284,12 +363,16 @@ public class TradedCompasses extends PersistentState {
         public static Compass fromNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
             Optional<RegistryKey<World>> dimension = World.CODEC.parse(NbtOps.INSTANCE, nbt.get("dimension")).result();
             if (dimension.isPresent()) {
-                Optional<Text> text = Optional.empty();
+                Optional<Text> name = Optional.empty();
                 if (nbt.contains("name")) {
-                    text = Optional.ofNullable(Text.Serialization.fromJson(nbt.getString("name"), lookup));
+                    name = Optional.ofNullable(Text.Serialization.fromJson(nbt.getString("name"), lookup));
+                }
+                Optional<Text> lore = Optional.empty();
+                if (nbt.contains("lore")) {
+                    lore = Optional.ofNullable(Text.Serialization.fromJson(nbt.getString("lore"), lookup));
                 }
                 Optional<BlockPos> pos = NbtHelper.toBlockPos(nbt, "pos");
-                return pos.isEmpty() ? null : new Compass(text, pos.get(), dimension.get());
+                return pos.isEmpty() ? null : new Compass(name, lore, pos.get(), dimension.get());
             }
             return null;
         }
@@ -300,6 +383,7 @@ public class TradedCompasses extends PersistentState {
             if (dimension.isPresent()) {
                 NbtCompound nbt = new NbtCompound();
                 name.ifPresent(text -> nbt.putString("name", Text.Serialization.toJsonString(text, lookup)));
+                lore.ifPresent(text -> nbt.putString("lore", Text.Serialization.toJsonString(text, lookup)));
                 nbt.put("pos", NbtHelper.fromBlockPos(lodestonePos));
                 nbt.put("dimension", dimension.get());
                 return nbt;

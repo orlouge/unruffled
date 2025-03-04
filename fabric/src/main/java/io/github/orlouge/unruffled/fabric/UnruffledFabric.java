@@ -29,13 +29,11 @@ import net.minecraft.loot.entry.LootTableEntry;
 import net.minecraft.loot.function.SetComponentsLootFunction;
 import net.minecraft.loot.provider.number.UniformLootNumberProvider;
 import net.minecraft.registry.*;
-import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.tag.BiomeTags;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.gen.GenerationStep;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -43,7 +41,7 @@ public class UnruffledFabric implements ModInitializer {
     @Override
     public void onInitialize() {
         PayloadTypeRegistry.playC2S().register(Packets.AttackMiss.PACKET_ID, Packets.AttackMiss.CODEC);
-        PayloadTypeRegistry.playC2S().register(Packets.LockRecoveryCompass.PACKET_ID, Packets.LockRecoveryCompass.CODEC);
+        PayloadTypeRegistry.playC2S().register(Packets.LockCompass.PACKET_ID, Packets.LockCompass.CODEC);
         PayloadTypeRegistry.playS2C().register(Packets.LockedDeathPositionUpdate.PACKET_ID, Packets.LockedDeathPositionUpdate.CODEC);
         PayloadTypeRegistry.playS2C().register(Packets.ExtendedHungerUpdate.PACKET_ID, Packets.ExtendedHungerUpdate.CODEC);
 
