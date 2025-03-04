@@ -195,7 +195,7 @@ public class UnruffledMod {
         });
 
         Packets.LockRecoveryCompass.register(player -> {
-            if (player instanceof HasLockedDeathPosition lockedDeathPosition /* && Config.INSTANCE.get().mechanicsConfig.recoveryCompassLocking().orElse(true) */) {
+            if (player instanceof HasLockedDeathPosition lockedDeathPosition && Config.INSTANCE.get().navigationConfig.recoveryCompassLocking()) {
                 ItemStack compass = player.getMainHandStack();
                 if (!compass.isEmpty() && compass.isOf(Items.RECOVERY_COMPASS)) {
                     compass = compass.copy();
@@ -211,7 +211,7 @@ public class UnruffledMod {
                             lockedDeathPosition.setLockedDeathPosition();
                         }
                         compass.set(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE, true);
-                        compass.set(DataComponentTypes.LORE, new LoreComponent(Text.of("Locked").getWithStyle(Style.EMPTY.withColor(Formatting.BLUE))));
+                        compass.set(DataComponentTypes.LORE, new LoreComponent(Text.translatable("item.minecraft.recovery_compass.locked").getWithStyle(Style.EMPTY.withColor(Formatting.BLUE))));
                         compass.set(LOCKED_COMPASS_COMPONENT, true);
                     }
                     player.setStackInHand(Hand.MAIN_HAND, compass);

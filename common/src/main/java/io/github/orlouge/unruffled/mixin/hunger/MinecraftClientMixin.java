@@ -20,11 +20,6 @@ public class MinecraftClientMixin {
 
     @Shadow @Final public Mouse mouse;
 
-    @Inject(method = "doItemUse", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;isRiding()Z"))
-    public void onItemUse(CallbackInfo ci) {
-        UnruffledModClient.onItemUse(this.player);
-    }
-
     @Redirect(method = "doAttack", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;resetLastAttackedTicks()V"))
     public void onAttackMiss(ClientPlayerEntity instance) {
         UnruffledModClient.onAttackMiss(instance, false);

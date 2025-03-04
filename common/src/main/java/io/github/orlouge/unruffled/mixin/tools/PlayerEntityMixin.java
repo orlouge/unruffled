@@ -56,7 +56,7 @@ public abstract class PlayerEntityMixin extends LivingEntity {
 
     @Inject(method = "hasReducedDebugInfo", at = @At("HEAD"), cancellable = true)
     public void overrideReducedDebugInfo(CallbackInfoReturnable<Boolean> cir) {
-        if (Config.INSTANCE.get().mechanicsConfig.forceReducedDebugInfo() && !this.isCreative() && !this.isSpectator()) {
+        if (Config.INSTANCE.get().navigationConfig.forceReducedDebugInfo() && !this.isCreative() && !this.isSpectator()) {
             cir.setReturnValue(true);
             cir.cancel();
         }

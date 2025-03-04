@@ -6,6 +6,7 @@ import net.minecraft.client.item.ModelPredicateProvider;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Items;
 import net.minecraft.util.Hand;
@@ -32,8 +33,8 @@ public class UnruffledModClient {
 
         Packets.LockedDeathPositionUpdate.register((pos) -> { lockedDeathPosition = pos; });
 
-        ModelPredicateProvider compassProvider = ModelPredicateProviderRegistry.get(Items.RECOVERY_COMPASS.getDefaultStack(), Identifier.ofVanilla("angle"));
-        if (compassProvider instanceof CompassAnglePredicateProvider compassAnglePredicateProvider) {
+        ModelPredicateProvider recoveryCompassProvider = ModelPredicateProviderRegistry.get(Items.RECOVERY_COMPASS.getDefaultStack(), Identifier.ofVanilla("angle"));
+        if (recoveryCompassProvider instanceof CompassAnglePredicateProvider compassAnglePredicateProvider) {
             CompassAnglePredicateProvider.CompassTarget originalTarget = compassAnglePredicateProvider.compassTarget;
             compassAnglePredicateProvider.compassTarget = (world, stack, entity) ->
                 lockedDeathPosition.filter((pos) ->
@@ -51,9 +52,11 @@ public class UnruffledModClient {
         }
     }
 
-    public static void onItemUse(ClientPlayerEntity player) {
+    public static boolean onItemUse(PlayerEntity player) {
         if (player.getStackInHand(Hand.MAIN_HAND).isOf(Items.RECOVERY_COMPASS)) {
             Packets.LockRecoveryCompass.INSTANCE.sendToServer();
+            return true;
         }
+        return false;
     }
 }
