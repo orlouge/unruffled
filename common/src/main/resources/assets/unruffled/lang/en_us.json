@@ -14,6 +14,7 @@
   "item.minecraft.potion.effect.teleportation": "Potion of Teleportation",
   "item.minecraft.splash_potion.effect.teleportation": "Splash Potion of Teleportation",
   "item.minecraft.lingering_potion.effect.teleportation": "Lingering Potion of Teleportation",
+  "item.minecraft.recovery_compass.locked": "Locked",
   "effect.unruffled.teleportation": "Teleportation",
   "effect.unruffled.teleport.no_compass": "A compass pointing to a lodestone is required to teleport.",
   "effect.unruffled.teleport.no_lodestone": "Cannot teleport: no lodestone found.",

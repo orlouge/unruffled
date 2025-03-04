@@ -35,6 +35,7 @@ public class Config {
     public final LootConfig lootConfig;
     public final Trades.TradesConfig tradesConfig;
     public final StackSizeConfig stackSizeConfig;
+    public final NavigationConfig navigationConfig;
 
     public static final String CONFIG_FNAME = Platform.getConfigDirectory() + "/" + UnruffledMod.MOD_ID + ".json";
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
@@ -76,13 +77,15 @@ public class Config {
     public Config() {
         this(
             new HungerConfig(), new EnchantmentsConfig(), new ElytraConfig(), new MechanicsConfig(),
-            new WorldgenConfig(), new LootConfig(), Trades.DEFAULT_CONFIG, new StackSizeConfig()
+            new WorldgenConfig(), new LootConfig(), Trades.DEFAULT_CONFIG, new StackSizeConfig(),
+            Optional.empty()
         );
     }
 
     public Config(
         HungerConfig hungerConfig, EnchantmentsConfig enchantmentsConfig, ElytraConfig elytraConfig, MechanicsConfig mechanicsConfig,
-        WorldgenConfig worldgenConfig, LootConfig lootConfig, Trades.TradesConfig tradesConfig, StackSizeConfig stackSizeConfig) {
+        WorldgenConfig worldgenConfig, LootConfig lootConfig, Trades.TradesConfig tradesConfig, StackSizeConfig stackSizeConfig,
+        Optional<NavigationConfig> navigationConfig) {
         this.hungerConfig = hungerConfig;
         this.tradesConfig = tradesConfig;
         this.worldgenConfig = worldgenConfig;
@@ -91,6 +94,7 @@ public class Config {
         this.enchantmentsConfig = enchantmentsConfig;
         this.lootConfig = lootConfig;
         this.stackSizeConfig = stackSizeConfig;
+        this.navigationConfig = navigationConfig.orElse(new NavigationConfig());
     }
 
     public static Codec<Config> CODEC = RecordCodecBuilder.create(instance -> instance.group(
@@ -101,7 +105,8 @@ public class Config {
             WorldgenConfig.CODEC.fieldOf("worldgen").forGetter(config -> config.worldgenConfig),
             LootConfig.CODEC.fieldOf("loot").forGetter(config -> config.lootConfig),
             Trades.TradesConfig.CODEC.fieldOf("trades").forGetter(config -> config.tradesConfig),
-            StackSizeConfig.CODEC.fieldOf("stack_size").forGetter(config -> config.stackSizeConfig)
+            StackSizeConfig.CODEC.fieldOf("stack_size").forGetter(config -> config.stackSizeConfig),
+            NavigationConfig.CODEC.optionalFieldOf("navigation").forGetter(config -> Optional.ofNullable(config.navigationConfig))
     ).apply(instance, Config::new));
 
     public static final Lazy<Config> INSTANCE = new Lazy<>(Config::read);
@@ -186,28 +191,42 @@ public class Config {
         ).apply(instance, ElytraConfig::new));
     }
 
+    public record NavigationConfig(
+        boolean forceReducedDebugInfo, boolean reducedDebugFacing, boolean reducedDebugBiome,
+        int maxMapSize,
+        boolean recoveryCompassLocking) {
+        public NavigationConfig() {
+            this(false, true, true, 4, true);
+        }
+
+        public static final Codec<NavigationConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+            Codec.BOOL.fieldOf("force_reduced_debug_info_in_survival").forGetter(config -> config.forceReducedDebugInfo),
+            Codec.BOOL.fieldOf("show_facing_when_force_reduce_debug").forGetter(config -> config.reducedDebugFacing),
+            Codec.BOOL.fieldOf("show_biome_when_force_reduce_debug").forGetter(config -> config.reducedDebugBiome),
+            Codec.INT.fieldOf("max_map_size").forGetter(config -> config.maxMapSize),
+            Codec.BOOL.fieldOf("recovery_compass_locking").forGetter(config -> config.recoveryCompassLocking)
+        ).apply(instance, NavigationConfig::new));
+    }
+
     public record MechanicsConfig(
         boolean peacefulChunks, int sleepTime, int backupSpawnPoints, /* Optional<Boolean> recoveryCompassLocking, */ float dropSpreadFactor,
         boolean disableTotemOfUndying, boolean evokerDropsEvilTotem, boolean badOmenFromEvilTotem, boolean badOmenFromCaptain,
         boolean evilTotemBinding,
         boolean canTeleportMobs, float potionDurationFactor, int bundleSize, int wanderingSpawnFrequency,
-        boolean zombiesDontTargetVillagers,
-        boolean forceReducedDebugInfo, int maxMapSize) {
+        boolean zombiesDontTargetVillagers) {
         public MechanicsConfig() {
             this(
                 true, 16000, 10, /* Optional.of(true), */ 0.2f,
                 true, true, true, false,
                 true,
                 true, 2f, 256, 3,
-                true,
-                false, 4
+                true
             );
         }
         public static final Codec<MechanicsConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Codec.BOOL.fieldOf("no_hostile_mobs_around_spawn_beds").forGetter(config -> config.peacefulChunks),
             Codec.INT.fieldOf("sleep_time___set_to_negative_to_disable").forGetter(config -> config.sleepTime),
             Codec.INT.optionalFieldOf("backup_spawn_points", 3).forGetter(config -> config.backupSpawnPoints),
-            //Codec.BOOL.optionalFieldOf("recovery_compass_locking").forGetter(config -> config.recoveryCompassLocking),
             Codec.FLOAT.fieldOf("drop_spread_factor").forGetter(config -> config.dropSpreadFactor),
             Codec.BOOL.fieldOf("disable_totem_of_undying").forGetter(config -> config.disableTotemOfUndying),
             Codec.BOOL.fieldOf("evil_totem_dropped_by_evoker").forGetter(config -> config.evokerDropsEvilTotem),
@@ -218,9 +237,7 @@ public class Config {
             Codec.FLOAT.fieldOf("potion_duration_factor").forGetter(config -> config.potionDurationFactor),
             Codec.INT.fieldOf("bundle_size").forGetter(config -> config.bundleSize),
             Codec.INT.fieldOf("wandering_trader_spawn_frequency").forGetter(config -> config.wanderingSpawnFrequency),
-            Codec.BOOL.fieldOf("disable_zombie_targeting_villagers").forGetter(config -> config.zombiesDontTargetVillagers),
-            Codec.BOOL.fieldOf("force_reduced_debug_info_in_survival").forGetter(config -> config.forceReducedDebugInfo),
-            Codec.INT.fieldOf("max_map_size").forGetter(config -> config.maxMapSize)
+            Codec.BOOL.fieldOf("disable_zombie_targeting_villagers").forGetter(config -> config.zombiesDontTargetVillagers)
             ).apply(instance, MechanicsConfig::new));
     }
 

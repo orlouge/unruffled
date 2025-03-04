@@ -10,6 +10,6 @@ import org.spongepowered.asm.mixin.injection.ModifyConstant;
 public class CartographyTableScreenMixin {
     @ModifyConstant(method = "drawBackground", constant = @Constant(intValue = 4, ordinal = 0))
     public int overrideMaxMapSize(int constant) {
-        return Config.INSTANCE.get().mechanicsConfig.maxMapSize();
+        return Config.INSTANCE.get().navigationConfig.maxMapSize();
     }
 }

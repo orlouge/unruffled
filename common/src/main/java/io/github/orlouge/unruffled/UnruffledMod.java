@@ -176,7 +176,7 @@ public class UnruffledMod {
         });
 
         Packets.LockRecoveryCompass.register(player -> {
-            if (player instanceof HasLockedDeathPosition lockedDeathPosition /* && Config.INSTANCE.get().mechanicsConfig.recoveryCompassLocking().orElse(true) */) {
+            if (player instanceof HasLockedDeathPosition lockedDeathPosition && Config.INSTANCE.get().navigationConfig.recoveryCompassLocking()) {
                 ItemStack compass = player.getMainHandStack();
                 if (!compass.isEmpty() && compass.isOf(Items.RECOVERY_COMPASS)) {
                     compass = compass.copy();

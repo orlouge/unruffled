@@ -44,22 +44,24 @@ public abstract class DebugHudMixin {
 
     @ModifyReturnValue(method = "getLeftText", at = @At("RETURN"))
     public List<String> addExtraDebugInfoIfReduced(List<String> text) {
-        if (this.client.hasReducedDebugInfo() && Config.INSTANCE.get().mechanicsConfig.forceReducedDebugInfo()) {
+        if (this.client.hasReducedDebugInfo() && Config.INSTANCE.get().navigationConfig.forceReducedDebugInfo()) {
             List<String> extra = new LinkedList<>(text);
 
             Entity entity = this.client.getCameraEntity();
             if (entity != null) {
-                Direction direction = entity.getHorizontalFacing();
-                String textDirection = switch (direction) {
-                    case NORTH -> "Towards negative Z";
-                    case SOUTH -> "Towards positive Z";
-                    case WEST -> "Towards negative X";
-                    case EAST -> "Towards positive X";
-                    default -> "Invalid";
-                };
-                extra.add(
-                    String.format(Locale.ROOT, "Facing: %s (%s) (%.1f / %.1f)", direction, textDirection, MathHelper.wrapDegrees(entity.getYaw()), MathHelper.wrapDegrees(entity.getPitch()))
-                );
+                if (Config.INSTANCE.get().navigationConfig.reducedDebugFacing()) {
+                    Direction direction = entity.getHorizontalFacing();
+                    String textDirection = switch (direction) {
+                        case NORTH -> "Towards negative Z";
+                        case SOUTH -> "Towards positive Z";
+                        case WEST -> "Towards negative X";
+                        case EAST -> "Towards positive X";
+                        default -> "Invalid";
+                    };
+                    extra.add(
+                        String.format(Locale.ROOT, "Facing: %s (%s) (%.1f / %.1f)", direction, textDirection, MathHelper.wrapDegrees(entity.getYaw()), MathHelper.wrapDegrees(entity.getPitch()))
+                    );
+                }
 
                 ChunkPos chunkPos = new ChunkPos(entity.getBlockPos());
                 if (!Objects.equals(this.pos, chunkPos)) {
@@ -83,8 +85,10 @@ public abstract class DebugHudMixin {
                     int block = this.client.world.getLightLevel(LightType.BLOCK, blockPos);
                     extra.add("Client Light: " + light + " (" + sky + " sky, " + block + " block)");
 
-                    if (blockPos.getY() >= this.client.world.getBottomY() && blockPos.getY() < this.client.world.getTopY()) {
-                        extra.add("Biome: " + getBiomeString(this.client.world.getBiome(blockPos)));
+                    if (Config.INSTANCE.get().navigationConfig.reducedDebugBiome()) {
+                        if (blockPos.getY() >= this.client.world.getBottomY() && blockPos.getY() < this.client.world.getTopY()) {
+                            extra.add("Biome: " + getBiomeString(this.client.world.getBiome(blockPos)));
+                        }
                     }
                 }
             }
