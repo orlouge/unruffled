@@ -42,7 +42,7 @@ public abstract class InGameHudMixin {
         float stamina = UnruffledModClient.stamina;
         if (stamina > 0) {
             int y = context.getScaledWindowHeight() - 32 + 3;
-            int width = (int) (stamina * 183.0F);
+            int width = (int) (stamina * 182.0F);
             float regen = UnruffledModClient.lastStaminaRegeneration;
             float travel = UnruffledModClient.lastTravelPenalty;
             Sprite backgroundSprite = context.guiAtlasManager.getSprite(InGameHud.EXPERIENCE_BAR_BACKGROUND_TEXTURE);
