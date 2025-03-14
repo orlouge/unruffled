@@ -126,25 +126,25 @@ public class UnruffledMod {
         DEFAULT_LOOT_CODICES_ADD = Map.ofEntries(
                 Map.entry(LootTables.BURIED_TREASURE_CHEST, List.of(1, 4, 6)),
                 Map.entry(LootTables.SHIPWRECK_MAP_CHEST, List.of(2, 5, 10)),
-                Map.entry(LootTables.UNDERWATER_RUIN_BIG_CHEST, List.of(3, 7, 9)),
+                Map.entry(LootTables.UNDERWATER_RUIN_BIG_CHEST, List.of(3, 7, 9, 18)),
                 Map.entry(LootTables.SIMPLE_DUNGEON_CHEST, List.of(11, 16)),
                 Map.entry(LootTables.ANCIENT_CITY_CHEST, List.of(12, 15, 20)),
-                Map.entry(LootTables.BASTION_TREASURE_CHEST, List.of(14, 17, 18)),
+                Map.entry(LootTables.BASTION_TREASURE_CHEST, List.of(13, 14, 17)),
                 Map.entry(LootTables.IGLOO_CHEST_CHEST, List.of(21, 25, 28)),
                 Map.entry(LootTables.STRONGHOLD_LIBRARY_CHEST, List.of(23, 24, 27, 29)),
                 Map.entry(LootTables.WOODLAND_MANSION_CHEST, List.of(22, 26, 30)),
                 Map.entry(LootTables.DESERT_PYRAMID_CHEST, List.of(31, 34, 36)),
                 Map.entry(LootTables.NETHER_BRIDGE_CHEST, List.of(33, 35, 38, 39)),
                 Map.entry(LootTables.JUNGLE_TEMPLE_CHEST, List.of(41, 45, 48)),
-                Map.entry(BOOKSHELF_LOOT_TABLE, List.of(8, 13, 19, 47))
+                Map.entry(BOOKSHELF_LOOT_TABLE, List.of(8, 19, 47))
         );
     }
 
     public static Map<Identifier, List<Integer>> DEFAULT_LOOT_CODICES_MODIFY = Map.ofEntries(
             Map.entry(LootTables.DESERT_PYRAMID_ARCHAEOLOGY, List.of(32, 37, 40)),
-            Map.entry(LootTables.TRAIL_RUINS_COMMON_ARCHAEOLOGY, List.of(43, 46, 49)),
-            Map.entry(LootTables.TRAIL_RUINS_RARE_ARCHAEOLOGY, List.of(42, 44, 50)),
-            Map.entry(NORTHBOUND_GATE_LOOT_TABLE, List.of(8, 12, 28))
+            Map.entry(LootTables.TRAIL_RUINS_COMMON_ARCHAEOLOGY, List.of(43, 44, 46)),
+            Map.entry(LootTables.TRAIL_RUINS_RARE_ARCHAEOLOGY, List.of(42, 49, 50)),
+            Map.entry(NORTHBOUND_GATE_LOOT_TABLE, List.of(8, 43, 28))
     );
 
     public static Map<Identifier, List<Integer>> DEFAULT_ASSORTED_POTIONS_ADD = Map.ofEntries(
