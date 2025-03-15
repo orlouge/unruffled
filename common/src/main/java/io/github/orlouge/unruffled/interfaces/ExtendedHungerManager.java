@@ -98,18 +98,18 @@ public interface ExtendedHungerManager {
 
     default Pair<Float, Float> calculateWeight(PlayerEntity player) {
         PlayerInventory inv = player.getInventory();
-        Pair<Float, Boolean> inventoryWeight = getInventoryWeight(inv);
+        Pair<Float, Boolean> inventoryWeight = getInventoryWeight(inv, false);
         float weight = inventoryWeight.getLeft() / inv.size();
         float echestWeight = 0;
         if (inventoryWeight.getRight()) {
             Inventory inv2 = player.getEnderChestInventory();
-            echestWeight = getInventoryWeight(inv2).getLeft() / inv2.size();
+            echestWeight = getInventoryWeight(inv2, true).getLeft() / inv2.size();
             weight += echestWeight;
         }
-        return new Pair<>(Math.max(1f, weight * weight * Config.INSTANCE.get().hungerConfig.inventoryWeightPenaltyFactor()), echestWeight);
+        return new Pair<>(Math.max(1f, weight * weight * Config.INSTANCE.get().hungerConfig.inventoryWeightPenaltyFactor()), echestWeight / weight);
     }
 
-    private static Pair<Float, Boolean> getInventoryWeight(Inventory inventory) {
+    private static Pair<Float, Boolean> getInventoryWeight(Inventory inventory, boolean isEnderChest) {
         float weight = 0;
         boolean hasContainers = false, hasEnderChest = false;
         for(int j = 0; j < inventory.size(); ++j) {
@@ -119,7 +119,7 @@ public interface ExtendedHungerManager {
             if (itemWeight.getLeft() > 1) hasContainers = true;
             hasEnderChest |= itemWeight.getRight();
         }
-        return new Pair<>(hasContainers ? weight : 0f, hasEnderChest);
+        return new Pair<>(hasContainers || hasEnderChest || isEnderChest ? weight : 0f, hasEnderChest);
     }
 
     private static Pair<Float, Boolean> getNbtWeight(NbtCompound nbt) {

@@ -80,7 +80,7 @@ public abstract class HungerManagerMixin implements ExtendedHungerManager {
             this.inventoryWeightTimer = 0;
             if (this.inventoryWeight > 1.5 && player instanceof ServerPlayerEntity serverPlayer) {
                 UnruffledMod.HEAVY_INVENTORY_CRITERION.trigger(serverPlayer);
-                if (weight.getRight() > 1f) {
+                if (weight.getRight() > 0.3f) {
                     UnruffledMod.HEAVY_ENDER_CHEST_CRITERION.trigger(serverPlayer);
                 }
             }
