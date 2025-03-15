@@ -9,6 +9,7 @@ import net.minecraft.component.type.LoreComponent;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.*;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
@@ -65,19 +66,8 @@ public class CompassItemMixin extends Item {
     }
 
     private static void updateLore(ItemUsageContext context, ItemStack stack) {
-        if (context.getPlayer() instanceof ServerPlayerEntity serverPlayer) {
-            Text newLore = null;
-            if (serverPlayer.isSneaking() && !stack.contains(DataComponentTypes.LODESTONE_TRACKER) && !(stack.contains(DataComponentTypes.LORE) && stack.get(DataComponentTypes.LORE).lines().size() > 0)) {
-                if (stack.contains(DataComponentTypes.CUSTOM_NAME)) {
-                    newLore = stack.get(DataComponentTypes.CUSTOM_NAME).getWithStyle(Style.EMPTY.withColor(Formatting.LIGHT_PURPLE)).get(0);
-                    TradedCompasses.get(serverPlayer.getServerWorld().getPersistentStateManager()).storeLodestoneName(context.getBlockPos(), newLore);
-                    stack.remove(DataComponentTypes.CUSTOM_NAME);
-                } else {
-                    TradedCompasses.get(serverPlayer.getServerWorld().getPersistentStateManager()).deleteLodestoneName(context.getBlockPos());
-                }
-            } else {
-                newLore = TradedCompasses.get(serverPlayer.getServerWorld().getPersistentStateManager()).getLodestoneName(context.getBlockPos());
-            }
+        if (context.getWorld() instanceof ServerWorld world) {
+            Text newLore = TradedCompasses.get(world.getPersistentStateManager()).getLodestoneName(context.getBlockPos());
             if (newLore != null) {
                 stack.set(DataComponentTypes.LORE, new LoreComponent(List.of(newLore)));
             }
