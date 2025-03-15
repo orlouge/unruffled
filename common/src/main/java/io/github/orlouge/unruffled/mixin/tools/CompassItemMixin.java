@@ -7,9 +7,9 @@ import net.minecraft.item.ItemUsageContext;
 import net.minecraft.item.Items;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.math.GlobalPos;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -33,7 +33,7 @@ public class CompassItemMixin {
         }
     }
 
-    @Inject(method = "useOnBlock", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;set(Lnet/minecraft/component/ComponentType;Ljava/lang/Object;)Ljava/lang/Object;", ordinal = 0))
+    @Inject(method = "useOnBlock", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;set(Lnet/minecraft/component/ComponentType;Ljava/lang/Object;)Ljava/lang/Object;", ordinal = 0, shift = At.Shift.AFTER))
     public void setLoreInPlace(ItemUsageContext context, CallbackInfoReturnable<ActionResult> cir, @Local ItemStack stack) {
         updateLore(context, stack);
         addBuy(context, stack);
@@ -53,7 +53,7 @@ public class CompassItemMixin {
 
     private static void updateLore(ItemUsageContext context, ItemStack stack) {
         if (context.getWorld() instanceof ServerWorld world) {
-            Text newLore = TradedCompasses.get(world.getPersistentStateManager()).getLodestoneName(context.getBlockPos());
+            Text newLore = TradedCompasses.get(world.getPersistentStateManager()).getLodestoneName(new GlobalPos(context.getWorld().getRegistryKey(), context.getBlockPos()));
             if (newLore != null) {
                 stack.set(DataComponentTypes.LORE, new LoreComponent(List.of(newLore)));
             }
