@@ -10,6 +10,7 @@ import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.math.GlobalPos;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -29,11 +30,12 @@ public class ItemMixin {
     public void nameTagLodestone(ItemUsageContext context, CallbackInfoReturnable<ActionResult> cir) {
         if ((Object) this instanceof NameTagItem && context.getWorld() instanceof ServerWorld serverWorld && serverWorld.getBlockState(context.getBlockPos()).isOf(Blocks.LODESTONE)) {
             TradedCompasses compassDB = TradedCompasses.get(serverWorld.getPersistentStateManager());
+            GlobalPos pos = new GlobalPos(serverWorld.getRegistryKey(), context.getBlockPos());
             if (context.getStack().contains(DataComponentTypes.CUSTOM_NAME)) {
                 Text newLore = context.getStack().get(DataComponentTypes.CUSTOM_NAME).getWithStyle(Style.EMPTY.withColor(Formatting.LIGHT_PURPLE)).get(0);
-                compassDB.storeLodestoneName(context.getBlockPos(), newLore);
+                compassDB.storeLodestoneName(pos, newLore);
             } else {
-                compassDB.deleteLodestoneName(context.getBlockPos());
+                compassDB.deleteLodestoneName(pos);
             }
             cir.setReturnValue(ActionResult.SUCCESS_NO_ITEM_USED);
             cir.cancel();
