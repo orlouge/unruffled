@@ -4,23 +4,24 @@ import com.mojang.serialization.Codec;
 import io.github.orlouge.unruffled.utils.RomanNumerals;
 import net.minecraft.component.ComponentType;
 import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.LoreComponent;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.network.packet.s2c.play.OpenWrittenBookS2CPacket;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.stat.Stats;
 import net.minecraft.text.MutableText;
+import net.minecraft.text.Style;
 import net.minecraft.text.Text;
+import net.minecraft.text.TextColor;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class AncientCodexItem extends Item {
@@ -35,14 +36,24 @@ public class AncientCodexItem extends Item {
         return stack;
     }
 
+    public static ItemStack setExcerpt(ItemStack stack, Random random) {
+        List<String> excerpts = EXCERPTS.get(stack.get(NUMBER) - 1);
+        Text excerpt = Text.of("\"... " + excerpts.get(random.nextBetweenExclusive(0, excerpts.size())) + " ...\"");
+        List<Text> lore = excerpt.getWithStyle(Style.EMPTY.withColor(TextColor.fromFormatting(Formatting.GRAY)).withItalic(true));
+        stack.set(DataComponentTypes.LORE, new LoreComponent(lore));
+        return stack;
+    }
+
     @Override
     public Text getName(ItemStack stack) {
         Text base = super.getName(stack);
+        /*
         if (stack.contains(NUMBER)) {
             MutableText name = base.copy();
             name.append(" " + RomanNumerals.MAP.getOrDefault(stack.get(NUMBER), "?"));
             return name;
         }
+         */
         return base;
     }
 
@@ -59,6 +70,59 @@ public class AncientCodexItem extends Item {
             return super.use(world, user, hand);
         }
     }
+
+    public static final List<List<String>> EXCERPTS = List.of(
+        List.of("many streams and waterfalls", "many villages and towns", "paved with stone"),
+        List.of("great beast rising from the depths", "cliffs of black rock", "race of beings that are neither human"),
+        List.of("seek his fortune in a distant land", "from kings to other kings", "brought back into the memory"),
+        List.of("his wisdom and virtue", "dwellings on the hill", "anniversary of the city's founding"),
+        List.of("treasures from distant places", "drove him out of the city", "could gain too much power"),
+        List.of("ground is hot enough to cook an egg", "from which hot gases escape", "underground dwellings to cool themselves"),
+        List.of("chanting of prayers", "separation from ordinary life", "headdress of silver"),
+        List.of("sails of linen", "explore the lands and the seas", "prey of the waves"),
+        List.of("smeared with poison", "send an arrow through any armor", "shaft of iron"),
+        List.of("temple of solid gold", "all kinds of birds", "the scent of flowers"),
+        List.of("dried for twenty days", "music of the royal court", "Song of Winter"),
+        List.of("its hull black as night", "a piece of broken oar", "beyond the river bend"),
+        List.of("the hand of the smith", "the weapons of kings", "rings in the deep places of the world"),
+        List.of("the defense of the kingdom", "survey the battlefield", "appearing weak when you are strong"),
+        List.of("animal is sacrificed", "the story of their family", "offerings for the river goddess"),
+        List.of("soul is heavy with sorrow", "lost spirits may find their way", "until the end of time"),
+        List.of("arches and domes", "soft and easy to carve", "will last for ages"),
+        List.of("sandstorms that can bury a caravan", "goods unknown in our land", "jewels that glow in the darkness"),
+        List.of("air is hot and dry", "burn its flesh on the altar", "blood will be poured upon the earth"),
+        List.of("built upon clouds", "read the thoughts of all who approach", "into which all the wicked are cast"),
+        List.of("and never meet each other", "travels in the midst of heaven", "they steer their course by the stars"),
+        List.of("straits between the two great", "the islands of the west", "strange and wonderful craftsmanship"),
+        List.of("take away what belongs to the gods", "let him die by the hands of", "tools of a carpenter"),
+        List.of("destruction of all living things", "extends as far as the heavens", "happiness and sorrow"),
+        List.of("terrors unknown to most of mankind", "phosphorescent fungi that grow on the walls", "the tunnels twist and branch"),
+        List.of("smoke from a fire", "sealed with wax", "dried in the sun"),
+        List.of("appeared in the coastal regions", "seventh year of the reign of", "bodies becoming rigid"),
+        List.of("let blood from a man", "caught in a vessel", "a vein is opened"),
+        List.of("small fire before the entrance", "seals it with clay", "singing hymns, and lamenting"),
+        List.of("figures of beasts and birds", "the mountains beyond the desert", "Let no man disturb my rest"),
+        List.of("vision of things distant in space or time", "patterns formed by the smoke", "the language of dreams"),
+        List.of("where no light enters", "tore out their own eyes", "and no voice is raised"),
+        List.of("the wisdom of our ancestors", "a vow of silence", "guide the affairs of the kingdom"),
+        List.of("keep watch by night", "reflects it far out over the sea", "swing a lantern backwards and forwards"),
+        List.of("offered to any god or goddess", "love them and serve them", "proclaimed throughout the land"),
+        List.of("taken at the age of seven", "see into the future", "lives of exemplary virtue"),
+        List.of("decorate them with garlands", "through the streets, singing songs", "the entire village is illuminated."),
+        List.of("eye glowed red in the darkness", "no ship would venture into", "tales of horror and destruction"),
+        List.of("no map can chart its course", "built not by hands", "its heart lies a dormant"),
+        List.of("walls are hung with tapestries", "so bright that they dazzle the eyes", "gold is hidden within the walls"),
+        List.of("lit neither by sun nor lamp", "fed once a day, and given water twice", "extinguish the light of life"),
+        List.of("filled with gold and precious stones", "will never come out alive", "flowers that bloom all year round"),
+        List.of("the sweet scent of honey", "the bees swarmed upon him", "threw himself into the river"),
+        List.of("feared throughout the southern seas", "where other ships dared not go", "bringing food for the hungry and medicine"),
+        List.of("feast of the new year", "form a crescent shape", "decorated with flowers"),
+        List.of("part we give to the god", "a great feast, and invite all the people", "drink wine, and sing songs, and dance"),
+        List.of("spread the mixture on the wound", "salted meats and strong wines", "the venom may be carried away"),
+        List.of("evil spirits which are tormenting", "return to the abyss", "the mighty name of"),
+        List.of("deceive him if he follows her", "goes out alone to the forest", "let him pass by quickly, and look not on it"),
+        List.of("become barren and sterile", "country will be full of ruins", "and the people will die like flies")
+        );
 
     public static final List<List<Text>> CONTENTS = List.of(
         List.of(
