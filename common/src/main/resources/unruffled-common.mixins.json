@@ -6,8 +6,10 @@
   "client": [
     "BookScreenMixin",
     "BookScreenMixin$ContentsMixin",
+    "ClientPlayNetworkHandlerMixin",
     "DebugHudMixin",
     "IntegratedServerLoaderMixin",
+    "MerchantScreenMixin",
     "hunger.ClientPlayerEntityMixin",
     "hunger.ClientPlayerInteractionManagerMixin",
     "hunger.InGameHudMixin",
@@ -20,7 +22,6 @@
     "ItemEntityMixin",
     "LivingEntityMixin",
     "TippedArrowRecipeMixin",
-    "TradedItemMixin",
     "accessors.ItemAccessor",
     "accessors.ToolMaterialsAccessor",
     "enchanting.ChiseledBookshelfBlockEntityMixin",

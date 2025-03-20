@@ -1,6 +1,5 @@
 package io.github.orlouge.unruffled.mixin;
 
-import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import io.github.orlouge.unruffled.config.Config;
 import it.unimi.dsi.fastutil.longs.LongSet;
 import it.unimi.dsi.fastutil.longs.LongSets;
@@ -22,6 +21,8 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.*;
 
@@ -42,10 +43,10 @@ public abstract class DebugHudMixin {
 
     @Shadow public abstract void resetChunk();
 
-    @ModifyReturnValue(method = "getLeftText", at = @At("RETURN"))
-    public List<String> addExtraDebugInfoIfReduced(List<String> text) {
+    @Inject(method = "getLeftText", at = @At("RETURN"), cancellable = true)
+    public void addExtraDebugInfoIfReduced(CallbackInfoReturnable<List<String>> cir) {
         if (this.client.hasReducedDebugInfo() && Config.INSTANCE.get().navigationConfig.forceReducedDebugInfo()) {
-            List<String> extra = new LinkedList<>(text);
+            List<String> extra = new LinkedList<>(cir.getReturnValue());
 
             Entity entity = this.client.getCameraEntity();
             if (entity != null) {
@@ -93,8 +94,7 @@ public abstract class DebugHudMixin {
                 }
             }
 
-            return new ArrayList<>(extra);
+            cir.setReturnValue(new ArrayList<>(extra));
         }
-        return text;
     }
 }

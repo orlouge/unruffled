@@ -3,7 +3,6 @@ package io.github.orlouge.unruffled.mixin.enchanting;
 import io.github.orlouge.unruffled.config.Config;
 import io.github.orlouge.unruffled.utils.TradedCompasses;
 import net.minecraft.block.Blocks;
-import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.*;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Style;
@@ -30,14 +29,14 @@ public class ItemMixin {
     public void nameTagLodestone(ItemUsageContext context, CallbackInfoReturnable<ActionResult> cir) {
         if ((Object) this instanceof NameTagItem && context.getWorld() instanceof ServerWorld serverWorld && serverWorld.getBlockState(context.getBlockPos()).isOf(Blocks.LODESTONE)) {
             TradedCompasses compassDB = TradedCompasses.get(serverWorld.getPersistentStateManager());
-            GlobalPos pos = new GlobalPos(serverWorld.getRegistryKey(), context.getBlockPos());
-            if (context.getStack().contains(DataComponentTypes.CUSTOM_NAME)) {
-                Text newLore = context.getStack().get(DataComponentTypes.CUSTOM_NAME).getWithStyle(Style.EMPTY.withColor(Formatting.LIGHT_PURPLE)).get(0);
+            GlobalPos pos = GlobalPos.create(serverWorld.getRegistryKey(), context.getBlockPos());
+            if (context.getStack().hasCustomName()) {
+                Text newLore = context.getStack().getName().getWithStyle(Style.EMPTY.withColor(Formatting.LIGHT_PURPLE)).get(0);
                 compassDB.storeLodestoneName(pos, newLore);
             } else {
                 compassDB.deleteLodestoneName(pos);
             }
-            cir.setReturnValue(ActionResult.SUCCESS_NO_ITEM_USED);
+            cir.setReturnValue(ActionResult.SUCCESS);
             cir.cancel();
         }
     }

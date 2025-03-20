@@ -3,13 +3,6 @@ package io.github.orlouge.unruffled.utils;
 import com.mojang.authlib.GameProfile;
 import com.mojang.serialization.DataResult;
 import io.github.orlouge.unruffled.UnruffledMod;
-<<<<<<< HEAD
-=======
-import net.minecraft.component.ComponentChanges;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.LodestoneTrackerComponent;
-import net.minecraft.component.type.LoreComponent;
->>>>>>> 4aeadba (Reworked compass trades)
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.CompassItem;
 import net.minecraft.item.ItemStack;
@@ -18,7 +11,9 @@ import net.minecraft.nbt.*;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.text.Style;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.GlobalPos;
 import net.minecraft.util.math.Vec3d;
@@ -37,9 +32,6 @@ public class TradedCompasses extends PersistentState {
     public final Map<Text, Integer> usedNames = new HashMap<>();
     public final Map<Text, Integer> usedLores = new HashMap<>();
     private final Map<GlobalPos, Lodestone> lodestoneStatus = new HashMap<>();
-    private static final Type<TradedCompasses> TYPE = new Type<>(
-        TradedCompasses::new, TradedCompasses::new, null
-    );
 
     public static final int MAX_BUY_PER_PLAYER = 10;
     public static final int MAX_SELL_PER_PLAYER = 30;
@@ -56,14 +48,14 @@ public class TradedCompasses extends PersistentState {
         LinkedHashMap<GlobalPos, ItemStack> buy = availableForBuy.computeIfAbsent(player.getUuid(), k -> new LinkedHashMap<>());
         Optional<Compass> compassData = getCompass(compass);
         if (compassData.isEmpty()) return;
-        GlobalPos pos = new GlobalPos(compassData.get().dimension, compassData.get().lodestonePos());
+        GlobalPos pos = GlobalPos.create(compassData.get().dimension, compassData.get().lodestonePos());
         Lodestone status = lodestoneStatus.get(pos);
         if (status != null && status.sellTrades > 0 && !buy.containsKey(pos)) return;
         buy.remove(pos);
         while (buy.size() >= MAX_BUY_PER_PLAYER) {
-            buy.pollFirstEntry();
+            buy.remove(buy.keySet().iterator().next());
         }
-        buy.putLast(pos, compass);
+        buy.put(pos, compass);
         markDirty();
     }
 
@@ -73,7 +65,7 @@ public class TradedCompasses extends PersistentState {
         }
         Optional<Compass> soldCompass = getCompass(compassStack);
         if (soldCompass.isPresent()) {
-            GlobalPos pos = new GlobalPos(soldCompass.get().dimension, soldCompass.get().lodestonePos);
+            GlobalPos pos = GlobalPos.create(soldCompass.get().dimension, soldCompass.get().lodestonePos);
             Lodestone lodestone = lodestoneStatus.get(pos);
             Compass compass;
             if (soldCompass.get().lore.isPresent() && lodestone.name().equals(soldCompass.get().lore())) {
@@ -90,8 +82,8 @@ public class TradedCompasses extends PersistentState {
             }
             List<Compass> sell = availableForSell.computeIfAbsent(customer.getUuid(), k -> new LinkedList<>());
             while (sell.size() >= MAX_SELL_PER_PLAYER) {
-                Compass removedCompass = sell.removeFirst();
-                GlobalPos removedCompassPos = new GlobalPos(removedCompass.dimension, removedCompass.lodestonePos);
+                Compass removedCompass = sell.remove(0);
+                GlobalPos removedCompassPos = GlobalPos.create(removedCompass.dimension, removedCompass.lodestonePos);
                 Lodestone removedCompassLodestone = lodestoneStatus.get(removedCompassPos);
                 if (removedCompassLodestone != null) lodestoneStatus.put(removedCompassPos, new Lodestone(removedCompassLodestone.name, removedCompassLodestone.sellTrades - 1));
             }
@@ -104,9 +96,11 @@ public class TradedCompasses extends PersistentState {
     }
 
     public ItemStack getBuy(ServerWorld world, PlayerEntity player) {
-        LinkedHashMap<GlobalPos, ItemStack> buy = availableForBuy.getOrDefault(player.getUuid(), new LinkedHashMap<>());
-        for (int attempts = 0; !buy.isEmpty() && attempts < 10; attempts++) {
-            ItemStack stack = buy.lastEntry().getValue();
+        LinkedHashMap<GlobalPos, ItemStack> buyMap = availableForBuy.getOrDefault(player.getUuid(), new LinkedHashMap<>());
+        List<Map.Entry<GlobalPos, ItemStack>> buy = buyMap.entrySet().stream().toList();
+        for (int attempts = 0; !buy.isEmpty() && attempts < buy.size(); attempts++) {
+            Map.Entry<GlobalPos, ItemStack> entry = buy.get(buy.size() - 1 - attempts);
+            ItemStack stack = entry.getValue();
             Optional<Compass> topCompass = getCompass(stack);
             if (topCompass.isPresent() && topCompass.get().isValid(world.getServer())) {
                 List<Compass> sell = availableForSell.getOrDefault(player.getUuid(), Collections.emptyList());
@@ -120,7 +114,7 @@ public class TradedCompasses extends PersistentState {
                     return stack;
                 }
             }
-            buy.pollLastEntry();
+            buyMap.remove(entry.getKey());
             markDirty();
         }
         return null;
@@ -141,10 +135,10 @@ public class TradedCompasses extends PersistentState {
             }
             Compass compass;
             if (sell.size() == 1) {
-                compass = sell.getFirst();
+                compass = sell.get(0);
             } else {
                 sell = new ArrayList<>(sell);
-                Compass last = sell.getLast();
+                Compass last = sell.get(sell.size() - 1);
                 for (int j = 0; j < sell.size() / 4; j++) {
                     sell.add(last);
                 }
@@ -162,7 +156,7 @@ public class TradedCompasses extends PersistentState {
                 ItemStack stack = new ItemStack(Items.COMPASS);
                 NbtCompound nbt = stack.getOrCreateNbt();
                 compassItem.writeNbt(compass.dimension, compass.lodestonePos, nbt);
-                GlobalPos pos = new GlobalPos(compass.dimension, compass.lodestonePos);
+                GlobalPos pos = GlobalPos.create(compass.dimension, compass.lodestonePos);
                 Text name = null;
                 List<Text> lore = null;
                 boolean duplicateName = true, duplicateLore = true;
@@ -187,8 +181,15 @@ public class TradedCompasses extends PersistentState {
                         if (lore == null) lore = new ArrayList<>();
                         lore.addAll(Text.of(String.format("%s / %04d", profile.get().getName(), Math.abs(pos.hashCode()) % 10000)).getWithStyle(Style.EMPTY.withColor(Formatting.GRAY)));
                     }
-                    stack.setCustomName(name);
                 }
+                if (lore != null) {
+                    NbtCompound displayNbt = new NbtCompound();
+                    NbtList loreNbt = new NbtList();
+                    lore.forEach(t -> loreNbt.add(NbtString.of(Text.Serializer.toJson(t))));
+                    displayNbt.put("Lore", loreNbt);
+                    stack.setSubNbt("display", displayNbt);
+                }
+                if (name != null) stack.setCustomName(name);
                 return stack;
             }
         }
@@ -197,7 +198,7 @@ public class TradedCompasses extends PersistentState {
 
     private void invalidateCompass(UUID uuid, Compass compass) {
         List<Compass> sell = availableForSell.getOrDefault(uuid, Collections.emptyList());
-        GlobalPos pos = new GlobalPos(compass.dimension, compass.lodestonePos);
+        GlobalPos pos = GlobalPos.create(compass.dimension, compass.lodestonePos);
         Lodestone lodestoneStatus = this.lodestoneStatus.get(pos);
         if (lodestoneStatus != null) this.lodestoneStatus.put(pos, new Lodestone(lodestoneStatus.name, lodestoneStatus.sellTrades - 1));
         sell = new ArrayList<>(sell.stream().filter(other -> !other.isClone(compass)).toList());
@@ -216,24 +217,6 @@ public class TradedCompasses extends PersistentState {
             }
         }
         markDirty();
-    }
-
-    public static Optional<Compass> getCompass(ItemStack stack) {
-        if (stack.isOf(Items.COMPASS) && stack.contains(DataComponentTypes.LODESTONE_TRACKER)) {
-            LodestoneTrackerComponent lodestone = stack.get(DataComponentTypes.LODESTONE_TRACKER);
-
-            if (lodestone == null || lodestone.target().isEmpty()) {
-                return Optional.empty();
-            }
-
-            RegistryKey<World> lodestoneDimension = lodestone.target().get().dimension();
-            BlockPos lodestonePos = lodestone.target().get().pos();
-            return Optional.of(new Compass(
-                stack.contains(DataComponentTypes.CUSTOM_NAME) && !stack.get(DataComponentTypes.CUSTOM_NAME).asTruncatedString(10).isEmpty() ? Optional.of(stack.getName()) : Optional.empty(),
-                stack.contains(DataComponentTypes.LORE) ? Optional.of(stack.get(DataComponentTypes.LORE).lines()).filter(s -> !s.isEmpty()).map(s -> s.get(0)) : Optional.empty(),
-                lodestonePos, lodestoneDimension));
-        }
-        return Optional.empty();
     }
 
     public void storeLodestoneName(GlobalPos blockPos, Text name) {
@@ -257,7 +240,6 @@ public class TradedCompasses extends PersistentState {
 
     public void deleteLodestoneName(GlobalPos blockPos) {
         storeLodestoneName(blockPos, null);
-        //lodestoneStatus.compute(blockPos, (k, v) -> new Lodestone(Optional.empty(), v == null ? 0 : v.sellTrades));
         markDirty();
     }
 
@@ -273,8 +255,8 @@ public class TradedCompasses extends PersistentState {
             NbtCompound playerEntry = new NbtCompound();
             playerEntry.putUuid("uuid", entry.getKey());
             NbtList stackList = new NbtList();
-            for (Map.Entry<GlobalPos, ItemStack> compassEntry : entry.getValue().sequencedEntrySet()) {
-                stackList.add(stack.getNbt());
+            for (Map.Entry<GlobalPos, ItemStack> compassEntry : entry.getValue().entrySet()) {
+                stackList.add(compassEntry.getValue().getNbt());
             }
             playerEntry.put("compasses", stackList);
             buyList.add(playerEntry);
@@ -312,7 +294,7 @@ public class TradedCompasses extends PersistentState {
         for (Map.Entry<Text, Integer> entry : this.usedLores.entrySet()) {
             if (entry.getValue() == 0) continue;
             NbtCompound loreEntry = new NbtCompound();
-            loreEntry.putString("lore", Text.Serialization.toJsonString(entry.getKey(), lookup));
+            loreEntry.putString("lore", Text.Serializer.toJson(entry.getKey()));
             loreEntry.putInt("count", entry.getValue());
             loreList.add(loreEntry);
         }
@@ -322,9 +304,9 @@ public class TradedCompasses extends PersistentState {
         for (Map.Entry<GlobalPos, Lodestone> entry : this.lodestoneStatus.entrySet()) {
             if (entry.getValue() == null) continue;
             NbtCompound lodestoneEntry = new NbtCompound();
-            lodestoneEntry.put("pos", NbtHelper.fromBlockPos(entry.getKey().pos()));
-            lodestoneEntry.put("dimension", World.CODEC.encodeStart(NbtOps.INSTANCE, entry.getKey().dimension()).getOrThrow());
-            lodestoneEntry.put("status", entry.getValue().toNbt(lookup));
+            lodestoneEntry.put("pos", NbtHelper.fromBlockPos(entry.getKey().getPos()));
+            lodestoneEntry.put("dimension", World.CODEC.encodeStart(NbtOps.INSTANCE, entry.getKey().getDimension()).result().get());
+            lodestoneEntry.put("status", entry.getValue().toNbt());
             lodestoneNameList.add(lodestoneEntry);
         }
         nbt.put("lodestones", lodestoneNameList);
@@ -339,13 +321,11 @@ public class TradedCompasses extends PersistentState {
             LinkedHashMap<GlobalPos, ItemStack> compasses = new LinkedHashMap<>();
             for (NbtElement compassEntry : playerEntry.getList("compasses", NbtElement.COMPOUND_TYPE)) {
                 ItemStack stack = new ItemStack(Items.COMPASS);
-
                 stack.setNbt((NbtCompound) compassEntry);
-                stack.applyChanges(ComponentChanges.CODEC.decode(NbtOps.INSTANCE, compassEntry).getOrThrow().getFirst());
                 Optional<Compass> compassData = getCompass(stack);
                 if (compassData.isEmpty()) continue;
-                GlobalPos pos = new GlobalPos(compassData.get().dimension, compassData.get().lodestonePos);
-                compasses.putLast(pos, stack);
+                GlobalPos pos = GlobalPos.create(compassData.get().dimension, compassData.get().lodestonePos);
+                compasses.put(pos, stack);
             }
             availableForBuy.put(player, compasses);
         }
@@ -369,7 +349,7 @@ public class TradedCompasses extends PersistentState {
 
         for (NbtElement loreElement : nbt.getList("lores", NbtElement.COMPOUND_TYPE)) {
             NbtCompound nameEntry = (NbtCompound) loreElement;
-            Text name = Text.Serialization.fromJson(nameEntry.getString("lore"), lookup);
+            Text name = Text.Serializer.fromJson(nameEntry.getString("lore"));
             if (name != null) usedLores.put(name, nameEntry.getInt("count"));
         }
 
@@ -377,8 +357,8 @@ public class TradedCompasses extends PersistentState {
             for (NbtElement lodestoneElement : nbt.getList("lodestones", NbtElement.COMPOUND_TYPE)) {
                 NbtCompound lodestoneEntry = (NbtCompound) lodestoneElement;
                 Optional<RegistryKey<World>> dimension = World.CODEC.parse(NbtOps.INSTANCE, lodestoneEntry.get("dimension")).result();
-                dimension.ifPresent(worldRegistryKey -> NbtHelper.toBlockPos(lodestoneEntry, "pos").ifPresent(pos ->
-                    lodestoneStatus.put(new GlobalPos(worldRegistryKey, pos), Lodestone.fromNbt(lodestoneEntry.getCompound("status"), lookup))
+                dimension.ifPresent(worldRegistryKey -> Optional.ofNullable(NbtHelper.toBlockPos(lodestoneEntry.getCompound("pos"))).ifPresent(pos ->
+                    lodestoneStatus.put(GlobalPos.create(worldRegistryKey, pos), Lodestone.fromNbt(lodestoneEntry.getCompound("status")))
                 ));
             }
         }
@@ -394,7 +374,15 @@ public class TradedCompasses extends PersistentState {
             Optional<RegistryKey<World>> lodestoneDimension = CompassItem.getLodestoneDimension(compassNbt);
             if (lodestoneDimension.isPresent()) {
                 BlockPos lodestonePos = NbtHelper.toBlockPos(compassNbt.getCompound("LodestonePos"));
-                return Optional.of(new Compass(stack.hasCustomName() ? Optional.of(stack.getName()) : Optional.empty(), lodestonePos, lodestoneDimension.get()));
+                return Optional.of(new Compass(
+                    stack.hasCustomName() ? Optional.of(stack.getName()) : Optional.empty(),
+                    Optional.ofNullable(stack.getNbt())
+                        .filter(nbt -> nbt.contains("display", NbtElement.COMPOUND_TYPE))
+                        .map(nbt -> nbt.getCompound("display"))
+                        .filter(nbt -> nbt.contains("Lore", NbtElement.LIST_TYPE))
+                        .flatMap(nbt -> nbt.getList("Lore", NbtElement.STRING_TYPE).stream().findFirst())
+                        .map(l -> Text.Serializer.fromJson(l.asString())),
+                    lodestonePos, lodestoneDimension.get()));
             }
         }
         return Optional.empty();
@@ -402,18 +390,18 @@ public class TradedCompasses extends PersistentState {
 
 
     public record Lodestone(Optional<Text> name, int sellTrades) {
-        public static Lodestone fromNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
+        public static Lodestone fromNbt(NbtCompound nbt) {
             Optional<Text> name = Optional.empty();
             if (nbt.contains("name")) {
-                name = Optional.ofNullable(Text.Serialization.fromJson(nbt.getString("name"), lookup));
+                name = Optional.ofNullable(Text.Serializer.fromJson(nbt.getString("name")));
             }
             int hasSellTrade = nbt.getShort("trades");
             return new Lodestone(name, hasSellTrade);
         }
 
-        public NbtCompound toNbt(RegistryWrapper.WrapperLookup lookup) {
+        public NbtCompound toNbt() {
             NbtCompound nbt = new NbtCompound();
-            name.ifPresent(text -> nbt.putString("name", Text.Serialization.toJsonString(text, lookup)));
+            name.ifPresent(text -> nbt.putString("name", Text.Serializer.toJson(text)));
             nbt.putShort("trades", (short) sellTrades);
             return nbt;
         }
@@ -433,11 +421,14 @@ public class TradedCompasses extends PersistentState {
         public static Compass fromNbt(NbtCompound nbt) {
             Optional<RegistryKey<World>> dimension = World.CODEC.parse(NbtOps.INSTANCE, nbt.get("dimension")).result();
             if (dimension.isPresent()) {
-                Optional<Text> text = Optional.empty();
+                Optional<Text> text = Optional.empty(), lore = Optional.empty();
                 if (nbt.contains("name")) {
                     text = Optional.ofNullable(Text.Serializer.fromJson(nbt.getString("name")));
                 }
-                return new Compass(text, NbtHelper.toBlockPos(nbt.getCompound("pos")), dimension.get());
+                if (nbt.contains("lore")) {
+                    lore = Optional.ofNullable(Text.Serializer.fromJson(nbt.getString("lore")));
+                }
+                return new Compass(text, lore, NbtHelper.toBlockPos(nbt.getCompound("pos")), dimension.get());
             }
             return null;
         }

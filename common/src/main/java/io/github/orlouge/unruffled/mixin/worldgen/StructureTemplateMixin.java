@@ -29,15 +29,17 @@ public class StructureTemplateMixin {
     @ModifyVariable(method = "spawnEntities", at = @At(value = "STORE"))
     public NbtCompound removeEnchantmentsFromItemFrames(NbtCompound nbt, ServerWorldAccess world) {
         if (Config.INSTANCE.get().enchantmentsConfig.filterStructureItemFrames().orElse(true) && nbt.contains("id")) {
-            Identifier id = Identifier.of(nbt.getString("id"));
-            if (id.equals(Identifier.ofVanilla("item_frame")) || id.equals(Identifier.ofVanilla("glow_item_frame"))) {
+            Identifier id = new Identifier(nbt.getString("id"));
+            if (id.equals(new Identifier("item_frame")) || id.equals(new Identifier("glow_item_frame"))) {
                 if (nbt.contains("Item")) {
-                    Optional<ItemStack> stack = ItemStack.fromNbt(world.getRegistryManager(), nbt.get("Item"));
-                    stack.ifPresent(itemStack -> nbt.put("Item", ItemEnchantmentsHelper.processItem(
-                        itemStack,
+                    ItemStack stack = ItemStack.fromNbt(nbt.getCompound("Item"));
+                    NbtCompound itemNbt = new NbtCompound();
+                    ItemEnchantmentsHelper.processItem(
+                        stack,
                         world.getRegistryManager().createRegistryLookup(),
                         false
-                    ).encode(world.getRegistryManager())));
+                    ).writeNbt(itemNbt);
+                    nbt.put("Item", itemNbt);
                 }
             }
         }
@@ -56,20 +58,15 @@ public class StructureTemplateMixin {
                 NbtList bookListNbt = nbt.getList("Items", NbtElement.COMPOUND_TYPE);
                 for (int j = 0; j < bookListNbt.size(); j++) {
                     NbtCompound bookNbt = bookListNbt.getCompound(j);
-                    if (bookNbt.contains("id", NbtElement.STRING_TYPE) && Identifier.of(bookNbt.getString("id")).equals(Identifier.ofVanilla("enchanted_book"))) {
-                        Optional<ItemStack> stack = ItemStack.fromNbt(world.getRegistryManager(), bookNbt);
-                        if (stack.isPresent()) {
-                            ItemStack newStack = ItemEnchantmentsHelper.processItem(stack.get(), world.getRegistryManager().createRegistryLookup(), false);
-                            NbtCompound newBookNbt = (NbtCompound) newStack.encode(world.getRegistryManager());
-                            newBookNbt.putByte("Slot", bookNbt.getByte("Slot"));
-                            bookListNbt.set(j, newBookNbt);
-                        }
+                    if (bookNbt.contains("id", NbtElement.STRING_TYPE) && new Identifier(bookNbt.getString("id")).equals(new Identifier("enchanted_book"))) {
+                        ItemStack stack = ItemStack.fromNbt(bookNbt);
+                        ItemStack newStack = ItemEnchantmentsHelper.processItem(stack, world.getRegistryManager().createRegistryLookup(), false);
+                        NbtCompound newBookNbt = new NbtCompound();
+                        newStack.writeNbt(newBookNbt);
+                        newBookNbt.putByte("Slot", bookNbt.getByte("Slot"));
+                        bookListNbt.set(j, newBookNbt);
                     }
                 }
-            } else if (Config.INSTANCE.get().enchantmentsConfig.filterStructureDecoratedPots().orElse(true) && block.state().isOf(Blocks.DECORATED_POT) && block.nbt() != null && block.nbt().contains("item", NbtElement.COMPOUND_TYPE)) {
-                nbt = block.nbt().copy();
-                Optional<ItemStack> stack = ItemStack.fromNbt(world.getRegistryManager(), nbt.getCompound("item"));
-                if (stack.isPresent()) nbt.put("item", ItemEnchantmentsHelper.processItem(stack.get(), world.getRegistryManager().createRegistryLookup(), false).encode(world.getRegistryManager()));
             }
             if (nbt != null) {
                 blocks.set(i, new StructureTemplate.StructureBlockInfo(block.pos(), block.state(), nbt));

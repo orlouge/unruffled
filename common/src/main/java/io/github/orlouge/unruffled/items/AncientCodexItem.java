@@ -1,27 +1,20 @@
 package io.github.orlouge.unruffled.items;
 
+import com.google.common.collect.ImmutableList;
 import io.github.orlouge.unruffled.utils.RomanNumerals;
-<<<<<<< HEAD
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
+import net.minecraft.client.gui.screen.ingame.BookScreen;
+import net.minecraft.item.*;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
-=======
-import net.minecraft.component.ComponentType;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.LoreComponent;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.codec.PacketCodecs;
->>>>>>> e9ab97d (Added ancient codices excerpts, made their numbers hidden)
+import net.minecraft.nbt.NbtList;
+import net.minecraft.nbt.NbtString;
 import net.minecraft.network.packet.s2c.play.OpenWrittenBookS2CPacket;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.stat.Stats;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Style;
-import net.minecraft.text.Text;
-import net.minecraft.text.TextColor;
+import net.minecraft.text.*;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
@@ -49,10 +42,16 @@ public class AncientCodexItem extends Item {
     }
 
     public static ItemStack setExcerpt(ItemStack stack, Random random) {
-        List<String> excerpts = EXCERPTS.get(stack.get(NUMBER) - 1);
+        int number = stack.getOrCreateNbt().getInt("number");
+        if (number <= 0 || number > EXCERPTS.size()) return stack;
+        List<String> excerpts = EXCERPTS.get(number - 1);
         Text excerpt = Text.of("\"... " + excerpts.get(random.nextBetweenExclusive(0, excerpts.size())) + " ...\"");
         List<Text> lore = excerpt.getWithStyle(Style.EMPTY.withColor(TextColor.fromFormatting(Formatting.GRAY)).withItalic(true));
-        stack.set(DataComponentTypes.LORE, new LoreComponent(lore));
+        NbtList loreNbt = new NbtList();
+        lore.forEach(text -> loreNbt.add(NbtString.of(Text.Serializer.toJson(text))));
+        NbtCompound display = new NbtCompound();
+        display.put("Lore", loreNbt);
+        stack.setSubNbt("display", display);
         return stack;
     }
 
@@ -72,7 +71,8 @@ public class AncientCodexItem extends Item {
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
         ItemStack stack = user.getStackInHand(hand);
-        if (stack.contains(NUMBER) && stack.get(NUMBER) > 0 && stack.get(NUMBER) <= CONTENTS.size()) {
+        int number = stack.getOrCreateNbt().getInt("number");
+        if (number > 0 && number <= CONTENTS.size()) {
             if (user instanceof ServerPlayerEntity player) {
                 player.networkHandler.sendPacket(new OpenWrittenBookS2CPacket(hand));
             }
@@ -80,6 +80,22 @@ public class AncientCodexItem extends Item {
             return TypedActionResult.success(stack, world.isClient());
         } else {
             return super.use(world, user, hand);
+        }
+    }
+
+    public static class Contents implements BookScreen.Contents {
+        private final List<Text> pages;
+
+        public Contents(List<Text> pages) {
+            this.pages = pages;
+        }
+
+        public int getPageCount() {
+            return this.pages.size();
+        }
+
+        public StringVisitable getPageUnchecked(int index) {
+            return this.pages.get(index);
         }
     }
 

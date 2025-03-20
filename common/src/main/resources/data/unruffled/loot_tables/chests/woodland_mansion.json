@@ -6,20 +6,6 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "functions": [
-            {
-              "amplifier": {
-                "type": "minecraft:uniform",
-                "max": 4.0,
-                "min": 0.0
-              },
-              "function": "minecraft:set_ominous_bottle_amplifier"
-            }
-          ],
-          "name": "minecraft:ominous_bottle"
-        },
-        {
-          "type": "minecraft:item",
           "name": "minecraft:lodestone"
         },
         {

@@ -184,12 +184,12 @@ public class UnruffledMod {
                         EnchantmentHelper.set(Collections.emptyMap(), compass);
                         compass.removeSubNbt("display");
                         compass.removeSubNbt("IsLockedCompass");
+                        compass.removeSubNbt("HideFlags");
                     } else {
                         if (!player.isInSneakingPose()) {
                             lockedDeathPosition.setLockedDeathPosition();
                         }
                         compass.addEnchantment(Enchantments.BINDING_CURSE, 1);
-                        // display:{Lore:['{"text":"Locked","color":"blue"}']}
                         NbtCompound display = new NbtCompound();
                         NbtList lore = new NbtList();
                         lore.add(NbtString.of("{\"text\":\"Locked\",\"color\":\"blue\"}"));
