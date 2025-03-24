@@ -20,6 +20,7 @@
     "EyeOfEnderEntityMixin",
     "FireworkRocketEntityMixin",
     "ItemEntityMixin",
+    "LecternBlockEntityMixin",
     "LivingEntityMixin",
     "TippedArrowRecipeMixin",
     "accessors.ItemAccessor",
