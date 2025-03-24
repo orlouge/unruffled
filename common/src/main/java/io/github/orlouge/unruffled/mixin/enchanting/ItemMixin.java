@@ -1,9 +1,11 @@
 package io.github.orlouge.unruffled.mixin.enchanting;
 
+import io.github.orlouge.unruffled.UnruffledMod;
 import io.github.orlouge.unruffled.config.Config;
 import io.github.orlouge.unruffled.utils.TradedCompasses;
 import net.minecraft.block.Blocks;
 import net.minecraft.item.*;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
@@ -32,6 +34,7 @@ public class ItemMixin {
             GlobalPos pos = GlobalPos.create(serverWorld.getRegistryKey(), context.getBlockPos());
             if (context.getStack().hasCustomName()) {
                 Text newLore = context.getStack().getName().getWithStyle(Style.EMPTY.withColor(Formatting.LIGHT_PURPLE)).get(0);
+                if (context.getPlayer() instanceof ServerPlayerEntity player) UnruffledMod.NAME_LODESTONE_CRITERION.trigger(player);
                 compassDB.storeLodestoneName(pos, newLore);
             } else {
                 compassDB.deleteLodestoneName(pos);

@@ -67,6 +67,9 @@ public class UnruffledMod {
     public static final PigTeleportationCriterion PIG_TELEPORTATION_CRITERION = Criteria.register(new PigTeleportationCriterion(new Identifier(UnruffledMod.MOD_ID, "pig_teleportation")));
     public static final AquaAffinityCriterion AQUA_AFFINITY_CRITERION = Criteria.register(new AquaAffinityCriterion(new Identifier(UnruffledMod.MOD_ID, "aqua_affinity")));
     public static final PiercingCriterion PIERCING_CRITERION = Criteria.register(new PiercingCriterion(new Identifier(UnruffledMod.MOD_ID, "piercing")));
+    public static final KillWanderingTraderCriterion KILL_WANDERING_TRADER_CRITERION = Registry.register(Registries.CRITERION, Identifier.of(UnruffledMod.MOD_ID, "kill_wandering_trader"), new KillWanderingTraderCriterion());
+    public static final LockRecoveryCompassCriterion LOCK_RECOVERY_COMPASS = Registry.register(Registries.CRITERION, Identifier.of(UnruffledMod.MOD_ID, "lock_recovery_compass"), new LockRecoveryCompassCriterion());
+    public static final NameLodestoneCriterion NAME_LODESTONE_CRITERION = Registry.register(Registries.CRITERION, Identifier.of(UnruffledMod.MOD_ID, "name_lodestone"), new NameLodestoneCriterion());
 
     public static final Supplier<LootFunctionType> ITEM_ENCHANTMENTS_LOOT_FUNCTION_TYPE =
         Platform.registerLootFunctionType(new Identifier(MOD_ID, "item_enchantments"), new Serializer());
@@ -197,6 +200,7 @@ public class UnruffledMod {
                         compass.setSubNbt("display", display);
                         compass.addHideFlag(ItemStack.TooltipSection.ENCHANTMENTS);
                         compass.setSubNbt("IsLockedCompass", NbtByte.of((byte) 1));
+                        UnruffledMod.LOCK_RECOVERY_COMPASS.trigger(player);
                     }
                     player.setStackInHand(Hand.MAIN_HAND, compass);
                 }

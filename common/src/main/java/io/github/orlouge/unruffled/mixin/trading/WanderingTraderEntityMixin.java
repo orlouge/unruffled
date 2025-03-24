@@ -1,5 +1,6 @@
 package io.github.orlouge.unruffled.mixin.trading;
 
+import io.github.orlouge.unruffled.UnruffledMod;
 import io.github.orlouge.unruffled.config.Config;
 import io.github.orlouge.unruffled.config.Trades;
 import io.github.orlouge.unruffled.interfaces.NearbyPlayersTracker;
@@ -12,6 +13,7 @@ import net.minecraft.entity.passive.WanderingTraderEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.village.TradeOffer;
 import net.minecraft.village.TradeOffers;
@@ -69,6 +71,9 @@ public abstract class WanderingTraderEntityMixin extends MerchantEntity implemen
             properties.setWanderingTraderSpawnChance(this.unruffled_wanderingTraderManager.spawnChance);
             this.unruffled_wanderingTraderManager.spawnDelay = 96000 - unruffled_spawnChanceDiff * 1200;
             properties.setWanderingTraderSpawnDelay(this.unruffled_wanderingTraderManager.spawnDelay);
+            if (damageSource.getAttacker() instanceof ServerPlayerEntity player) {
+                UnruffledMod.KILL_WANDERING_TRADER_CRITERION.trigger(player);
+            }
         }
     }
 

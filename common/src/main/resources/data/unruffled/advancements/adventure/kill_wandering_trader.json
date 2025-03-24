@@ -1,0 +1,29 @@
+{
+  "parent": "minecraft:adventure/trade",
+  "criteria": {
+    "kill_wandering_trader": {
+      "conditions": {},
+      "trigger": "unruffled:kill_wandering_trader"
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.adventure.kill_wandering_trader.description"
+    },
+    "frame": "task",
+    "hidden": false,
+    "icon": {
+      "item": "minecraft:iron_axe"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.adventure.kill_wandering_trader.title"
+    }
+  },
+  "requirements": [
+    [
+      "kill_wandering_trader"
+    ]
+  ]
+}
