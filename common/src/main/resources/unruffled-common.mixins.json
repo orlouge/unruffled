@@ -76,6 +76,7 @@
     "tools.PlayerEntityMixin",
     "tools.PlayerScreenHandlerMixin",
     "tools.PlayerScreenHandlerMixin$OffhandSlotMixin",
+    "tools.PotionItemMixin",
     "tools.ServerPlayNetworkHandlerMixin",
     "tools.SmithingScreenHandlerMixin",
     "tools.TridentEntityMixin",

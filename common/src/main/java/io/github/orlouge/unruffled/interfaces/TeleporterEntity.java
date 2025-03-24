@@ -11,4 +11,6 @@ public interface TeleporterEntity {
     boolean isTeleporting();
     Collection<Entity> getTeleportTargets();
     void clearTeleporting();
+    void setTeleportCooldown(int cooldown);
+    int getTeleportCooldown();
 }

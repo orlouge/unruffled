@@ -19,6 +19,7 @@
   "effect.unruffled.teleport.no_compass": "A compass pointing to a lodestone is required to teleport.",
   "effect.unruffled.teleport.no_lodestone": "Cannot teleport: no lodestone found.",
   "effect.unruffled.teleport.no_teleport": "Cannot teleport: not enough space around the lodestone.",
+  "effect.unruffled.teleport.cooldown": "Please wait some time.",
   "advancements.nether.bad_brew.title": "Shoddy Brewery",
   "advancements.nether.bad_brew.description": "Accidentally brew a Thick Potion while using a Brewing Stand without fuel.",
   "advancements.nether.teleportation.title": "Ender Transmission",
