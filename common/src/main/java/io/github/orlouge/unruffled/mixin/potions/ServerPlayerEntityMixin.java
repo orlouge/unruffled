@@ -4,6 +4,9 @@ import io.github.orlouge.unruffled.interfaces.TeleporterEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -13,6 +16,7 @@ import java.util.Set;
 public class ServerPlayerEntityMixin implements TeleporterEntity {
     private Set<Entity> teleportTargets = new HashSet<>();
     private boolean teleporting = false;
+    private int teleportCooldown = 0;
 
     @Override
     public void setTeleporting() {
@@ -43,5 +47,20 @@ public class ServerPlayerEntityMixin implements TeleporterEntity {
     public void clearTeleporting() {
         this.teleporting = false;
         this.teleportTargets.clear();;
+    }
+
+    @Override
+    public void setTeleportCooldown(int cooldown) {
+        teleportCooldown = cooldown;
+    }
+
+    @Override
+    public int getTeleportCooldown() {
+        return teleportCooldown;
+    }
+
+    @Inject(method = "tick", at = @At("TAIL"))
+    public void tickTeleportCooldown(CallbackInfo ci) {
+        teleportCooldown = Math.max(0, teleportCooldown - 1);
     }
 }
