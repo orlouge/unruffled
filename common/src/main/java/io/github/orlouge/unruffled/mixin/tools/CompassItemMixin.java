@@ -80,6 +80,8 @@ public abstract class CompassItemMixin extends Item {
                 NbtCompound displayNbt = nbt.contains("display", NbtElement.COMPOUND_TYPE) ? nbt.getCompound("display") : new NbtCompound();
                 displayNbt.put("Lore", loreList);
                 nbt.put("display", displayNbt);
+            } else if (nbt.contains("display")) {
+                nbt.getCompound("display").remove("Lore");
             }
         }
     }
