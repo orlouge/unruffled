@@ -157,9 +157,12 @@ public class UnruffledFabric implements ModInitializer {
             EntitySleepEvents.ALLOW_SLEEP_TIME.register((player, pos, isNight) -> !isNight || (player.getWorld().getLunarTime() % 24000 < Config.INSTANCE.get().mechanicsConfig.sleepTime() /*player.getWorld().getAmbientDarkness() < 11*/ && !player.getWorld().isThundering()) ? ActionResult.FAIL : ActionResult.SUCCESS);
         }
 
-        for (BrewingPotionRecipe brewingPotionRecipe : UnruffledMod.POTION_RECIPES) {
-            BrewingRecipeRegistryAccessor.registerPotionRecipe(brewingPotionRecipe.input(), brewingPotionRecipe.ingredient(), brewingPotionRecipe.output());
-        }
+        FabricBrewingRecipeRegistryBuilder.BUILD.register(builder -> {
+            for (BrewingPotionRecipe brewingPotionRecipe : UnruffledMod.POTION_RECIPES.get()) {
+                if (brewingPotionRecipe.ingredient().equals(Items.AIR)) continue;
+                builder.registerPotionRecipe(brewingPotionRecipe.input(), brewingPotionRecipe.ingredient(), brewingPotionRecipe.output());
+            }
+        });
 
         UnruffledMod.init();
         BiomeModifications.addSpawn(
