@@ -115,9 +115,9 @@ public class UnruffledMod {
             CustomItems.SACRED_SWORD, Map.of(Enchantments.SMITE, 4)
     );
 
-    public static final List<BrewingPotionRecipe> POTION_RECIPES = List.of(
+    public static final Supplier<List<BrewingPotionRecipe>> POTION_RECIPES = () -> List.of(
             new BrewingPotionRecipe(Potions.MUNDANE, Items.FERMENTED_SPIDER_EYE, Potions.AWKWARD),
-            new BrewingPotionRecipe(Potions.AWKWARD, Items.ENDER_EYE, TELEPORTATION_POTION)
+            new BrewingPotionRecipe(Potions.AWKWARD, Config.INSTANCE.get().mechanicsConfig.teleportationPotionIngredient().orElse(Items.AIR), TELEPORTATION_POTION)
     );
 
     public static Map<RegistryKey<LootTable>, List<Integer>> DEFAULT_LOOT_CODICES_ADD;

@@ -145,7 +145,8 @@ public class UnruffledFabric implements ModInitializer {
         }
 
         FabricBrewingRecipeRegistryBuilder.BUILD.register(builder -> {
-            for (BrewingPotionRecipe brewingPotionRecipe : UnruffledMod.POTION_RECIPES) {
+            for (BrewingPotionRecipe brewingPotionRecipe : UnruffledMod.POTION_RECIPES.get()) {
+                if (brewingPotionRecipe.ingredient().equals(Items.AIR)) continue;
                 builder.registerPotionRecipe(brewingPotionRecipe.input(), brewingPotionRecipe.ingredient(), brewingPotionRecipe.output());
             }
         });

@@ -219,14 +219,14 @@ public class Config {
         boolean disableTotemOfUndying, boolean evokerDropsEvilTotem, boolean badOmenFromEvilTotem,
         boolean evilTotemBinding,
         boolean canTeleportMobs, float potionDurationFactor, int bundleSize, int wanderingSpawnFrequency,
-        boolean zombiesDontTargetVillagers) {
+        boolean zombiesDontTargetVillagers, Optional<Item> teleportationPotionIngredient) {
         public MechanicsConfig() {
             this(
                 true, 16000, 10, 0.2f,
                 true, true, true,
                 true,
                 true, 2f, 256, 3,
-                true
+                true, Optional.of(Items.ECHO_SHARD)
             );
         }
         public static final Codec<MechanicsConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group(
@@ -242,7 +242,8 @@ public class Config {
             Codec.FLOAT.fieldOf("potion_duration_factor").forGetter(config -> config.potionDurationFactor),
             Codec.INT.fieldOf("bundle_size").forGetter(config -> config.bundleSize),
             Codec.INT.fieldOf("wandering_trader_spawn_frequency").forGetter(config -> config.wanderingSpawnFrequency),
-            Codec.BOOL.fieldOf("disable_zombie_targeting_villagers").forGetter(config -> config.zombiesDontTargetVillagers)
+            Codec.BOOL.fieldOf("disable_zombie_targeting_villagers").forGetter(config -> config.zombiesDontTargetVillagers),
+            Registries.ITEM.getCodec().optionalFieldOf("teleportation_potion_ingredient").forGetter(config -> config.teleportationPotionIngredient)
             ).apply(instance, MechanicsConfig::new));
     }
 
