@@ -18,6 +18,7 @@
     "EyeOfEnderEntityMixin",
     "FireworkRocketEntityMixin",
     "ItemEntityMixin",
+    "LecternBlockEntityMixin",
     "LivingEntityMixin",
     "TippedArrowRecipeMixin",
     "TradedItemMixin",
