@@ -27,6 +27,8 @@
   "advancements.nether.teleportation.description": "Teleport to a Lodestone using a Potion of Teleportation and a compass.",
   "advancements.nether.pig_teleportation.title": "When Pigs Fly",
   "advancements.nether.pig_teleportation.description": "Teleport to the End together with a Pig.",
+  "advancements.nether.name_lodestone.title": "Accurate Directions",
+  "advancements.nether.name_lodestone.description": "Give a Lodestone a name.",
   "advancements.husbandry.aqua_affinity.title": "A Breath of Air",
   "advancements.husbandry.aqua_affinity.description": "Mine a block underwater with the Water Breathing effect.",
   "advancements.story.iron_bolster.title": "Stone Breaker",
@@ -45,6 +47,8 @@
   "advancements.adventure.magnetic_trident.description": "Throw a Trident at a lightning rod and wait for a lightning to strike it and turn it into a Magnetic Trident.",
   "advancements.adventure.bundle.title": "Extra Space",
   "advancements.adventure.bundle.description": "Obtain a Bundle.",
+  "advancements.adventure.lock_recovery_compass.title": "Emergency Recovery",
+  "advancements.adventure.lock_recovery_compass.description": "Lock the position of the Recovery Compass.",
   "advancements.adventure.ancient_codices.title": "The Philologist",
   "advancements.adventure.ancient_codices.description": "Find all 50 ancient codices.",
   "advancements.adventure.piercing.title": "Two Birds, One Arrow",
@@ -54,5 +58,7 @@
   "advancements.adventure.heavy_ender_chest.title": "Invisible Burden",
   "advancements.adventure.heavy_ender_chest.description": "Get slowed down by a heavily packed ender chest.",
   "advancements.adventure.peaceful_chunk.title": "Home Sweet Home",
-  "advancements.adventure.peaceful_chunk.description": "Enjoy a peaceful night without monsters around your bed."
+  "advancements.adventure.peaceful_chunk.description": "Enjoy a peaceful night without monsters around your bed.",
+  "advancements.adventure.kill_wandering_trader.title": "Unwelcome Visitor",
+  "advancements.adventure.kill_wandering_trader.description": "Make the Wandering Trader stop coming for a while."
 }

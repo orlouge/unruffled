@@ -69,6 +69,7 @@ public class UnruffledMod {
     public static final MagneticTridentCriterion MAGNETIC_TRIDENT_CRITERION = Registry.register(Registries.CRITERION, Identifier.of(UnruffledMod.MOD_ID, "magnetic_trident"), new MagneticTridentCriterion());
     public static final FastAttackCriterion FAST_ATTACK_CRITERION = Registry.register(Registries.CRITERION, Identifier.of(UnruffledMod.MOD_ID, "fast_attack"), new FastAttackCriterion());
     public static final KnockbackCriterion KNOCKBACK_CRITERION = Registry.register(Registries.CRITERION, Identifier.of(UnruffledMod.MOD_ID, "knockback"), new KnockbackCriterion());
+    public static final LockRecoveryCompassCriterion LOCK_RECOVERY_COMPASS = Registry.register(Registries.CRITERION, Identifier.of(UnruffledMod.MOD_ID, "lock_recovery_compass"), new LockRecoveryCompassCriterion());
     public static final HeavyInventoryCriterion HEAVY_INVENTORY_CRITERION = Registry.register(Registries.CRITERION, Identifier.of(UnruffledMod.MOD_ID, "heavy_inventory"), new HeavyInventoryCriterion());
     public static final HeavyEnderChestCriterion HEAVY_ENDER_CHEST_CRITERION = Registry.register(Registries.CRITERION, Identifier.of(UnruffledMod.MOD_ID, "heavy_ender_chest"), new HeavyEnderChestCriterion());
     public static final PeacefulChunkCriterion PEACEFUL_CHUNK_CRITERION = Registry.register(Registries.CRITERION, Identifier.of(UnruffledMod.MOD_ID, "peaceful_chunk"), new PeacefulChunkCriterion());
@@ -76,6 +77,8 @@ public class UnruffledMod {
     public static final PigTeleportationCriterion PIG_TELEPORTATION_CRITERION = Registry.register(Registries.CRITERION, Identifier.of(UnruffledMod.MOD_ID, "pig_teleportation"), new PigTeleportationCriterion());
     public static final AquaAffinityCriterion AQUA_AFFINITY_CRITERION = Registry.register(Registries.CRITERION, Identifier.of(UnruffledMod.MOD_ID, "aqua_affinity"), new AquaAffinityCriterion());
     public static final PiercingCriterion PIERCING_CRITERION = Registry.register(Registries.CRITERION, Identifier.of(UnruffledMod.MOD_ID, "piercing"), new PiercingCriterion());
+    public static final KillWanderingTraderCriterion KILL_WANDERING_TRADER_CRITERION = Registry.register(Registries.CRITERION, Identifier.of(UnruffledMod.MOD_ID, "kill_wandering_trader"), new KillWanderingTraderCriterion());
+    public static final NameLodestoneCriterion NAME_LODESTONE_CRITERION = Registry.register(Registries.CRITERION, Identifier.of(UnruffledMod.MOD_ID, "name_lodestone"), new NameLodestoneCriterion());
 
     public static final Supplier<LootFunctionType<ItemEnchantmentsLootFunction>> ITEM_ENCHANTMENTS_LOOT_FUNCTION_TYPE =
         Platform.registerLootFunctionType(Identifier.of(MOD_ID, "item_enchantments"), MapCodec.of(Encoder.empty(), Decoder.unit(new ItemEnchantmentsLootFunction())));
@@ -217,6 +220,7 @@ public class UnruffledMod {
                         compass.set(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE, true);
                         compass.set(DataComponentTypes.LORE, new LoreComponent(Text.translatable("item.minecraft.recovery_compass.locked").getWithStyle(Style.EMPTY.withColor(Formatting.BLUE))));
                         compass.set(LOCKED_COMPASS_COMPONENT, true);
+                        UnruffledMod.LOCK_RECOVERY_COMPASS.trigger(player);
                     }
                     player.setStackInHand(Hand.MAIN_HAND, compass);
                 }

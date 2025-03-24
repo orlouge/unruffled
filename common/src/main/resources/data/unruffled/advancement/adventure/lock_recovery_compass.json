@@ -1,0 +1,29 @@
+{
+  "parent": "minecraft:adventure/kill_a_mob",
+  "criteria": {
+    "lock_recovery_compass": {
+      "conditions": {},
+      "trigger": "unruffled:lock_recovery_compass"
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.adventure.lock_recovery_compass.description"
+    },
+    "frame": "task",
+    "hidden": false,
+    "icon": {
+      "id": "minecraft:recovery_compass"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.adventure.lock_recovery_compass.title"
+    }
+  },
+  "requirements": [
+    [
+      "lock_recovery_compass"
+    ]
+  ]
+}
