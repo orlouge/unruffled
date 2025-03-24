@@ -72,7 +72,7 @@ public abstract class WanderingTraderEntityMixin extends MerchantEntity implemen
         }
     }
 
-    @Inject(method = "fillRecipes", at = @At("HEAD"))
+    @Inject(method = "fillRecipes", at = @At("HEAD"), cancellable = true)
     public void addOffersOnFill(CallbackInfo ci) {
         if (this.offers != null) {
             Config.INSTANCE.get().tradesConfig.wanderingTraderTrades().ifPresent(
@@ -86,6 +86,9 @@ public abstract class WanderingTraderEntityMixin extends MerchantEntity implemen
                     }
                 }
             );
+        }
+        if (!Config.INSTANCE.get().tradesConfig.wanderingTraderTrades().flatMap(Trades.ConfiguredWanderingTraderTrades::addVanilla).orElse(true)) {
+            ci.cancel();
         }
     }
 
