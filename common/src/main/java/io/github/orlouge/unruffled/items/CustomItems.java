@@ -1,5 +1,6 @@
 package io.github.orlouge.unruffled.items;
 
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.FoodComponent;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
@@ -16,17 +17,17 @@ public class CustomItems {
                 .statusEffect(new StatusEffectInstance(StatusEffects.HASTE, 600, 1), 1.0F)
                 .alwaysEdible().build()
     ));
-    public static final Item IRON_BOLSTER = new BolsterItem(ToolMaterials.IRON, new Item.Settings());
-    public static final Item DIAMOND_BOLSTER = new BolsterItem(ToolMaterials.DIAMOND, new Item.Settings());
-    public static final Item NETHERITE_BOLSTER = new BolsterItem(ToolMaterials.NETHERITE, new Item.Settings());
-    public static final Item CHARGED_TRIDENT = new TridentItem((new Item.Settings()).maxDamage(250));
-    public static final Item MAGNETIC_TRIDENT = new TridentItem((new Item.Settings()).maxDamage(250));
+    public static final Item IRON_BOLSTER = new BolsterItem(ToolMaterials.IRON, new Item.Settings().attributeModifiers(PickaxeItem.createAttributeModifiers(ToolMaterials.IRON, 1.0F, -2.8F)));
+    public static final Item DIAMOND_BOLSTER = new BolsterItem(ToolMaterials.DIAMOND, new Item.Settings().attributeModifiers(PickaxeItem.createAttributeModifiers(ToolMaterials.DIAMOND, 1.0F, -2.8F)));
+    public static final Item NETHERITE_BOLSTER = new BolsterItem(ToolMaterials.NETHERITE, new Item.Settings().fireproof().attributeModifiers(PickaxeItem.createAttributeModifiers(ToolMaterials.NETHERITE, 1.0F, -2.8F)));
+    public static final Item CHARGED_TRIDENT = new TridentItem((new Item.Settings()).rarity(Rarity.EPIC).maxDamage(250).attributeModifiers(TridentItem.createAttributeModifiers()).component(DataComponentTypes.TOOL, TridentItem.createToolComponent()));
+    public static final Item MAGNETIC_TRIDENT = new TridentItem((new Item.Settings()).rarity(Rarity.EPIC).maxDamage(250).attributeModifiers(TridentItem.createAttributeModifiers()).component(DataComponentTypes.TOOL, TridentItem.createToolComponent()));
     public static final Item PIERCING_ARROW = new ArrowItem(new Item.Settings());
     public static final Item IGNITING_ARROW = new ArrowItem(new Item.Settings());
     public static final Item ANCIENT_CODEX = new AncientCodexItem((new Item.Settings()).maxCount(16).rarity(Rarity.UNCOMMON));
     public static final Item EVIL_TOTEM = new Item((new Item.Settings()).maxCount(1).rarity(Rarity.UNCOMMON));
-    public static final Item BLAZING_SWORD = new SwordItem(ToolMaterials.NETHERITE, new Item.Settings().attributeModifiers(SwordItem.createAttributeModifiers(ToolMaterials.NETHERITE, 2, -2.4F)));
-    public static final Item SACRED_SWORD = new SwordItem(ToolMaterials.IRON, new Item.Settings().attributeModifiers(SwordItem.createAttributeModifiers(ToolMaterials.IRON, 3, -2.4F)));
+    public static final Item BLAZING_SWORD = new SwordItem(ToolMaterials.NETHERITE, new Item.Settings().attributeModifiers(SwordItem.createAttributeModifiers(ToolMaterials.NETHERITE, 2, -2.4F)).fireproof());
+    public static final Item SACRED_SWORD = new SwordItem(ToolMaterials.IRON, new Item.Settings().attributeModifiers(SwordItem.createAttributeModifiers(ToolMaterials.IRON, 3, -2.4F)).fireproof());
     public static final Map<String, Item> TRIDENTS = Map.of(
             "charged", CustomItems.CHARGED_TRIDENT,
             "magnetic", CustomItems.MAGNETIC_TRIDENT
