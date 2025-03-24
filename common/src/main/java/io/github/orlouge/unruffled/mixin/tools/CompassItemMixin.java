@@ -69,6 +69,8 @@ public class CompassItemMixin extends Item {
             Text newLore = TradedCompasses.get(world.getPersistentStateManager()).getLodestoneName(new GlobalPos(context.getWorld().getRegistryKey(), context.getBlockPos()));
             if (newLore != null) {
                 stack.set(DataComponentTypes.LORE, new LoreComponent(List.of(newLore)));
+            } else {
+                stack.remove(DataComponentTypes.LORE);
             }
         }
     }
