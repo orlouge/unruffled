@@ -29,3 +29,4 @@ accessible field net/minecraft/item/Item maxDamage I
 mutable field net/minecraft/item/Item maxDamage I
 accessible field net/minecraft/entity/LivingEntity SOUL_SPEED_BOOST_ID Ljava/util/UUID;
 mutable field net/minecraft/client/item/CompassAnglePredicateProvider compassTarget Lnet/minecraft/client/item/CompassAnglePredicateProvider$CompassTarget;
+accessible method net/minecraft/entity/decoration/DisplayEntity setBillboardMode (Lnet/minecraft/entity/decoration/DisplayEntity$BillboardMode;)V
