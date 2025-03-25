@@ -36,9 +36,9 @@ public class ItemMixin {
             if (context.getStack().contains(DataComponentTypes.CUSTOM_NAME)) {
                 Text newLore = context.getStack().get(DataComponentTypes.CUSTOM_NAME).getWithStyle(Style.EMPTY.withColor(Formatting.LIGHT_PURPLE)).get(0);
                 if (context.getPlayer() instanceof ServerPlayerEntity player) UnruffledMod.NAME_LODESTONE_CRITERION.trigger(player);
-                compassDB.storeLodestoneName(pos, newLore);
+                compassDB.storeLodestoneName(pos, newLore, serverWorld);
             } else {
-                compassDB.deleteLodestoneName(pos);
+                compassDB.deleteLodestoneName(pos, serverWorld);
             }
             cir.setReturnValue(ActionResult.SUCCESS_NO_ITEM_USED);
             cir.cancel();

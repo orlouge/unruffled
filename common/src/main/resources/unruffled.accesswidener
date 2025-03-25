@@ -30,3 +30,4 @@ accessible field net/minecraft/client/gui/hud/InGameHud EXPERIENCE_BAR_BACKGROUN
 accessible field net/minecraft/client/gui/hud/InGameHud EXPERIENCE_BAR_PROGRESS_TEXTURE Lnet/minecraft/util/Identifier;
 accessible field net/minecraft/client/gui/DrawContext guiAtlasManager Lnet/minecraft/client/texture/GuiAtlasManager;
 accessible field net/minecraft/block/entity/DecoratedPotBlockEntity sherds Lnet/minecraft/block/entity/Sherds;
+accessible method net/minecraft/entity/decoration/DisplayEntity setBillboardMode (Lnet/minecraft/entity/decoration/DisplayEntity$BillboardMode;)V
