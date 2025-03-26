@@ -8,6 +8,16 @@
           "type": "minecraft:item",
           "functions": [
             {
+              "function": "minecraft:set_potion",
+              "id": "unruffled:silence"
+            }
+          ],
+          "name": "minecraft:potion"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
               "amplifier": {
                 "type": "minecraft:uniform",
                 "max": 4.0,

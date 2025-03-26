@@ -100,7 +100,7 @@ public class Trades {
             sellWithPotion(Items.SPLASH_POTION, Potions.STRONG_HEALING, 1, 1, 16, 1),
             sellWithPotion(Items.POTION, Potions.STRONG_HEALING, 1, 3, 16, 1),
             sellWithPotion(Items.POTION, Potions.REGENERATION, 1, 3, 16, 1),
-            sellWithPotion(Items.POTION, UnruffledMod.TELEPORTATION_POTION, 16, 1, 12, 1),
+            sellWithPotion(Items.POTION, UnruffledMod.TELEPORTATION_POTION, 24, 1, 12, 1),
             sellWithPotion(Items.POTION, Potions.STRONG_REGENERATION, 2, 3, 16, 2),
             sellWithPotion(Items.POTION, Potions.LONG_REGENERATION, 1, 3, 16, 1)
     };

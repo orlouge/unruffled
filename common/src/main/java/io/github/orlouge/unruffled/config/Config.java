@@ -10,6 +10,7 @@ import com.mojang.serialization.codecs.ListCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.orlouge.unruffled.Platform;
 import io.github.orlouge.unruffled.UnruffledMod;
+import io.github.orlouge.unruffled.potions.BrewingPotionRecipe;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
@@ -41,6 +42,7 @@ public class Config {
     public final Trades.TradesConfig tradesConfig;
     public final StackSizeConfig stackSizeConfig;
     public final NavigationConfig navigationConfig;
+    public final PotionsConfig potionsConfig;
 
     public static final String CONFIG_FNAME = Platform.getConfigDirectory() + "/" + UnruffledMod.MOD_ID + ".json";
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
@@ -83,14 +85,14 @@ public class Config {
         this(
             new HungerConfig(), new EnchantmentsConfig(), new ElytraConfig(), new MechanicsConfig(),
             new WorldgenConfig(), new LootConfig(), Trades.DEFAULT_CONFIG, new StackSizeConfig(),
-            Optional.empty()
+            Optional.empty(), Optional.empty()
         );
     }
 
     public Config(
         HungerConfig hungerConfig, EnchantmentsConfig enchantmentsConfig, ElytraConfig elytraConfig, MechanicsConfig mechanicsConfig,
         WorldgenConfig worldgenConfig, LootConfig lootConfig, Trades.TradesConfig tradesConfig, StackSizeConfig stackSizeConfig,
-        Optional<NavigationConfig> navigationConfig) {
+        Optional<NavigationConfig> navigationConfig, Optional<PotionsConfig> potionsConfig) {
         this.hungerConfig = hungerConfig;
         this.tradesConfig = tradesConfig;
         this.worldgenConfig = worldgenConfig;
@@ -100,6 +102,7 @@ public class Config {
         this.lootConfig = lootConfig;
         this.stackSizeConfig = stackSizeConfig;
         this.navigationConfig = navigationConfig.orElse(new NavigationConfig());
+        this.potionsConfig = potionsConfig.orElse(new PotionsConfig());
     }
 
     public static Codec<Config> CODEC = RecordCodecBuilder.create(instance -> instance.group(
@@ -111,7 +114,8 @@ public class Config {
             LootConfig.CODEC.fieldOf("loot").forGetter(config -> config.lootConfig),
             Trades.TradesConfig.CODEC.fieldOf("trades").forGetter(config -> config.tradesConfig),
             StackSizeConfig.CODEC.fieldOf("stack_size").forGetter(config -> config.stackSizeConfig),
-            NavigationConfig.CODEC.optionalFieldOf("navigation").forGetter(config -> Optional.ofNullable(config.navigationConfig))
+            NavigationConfig.CODEC.optionalFieldOf("navigation").forGetter(config -> Optional.ofNullable(config.navigationConfig)),
+            PotionsConfig.CODEC.optionalFieldOf("potions").forGetter(config -> Optional.ofNullable(config.potionsConfig))
     ).apply(instance, Config::new));
 
     public static final Lazy<Config> INSTANCE = new Lazy<>(Config::read);
@@ -217,16 +221,12 @@ public class Config {
     public record MechanicsConfig(
         boolean peacefulChunks, int sleepTime, int backupSpawnPoints, float dropSpreadFactor,
         boolean disableTotemOfUndying, boolean evokerDropsEvilTotem, boolean badOmenFromEvilTotem,
-        boolean evilTotemBinding,
-        boolean canTeleportMobs, float potionDurationFactor, int bundleSize, int wanderingSpawnFrequency,
-        boolean zombiesDontTargetVillagers, Optional<Item> teleportationPotionIngredient) {
+        boolean evilTotemBinding, int bundleSize, int wanderingSpawnFrequency, boolean zombiesDontTargetVillagers) {
         public MechanicsConfig() {
             this(
                 true, 16000, 10, 0.2f,
                 true, true, true,
-                true,
-                true, 2f, 256, 3,
-                true, Optional.of(Items.ECHO_SHARD)
+                true, 256, 3, true
             );
         }
         public static final Codec<MechanicsConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group(
@@ -238,13 +238,21 @@ public class Config {
             Codec.BOOL.fieldOf("evil_totem_dropped_by_evoker").forGetter(config -> config.evokerDropsEvilTotem),
             Codec.BOOL.fieldOf("evil_totem_bad_omen").forGetter(config -> config.badOmenFromEvilTotem),
             Codec.BOOL.fieldOf("evil_totem_binding").forGetter(config -> config.evilTotemBinding),
-            Codec.BOOL.fieldOf("potion_can_teleport_mobs").forGetter(config -> config.canTeleportMobs),
-            Codec.FLOAT.fieldOf("potion_duration_factor").forGetter(config -> config.potionDurationFactor),
             Codec.INT.fieldOf("bundle_size").forGetter(config -> config.bundleSize),
             Codec.INT.fieldOf("wandering_trader_spawn_frequency").forGetter(config -> config.wanderingSpawnFrequency),
-            Codec.BOOL.fieldOf("disable_zombie_targeting_villagers").forGetter(config -> config.zombiesDontTargetVillagers),
-            Registries.ITEM.getCodec().optionalFieldOf("teleportation_potion_ingredient").forGetter(config -> config.teleportationPotionIngredient)
+            Codec.BOOL.fieldOf("disable_zombie_targeting_villagers").forGetter(config -> config.zombiesDontTargetVillagers)
             ).apply(instance, MechanicsConfig::new));
+    }
+
+    public record PotionsConfig(boolean canTeleportMobs, float potionDurationFactor, List<BrewingPotionRecipe> recipes) {
+        public PotionsConfig() {
+            this(true, 2f, UnruffledMod.POTION_RECIPES);
+        }
+        public static final Codec<PotionsConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+            Codec.BOOL.fieldOf("can_teleport_mobs").forGetter(config -> config.canTeleportMobs),
+            Codec.FLOAT.fieldOf("duration_multiplier").forGetter(config -> config.potionDurationFactor),
+            BrewingPotionRecipe.CODEC.listOf().fieldOf("added_recipes").forGetter(config -> config.recipes)
+        ).apply(instance, PotionsConfig::new));
     }
 
     public record WorldgenConfig(float structureSpreadFactor, float structureSpreadCorrection, boolean disableOreVeins) {

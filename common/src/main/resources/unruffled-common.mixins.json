@@ -50,6 +50,7 @@
     "potions.BrewingStandBlockEntityMixin",
     "potions.BrewingStandScreenHandlerMixin",
     "potions.BrewingStandScreenHandlerMixin$PotionSlotMixin",
+    "potions.EntityMixin",
     "potions.LivingEntityMixin",
     "potions.PotionMixin",
     "potions.ServerPlayerEntityMixin",

@@ -27,6 +27,7 @@ import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.effect.StatusEffect;
+import net.minecraft.entity.effect.StatusEffectCategory;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -97,7 +98,12 @@ public class UnruffledMod {
     public static final RegistryEntry<StatusEffect> TELEPORTATION_EFFECT = Registry.registerReference(Registries.STATUS_EFFECT, Identifier.of(UnruffledMod.MOD_ID, "teleportation"), new TeleportEffect()
         .addAttributeModifier(EntityAttributes.GENERIC_MOVEMENT_SPEED, Identifier.of(UnruffledMod.MOD_ID, "teleport_slowness"), -0.50, EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL)
         .addAttributeModifier(EntityAttributes.GENERIC_ATTACK_SPEED, Identifier.of(UnruffledMod.MOD_ID, "teleport_fatigue"), -0.50, EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
+    public static final RegistryEntry<StatusEffect> SILENCE_EFFECT = Registry.registerReference(Registries.STATUS_EFFECT, Identifier.of(UnruffledMod.MOD_ID, "silence"), new StatusEffect(StatusEffectCategory.NEUTRAL, 0x0a5060) {}
+        .addAttributeModifier(EntityAttributes.GENERIC_MOVEMENT_SPEED, Identifier.of(UnruffledMod.MOD_ID, "silence_slowness"), -0.50, EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL)
+        .addAttributeModifier(EntityAttributes.GENERIC_ATTACK_SPEED, Identifier.of(UnruffledMod.MOD_ID, "silence_fatigue"), -0.50, EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL)
+    );
     public static final RegistryEntry<Potion> TELEPORTATION_POTION = Registry.registerReference(Registries.POTION, Identifier.of(UnruffledMod.MOD_ID, "teleportation"), new Potion(new StatusEffectInstance(TELEPORTATION_EFFECT, 100, 0)));
+    public static final RegistryEntry<Potion> SILENCE_POTION = Registry.registerReference(Registries.POTION, Identifier.of(UnruffledMod.MOD_ID, "silence"), new Potion(new StatusEffectInstance(SILENCE_EFFECT, 1800, 0)));
 
     public static final ComponentType<Boolean> LOCKED_COMPASS_COMPONENT = ComponentType.<Boolean>builder().codec(Codec.BOOL).packetCodec(PacketCodecs.BOOL).build();
 
@@ -118,9 +124,10 @@ public class UnruffledMod {
             CustomItems.SACRED_SWORD, Map.of(Enchantments.SMITE, 4)
     );
 
-    public static final Supplier<List<BrewingPotionRecipe>> POTION_RECIPES = () -> List.of(
+    public static final List<BrewingPotionRecipe> POTION_RECIPES = List.of(
             new BrewingPotionRecipe(Potions.MUNDANE, Items.FERMENTED_SPIDER_EYE, Potions.AWKWARD),
-            new BrewingPotionRecipe(Potions.AWKWARD, Config.INSTANCE.get().mechanicsConfig.teleportationPotionIngredient().orElse(Items.AIR), TELEPORTATION_POTION)
+            new BrewingPotionRecipe(Potions.AWKWARD, Items.ECHO_SHARD, SILENCE_POTION),
+            new BrewingPotionRecipe(SILENCE_POTION, Items.ENDER_PEARL, TELEPORTATION_POTION)
     );
 
     public static Map<RegistryKey<LootTable>, List<Integer>> DEFAULT_LOOT_CODICES_ADD;
