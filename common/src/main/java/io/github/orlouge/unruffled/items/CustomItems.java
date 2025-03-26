@@ -12,7 +12,6 @@ public class CustomItems {
             (new FoodComponent.Builder()).hunger(2).snack().saturationModifier(0.1F)
                 .statusEffect(new StatusEffectInstance(StatusEffects.INSTANT_HEALTH, 1, 1), 1.0F)
                 .statusEffect(new StatusEffectInstance(StatusEffects.GLOWING, 600, 0), 1.0F)
-                .statusEffect(new StatusEffectInstance(StatusEffects.HASTE, 600, 1), 1.0F)
                 .alwaysEdible().build()
     ));
     public static final Item IRON_BOLSTER = new BolsterItem(1.5f, -3, ToolMaterials.IRON, new Item.Settings());

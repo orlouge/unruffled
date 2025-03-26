@@ -29,7 +29,7 @@ public abstract class VillagerEntityMixin extends MerchantEntity {
         VillagerData villagerData = this.getVillagerData();
         Config.INSTANCE.get().tradesConfig.villagerTrades().ifPresent(trades -> {
             Trades.ConfiguredVillagerTrades villagerTrades = trades.get(villagerData.getProfession());
-            if (villagerTrades != null && villagerTrades.enabled() && villagerTrades.pools().length >= villagerData.getLevel()) {
+            if (villagerTrades != null && villagerTrades.enabled().orElse(true) && villagerTrades.pools().length >= villagerData.getLevel()) {
                 Trades.ConfiguredVillagerPool pool = villagerTrades.pools()[villagerData.getLevel() - 1];
                 this.fillRecipesFromPool(this.getOffers(), Arrays.stream(pool.trades()).map(
                     Trades.ConfiguredTrade::toFactory

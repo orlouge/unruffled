@@ -25,6 +25,7 @@ import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectCategory;
 import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -89,11 +90,23 @@ public class UnruffledMod {
     public static final StatusEffect TELEPORTATION_EFFECT = new TeleportEffect()
         .addAttributeModifier(EntityAttributes.GENERIC_MOVEMENT_SPEED, "a6032b73-feef-4d6d-ba59-2b701b5e71e0", -0.50, EntityAttributeModifier.Operation.MULTIPLY_TOTAL)
         .addAttributeModifier(EntityAttributes.GENERIC_ATTACK_SPEED, "33f6133c-109f-4b18-80b2-90919e060c4b", -0.50, EntityAttributeModifier.Operation.MULTIPLY_TOTAL);
-    public static final Potion TELEPORTATION_POTION = new Potion(new StatusEffectInstance(TELEPORTATION_EFFECT, 100, 0));
     public static final StatusEffect SILENCE_EFFECT = (new StatusEffect(StatusEffectCategory.NEUTRAL, 0x0a5060) {})
         .addAttributeModifier(EntityAttributes.GENERIC_MOVEMENT_SPEED, "cf41effd-c046-42cc-a396-cce10f42858b", -0.50, EntityAttributeModifier.Operation.MULTIPLY_TOTAL)
         .addAttributeModifier(EntityAttributes.GENERIC_ATTACK_SPEED, "09e2cf3d-87e8-4a86-b6f2-4faa7936d75b", -0.50, EntityAttributeModifier.Operation.MULTIPLY_TOTAL);
+    public static final StatusEffect HIDDEN_SLOWNESS_EFFECT = new StatusEffect(StatusEffectCategory.HARMFUL, 0x2a7080) {}
+        .addAttributeModifier(EntityAttributes.GENERIC_MOVEMENT_SPEED, "56306bca-c1cd-4dc7-ad3e-8812633635d1", -0.50, EntityAttributeModifier.Operation.MULTIPLY_TOTAL)
+        .addAttributeModifier(EntityAttributes.GENERIC_ATTACK_SPEED, "0e44fd12-2454-4f12-8712-91f83adfdeaa", -0.50, EntityAttributeModifier.Operation.MULTIPLY_TOTAL);
+
+    public static final Potion TELEPORTATION_POTION = new Potion(new StatusEffectInstance(TELEPORTATION_EFFECT, 100, 0));
     public static final Potion SILENCE_POTION = new Potion(new StatusEffectInstance(SILENCE_EFFECT, 1800, 0));
+    public static final Potion TERRIBLE_POTION =  new Potion(new StatusEffectInstance(HIDDEN_SLOWNESS_EFFECT, 100, 0, false, false, false));
+    public static final Potion LONG_SILENCE_POTION = new Potion(new StatusEffectInstance(SILENCE_EFFECT, 1800, 0));
+    public static final Potion FATIGUE_POTION = new Potion(new StatusEffectInstance(StatusEffects.MINING_FATIGUE, 1800, 0));
+    public static final Potion STRONG_FATIGUE_POTION = new Potion(new StatusEffectInstance(StatusEffects.MINING_FATIGUE, 1800, 2));
+    public static final Potion LONG_FATIGUE_POTION = new Potion(new StatusEffectInstance(StatusEffects.MINING_FATIGUE, 4800, 0));
+    public static final Potion HASTE_POTION = new Potion(new StatusEffectInstance(StatusEffects.HASTE, 1800, 0));
+    public static final Potion STRONG_HASTE_POTION = new Potion(new StatusEffectInstance(StatusEffects.HASTE, 1800, 1));
+    public static final Potion LONG_HASTE_POTION = new Potion(new StatusEffectInstance(StatusEffects.HASTE, 4800, 0));
 
 
     public static final Set<Enchantment> DEFAULT_UNOBTAINABLE_ENCHANTMENTS = Registries.ENCHANTMENT.getEntrySet().stream().filter(
@@ -119,8 +132,18 @@ public class UnruffledMod {
 
     public static final List<BrewingPotionRecipe> POTION_RECIPES = List.of(
             new BrewingPotionRecipe(Potions.MUNDANE, Items.FERMENTED_SPIDER_EYE, Potions.AWKWARD),
-            new BrewingPotionRecipe(Potions.AWKWARD, Items.ECHO_SHARD, SILENCE_POTION),
-            new BrewingPotionRecipe(SILENCE_POTION, Items.ENDER_PEARL, TELEPORTATION_POTION)
+            new BrewingPotionRecipe(Potions.AWKWARD, Items.ECHO_SHARD, TERRIBLE_POTION),
+            new BrewingPotionRecipe(TERRIBLE_POTION, Items.PRISMARINE_SHARD, FATIGUE_POTION),
+            new BrewingPotionRecipe(FATIGUE_POTION, Items.LAPIS_LAZULI, HASTE_POTION),
+            new BrewingPotionRecipe(FATIGUE_POTION, Items.REDSTONE, LONG_FATIGUE_POTION),
+            new BrewingPotionRecipe(FATIGUE_POTION, Items.GLOWSTONE_DUST, STRONG_FATIGUE_POTION),
+            new BrewingPotionRecipe(HASTE_POTION, Items.REDSTONE, LONG_HASTE_POTION),
+            new BrewingPotionRecipe(HASTE_POTION, Items.GLOWSTONE_DUST, STRONG_HASTE_POTION),
+            new BrewingPotionRecipe(LONG_FATIGUE_POTION, Items.LAPIS_LAZULI, LONG_HASTE_POTION),
+            new BrewingPotionRecipe(STRONG_FATIGUE_POTION, Items.LAPIS_LAZULI, STRONG_HASTE_POTION),
+            new BrewingPotionRecipe(TERRIBLE_POTION, Items.PHANTOM_MEMBRANE, SILENCE_POTION),
+            new BrewingPotionRecipe(SILENCE_POTION, Items.REDSTONE, LONG_SILENCE_POTION),
+            new BrewingPotionRecipe(TERRIBLE_POTION, Items.ENDER_PEARL, TELEPORTATION_POTION)
     );
 
     public static Map<Identifier, List<Integer>> DEFAULT_LOOT_CODICES_ADD;
