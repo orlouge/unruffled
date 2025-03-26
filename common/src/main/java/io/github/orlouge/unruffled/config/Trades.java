@@ -402,13 +402,13 @@ public class Trades {
     public static final TradesConfig DEFAULT_CONFIG = new TradesConfig(
         Optional.of(VILLAGER_TRADES.entrySet().stream().map(
             entry -> Map.entry(entry.getKey(), new ConfiguredVillagerTrades(
-                true,
+                Optional.of(true),
                 entry.getValue().stream().map(
                     pool -> new ConfiguredVillagerPool(2, pool)
                 ).toArray(ConfiguredVillagerPool[]::new)
             ))
         ).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))),
-        Optional.of(new ConfiguredWanderingTraderTrades(true, Optional.of(true), new ConfiguredWanderingTraderPool[]{
+        Optional.of(new ConfiguredWanderingTraderTrades(Optional.of(true), Optional.of(true), new ConfiguredWanderingTraderPool[]{
             new ConfiguredWanderingTraderPool(1, Trades.WANDERING_TRADER_BUY),
             new ConfiguredWanderingTraderPool(1, Trades.WANDERING_TRADER_GLAZED_TERRACOTTA),
             new ConfiguredWanderingTraderPool(2, Trades.WANDERING_TRADER_DECORATION),
@@ -640,17 +640,17 @@ public class Trades {
         ).apply(instance, ConfiguredVillagerPool::new));
     }
 
-    public record ConfiguredWanderingTraderTrades(boolean enabled, Optional<Boolean> addVanilla, ConfiguredWanderingTraderPool[] pools) {
+    public record ConfiguredWanderingTraderTrades(Optional<Boolean> enabled, Optional<Boolean> addVanilla, ConfiguredWanderingTraderPool[] pools) {
         public static final Codec<ConfiguredWanderingTraderTrades> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            Codec.BOOL.fieldOf("enabled").forGetter(ConfiguredWanderingTraderTrades::enabled),
+            Codec.BOOL.optionalFieldOf("add_extra_pools").forGetter(ConfiguredWanderingTraderTrades::enabled),
             Codec.BOOL.optionalFieldOf("add_vanilla_trades").forGetter(ConfiguredWanderingTraderTrades::addVanilla),
             Codec.list(ConfiguredWanderingTraderPool.CODEC).xmap(list -> list.toArray(ConfiguredWanderingTraderPool[]::new), array -> Arrays.stream(array).toList()).fieldOf("pools").forGetter(ConfiguredWanderingTraderTrades::pools)
         ).apply(instance, ConfiguredWanderingTraderTrades::new));
     }
 
-    public record ConfiguredVillagerTrades(boolean enabled, ConfiguredVillagerPool[] pools) {
+    public record ConfiguredVillagerTrades(Optional<Boolean> enabled, ConfiguredVillagerPool[] pools) {
         public static final Codec<ConfiguredVillagerTrades> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            Codec.BOOL.fieldOf("enabled").forGetter(ConfiguredVillagerTrades::enabled),
+            Codec.BOOL.optionalFieldOf("replace_with_pools").forGetter(ConfiguredVillagerTrades::enabled),
             Codec.list(ConfiguredVillagerPool.CODEC).xmap(list -> list.toArray(ConfiguredVillagerPool[]::new), array -> Arrays.stream(array).toList()).fieldOf("pools").forGetter(ConfiguredVillagerTrades::pools)
         ).apply(instance, ConfiguredVillagerTrades::new));
     }

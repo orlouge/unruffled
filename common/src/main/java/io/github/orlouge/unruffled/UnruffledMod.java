@@ -29,6 +29,7 @@ import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectCategory;
 import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -95,6 +96,9 @@ public class UnruffledMod {
     public static StructureType<NorthboundGateStructure> NORTHBOUND_GATE_STRUCTURE = Registry.register(Registries.STRUCTURE_TYPE, Identifier.of(UnruffledMod.MOD_ID, "northbound_gate"), () -> NorthboundGateStructure.CODEC);
     public static StructurePieceType NORTHBOUND_GATE_STRUCTURE_PIECE = Registry.register(Registries.STRUCTURE_PIECE, Identifier.of(UnruffledMod.MOD_ID, "northbound_gate_piece"), (StructurePieceType.Simple) NorthboundGateStructure.Piece::new);
 
+    public static final RegistryEntry<StatusEffect> HIDDEN_SLOWNESS_EFFECT = Registry.registerReference(Registries.STATUS_EFFECT, Identifier.of(UnruffledMod.MOD_ID, "hidden_slowness"), new StatusEffect(StatusEffectCategory.HARMFUL, 0x2a7080) {}
+        .addAttributeModifier(EntityAttributes.GENERIC_MOVEMENT_SPEED, Identifier.of(UnruffledMod.MOD_ID, "hidden_slowness"), -0.50, EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL)
+        .addAttributeModifier(EntityAttributes.GENERIC_ATTACK_SPEED, Identifier.of(UnruffledMod.MOD_ID, "hidden_slowness"), -0.50, EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
     public static final RegistryEntry<StatusEffect> TELEPORTATION_EFFECT = Registry.registerReference(Registries.STATUS_EFFECT, Identifier.of(UnruffledMod.MOD_ID, "teleportation"), new TeleportEffect()
         .addAttributeModifier(EntityAttributes.GENERIC_MOVEMENT_SPEED, Identifier.of(UnruffledMod.MOD_ID, "teleport_slowness"), -0.50, EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL)
         .addAttributeModifier(EntityAttributes.GENERIC_ATTACK_SPEED, Identifier.of(UnruffledMod.MOD_ID, "teleport_fatigue"), -0.50, EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
@@ -102,8 +106,17 @@ public class UnruffledMod {
         .addAttributeModifier(EntityAttributes.GENERIC_MOVEMENT_SPEED, Identifier.of(UnruffledMod.MOD_ID, "silence_slowness"), -0.50, EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL)
         .addAttributeModifier(EntityAttributes.GENERIC_ATTACK_SPEED, Identifier.of(UnruffledMod.MOD_ID, "silence_fatigue"), -0.50, EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL)
     );
+
+    public static final RegistryEntry<Potion> TERRIBLE_POTION = Registry.registerReference(Registries.POTION, Identifier.of(UnruffledMod.MOD_ID, "terrible"), new Potion(new StatusEffectInstance(HIDDEN_SLOWNESS_EFFECT, 100, 0, false, false, false)));
     public static final RegistryEntry<Potion> TELEPORTATION_POTION = Registry.registerReference(Registries.POTION, Identifier.of(UnruffledMod.MOD_ID, "teleportation"), new Potion(new StatusEffectInstance(TELEPORTATION_EFFECT, 100, 0)));
-    public static final RegistryEntry<Potion> SILENCE_POTION = Registry.registerReference(Registries.POTION, Identifier.of(UnruffledMod.MOD_ID, "silence"), new Potion(new StatusEffectInstance(SILENCE_EFFECT, 1800, 0)));
+    public static final RegistryEntry<Potion> SILENCE_POTION = Registry.registerReference(Registries.POTION, Identifier.of(UnruffledMod.MOD_ID, "silence"), new Potion(new StatusEffectInstance(SILENCE_EFFECT, 600, 0)));
+    public static final RegistryEntry<Potion> LONG_SILENCE_POTION = Registry.registerReference(Registries.POTION, Identifier.of(UnruffledMod.MOD_ID, "long_silence"), new Potion(new StatusEffectInstance(SILENCE_EFFECT, 1800, 0)));
+    public static final RegistryEntry<Potion> FATIGUE_POTION = Registry.registerReference(Registries.POTION, Identifier.of(UnruffledMod.MOD_ID, "fatigue"), new Potion(new StatusEffectInstance(StatusEffects.MINING_FATIGUE, 1800, 0)));
+    public static final RegistryEntry<Potion> STRONG_FATIGUE_POTION = Registry.registerReference(Registries.POTION, Identifier.of(UnruffledMod.MOD_ID, "strong_fatigue"), new Potion(new StatusEffectInstance(StatusEffects.MINING_FATIGUE, 1800, 2)));
+    public static final RegistryEntry<Potion> LONG_FATIGUE_POTION = Registry.registerReference(Registries.POTION, Identifier.of(UnruffledMod.MOD_ID, "long_fatigue"), new Potion(new StatusEffectInstance(StatusEffects.MINING_FATIGUE, 4800, 0)));
+    public static final RegistryEntry<Potion> HASTE_POTION = Registry.registerReference(Registries.POTION, Identifier.of(UnruffledMod.MOD_ID, "haste"), new Potion(new StatusEffectInstance(StatusEffects.HASTE, 1800, 0)));
+    public static final RegistryEntry<Potion> STRONG_HASTE_POTION = Registry.registerReference(Registries.POTION, Identifier.of(UnruffledMod.MOD_ID, "strong_haste"), new Potion(new StatusEffectInstance(StatusEffects.HASTE, 1800, 1)));
+    public static final RegistryEntry<Potion> LONG_HASTE_POTION = Registry.registerReference(Registries.POTION, Identifier.of(UnruffledMod.MOD_ID, "long_haste"), new Potion(new StatusEffectInstance(StatusEffects.HASTE, 4800, 0)));
 
     public static final ComponentType<Boolean> LOCKED_COMPASS_COMPONENT = ComponentType.<Boolean>builder().codec(Codec.BOOL).packetCodec(PacketCodecs.BOOL).build();
 
@@ -126,8 +139,18 @@ public class UnruffledMod {
 
     public static final List<BrewingPotionRecipe> POTION_RECIPES = List.of(
             new BrewingPotionRecipe(Potions.MUNDANE, Items.FERMENTED_SPIDER_EYE, Potions.AWKWARD),
-            new BrewingPotionRecipe(Potions.AWKWARD, Items.ECHO_SHARD, SILENCE_POTION),
-            new BrewingPotionRecipe(SILENCE_POTION, Items.ENDER_PEARL, TELEPORTATION_POTION)
+            new BrewingPotionRecipe(Potions.AWKWARD, Items.ECHO_SHARD, TERRIBLE_POTION),
+            new BrewingPotionRecipe(TERRIBLE_POTION, Items.PRISMARINE_SHARD, FATIGUE_POTION),
+            new BrewingPotionRecipe(FATIGUE_POTION, Items.LAPIS_LAZULI, HASTE_POTION),
+            new BrewingPotionRecipe(FATIGUE_POTION, Items.REDSTONE, LONG_FATIGUE_POTION),
+            new BrewingPotionRecipe(FATIGUE_POTION, Items.GLOWSTONE_DUST, STRONG_FATIGUE_POTION),
+            new BrewingPotionRecipe(HASTE_POTION, Items.REDSTONE, LONG_HASTE_POTION),
+            new BrewingPotionRecipe(HASTE_POTION, Items.GLOWSTONE_DUST, STRONG_HASTE_POTION),
+            new BrewingPotionRecipe(LONG_FATIGUE_POTION, Items.LAPIS_LAZULI, LONG_HASTE_POTION),
+            new BrewingPotionRecipe(STRONG_FATIGUE_POTION, Items.LAPIS_LAZULI, STRONG_HASTE_POTION),
+            new BrewingPotionRecipe(TERRIBLE_POTION, Items.PHANTOM_MEMBRANE, SILENCE_POTION),
+            new BrewingPotionRecipe(SILENCE_POTION, Items.REDSTONE, LONG_SILENCE_POTION),
+            new BrewingPotionRecipe(TERRIBLE_POTION, Items.ENDER_PEARL, TELEPORTATION_POTION)
     );
 
     public static Map<RegistryKey<LootTable>, List<Integer>> DEFAULT_LOOT_CODICES_ADD;
