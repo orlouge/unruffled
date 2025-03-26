@@ -23,6 +23,7 @@ import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.effect.StatusEffect;
+import net.minecraft.entity.effect.StatusEffectCategory;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -89,6 +90,10 @@ public class UnruffledMod {
         .addAttributeModifier(EntityAttributes.GENERIC_MOVEMENT_SPEED, "a6032b73-feef-4d6d-ba59-2b701b5e71e0", -0.50, EntityAttributeModifier.Operation.MULTIPLY_TOTAL)
         .addAttributeModifier(EntityAttributes.GENERIC_ATTACK_SPEED, "33f6133c-109f-4b18-80b2-90919e060c4b", -0.50, EntityAttributeModifier.Operation.MULTIPLY_TOTAL);
     public static final Potion TELEPORTATION_POTION = new Potion(new StatusEffectInstance(TELEPORTATION_EFFECT, 100, 0));
+    public static final StatusEffect SILENCE_EFFECT = (new StatusEffect(StatusEffectCategory.NEUTRAL, 0x0a5060) {})
+        .addAttributeModifier(EntityAttributes.GENERIC_MOVEMENT_SPEED, "cf41effd-c046-42cc-a396-cce10f42858b", -0.50, EntityAttributeModifier.Operation.MULTIPLY_TOTAL)
+        .addAttributeModifier(EntityAttributes.GENERIC_ATTACK_SPEED, "09e2cf3d-87e8-4a86-b6f2-4faa7936d75b", -0.50, EntityAttributeModifier.Operation.MULTIPLY_TOTAL);
+    public static final Potion SILENCE_POTION = new Potion(new StatusEffectInstance(SILENCE_EFFECT, 1800, 0));
 
 
     public static final Set<Enchantment> DEFAULT_UNOBTAINABLE_ENCHANTMENTS = Registries.ENCHANTMENT.getEntrySet().stream().filter(
@@ -112,9 +117,10 @@ public class UnruffledMod {
             CustomItems.SACRED_SWORD, Map.of(Enchantments.SMITE, 4)
     );
 
-    public static final Supplier<List<BrewingPotionRecipe>> POTION_RECIPES = () -> List.of(
+    public static final List<BrewingPotionRecipe> POTION_RECIPES = List.of(
             new BrewingPotionRecipe(Potions.MUNDANE, Items.FERMENTED_SPIDER_EYE, Potions.AWKWARD),
-            new BrewingPotionRecipe(Potions.AWKWARD, Config.INSTANCE.get().mechanicsConfig.teleportationPotionIngredient().orElse(Items.AIR), TELEPORTATION_POTION)
+            new BrewingPotionRecipe(Potions.AWKWARD, Items.ECHO_SHARD, SILENCE_POTION),
+            new BrewingPotionRecipe(SILENCE_POTION, Items.ENDER_PEARL, TELEPORTATION_POTION)
     );
 
     public static Map<Identifier, List<Integer>> DEFAULT_LOOT_CODICES_ADD;

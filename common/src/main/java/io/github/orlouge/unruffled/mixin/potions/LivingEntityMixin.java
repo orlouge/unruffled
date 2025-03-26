@@ -51,7 +51,7 @@ public abstract class LivingEntityMixin extends Entity {
         } else if (source instanceof TeleporterEntity teleporter) {
             if (source == this) {
                 teleporter.setTeleporting();
-            } else if (Config.INSTANCE.get().mechanicsConfig.canTeleportMobs() && this.canStartRiding(source)) {
+            } else if (Config.INSTANCE.get().potionsConfig.canTeleportMobs() && this.canStartRiding(source)) {
                 if (lastTeleporter != null) {
                     lastTeleporter.removeTeleportTarget(this);
                 }
