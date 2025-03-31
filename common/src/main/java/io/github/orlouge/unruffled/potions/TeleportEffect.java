@@ -123,7 +123,7 @@ public class TeleportEffect extends StatusEffect  {
                 for (int y = up > 0 ? 0 : 1; y <= 2; y++) {
                     for (int x = -2; x <= 2; x++) {
                         for (int z = -2; z <= 2; z++) {
-                            teleportPos = ServerPlayerEntity.findRespawnPosition(targetWorld, targetPos.add(x, y * up, z), 0f, true, true).map(r -> r.pos);
+                            teleportPos = ServerPlayerEntity.findRespawnPosition(targetWorld, targetPos.add(x, y * up, z), 0f, true, true);
                             if (teleportPos.isPresent()) break found;
                         }
                     }

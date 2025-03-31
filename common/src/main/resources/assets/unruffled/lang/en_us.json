@@ -41,6 +41,7 @@
   "item.minecraft.potion.effect.long_silence": "Potion of Silence",
   "item.minecraft.splash_potion.effect.long_silence": "Splash Potion of Silence",
   "item.minecraft.lingering_potion.effect.long_silence": "Lingering Potion of Silence",
+  "item.minecraft.compass.spawn": "Spawn",
   "item.minecraft.recovery_compass.locked": "Locked",
   "effect.unruffled.teleportation": "Teleportation",
   "effect.unruffled.teleport.no_compass": "A compass pointing to a lodestone is required to teleport.",

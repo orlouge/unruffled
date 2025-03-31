@@ -24,15 +24,4 @@ public class LecternBlockEntityMixin {
             cir.cancel();
         }
     }
-
-    @Inject(method = "getPageCount", at = @At("HEAD"), cancellable = true)
-    private static void resolveBookCodex(ItemStack book, CallbackInfoReturnable<Integer> cir) {
-        if (book.isOf(CustomItems.ANCIENT_CODEX) && book.contains(AncientCodexItem.NUMBER)) {
-            int number = book.get(AncientCodexItem.NUMBER);
-            if (number > 0 && number <= AncientCodexItem.CONTENTS.size()) {
-                cir.setReturnValue(AncientCodexItem.CONTENTS.get(number - 1).size());
-                cir.cancel();
-            }
-        }
-    }
 }

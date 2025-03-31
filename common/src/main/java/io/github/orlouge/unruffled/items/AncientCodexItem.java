@@ -2,6 +2,9 @@ package io.github.orlouge.unruffled.items;
 
 import com.google.common.collect.ImmutableList;
 import io.github.orlouge.unruffled.utils.RomanNumerals;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.LecternBlock;
 import net.minecraft.client.gui.screen.ingame.BookScreen;
 import net.minecraft.item.*;
 import net.minecraft.nbt.NbtCompound;
@@ -15,9 +18,11 @@ import net.minecraft.network.packet.s2c.play.OpenWrittenBookS2CPacket;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.stat.Stats;
 import net.minecraft.text.*;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 
@@ -80,6 +85,18 @@ public class AncientCodexItem extends Item {
             return TypedActionResult.success(stack, world.isClient());
         } else {
             return super.use(world, user, hand);
+        }
+    }
+
+    @Override
+    public ActionResult useOnBlock(ItemUsageContext context) {
+        World world = context.getWorld();
+        BlockPos blockPos = context.getBlockPos();
+        BlockState blockState = world.getBlockState(blockPos);
+        if (blockState.isOf(Blocks.LECTERN)) {
+            return LecternBlock.putBookIfAbsent(context.getPlayer(), world, blockPos, blockState, context.getStack()) ? ActionResult.success(world.isClient) : ActionResult.PASS;
+        } else {
+            return ActionResult.PASS;
         }
     }
 

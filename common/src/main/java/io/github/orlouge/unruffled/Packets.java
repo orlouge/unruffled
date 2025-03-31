@@ -42,12 +42,12 @@ public class Packets {
         }
     }
 
-    public static class LockRecoveryCompass extends Packet {
+    public static class LockCompass extends Packet {
         public static final Identifier PACKET_ID = new Identifier(UnruffledMod.MOD_ID, "lockrecoverycompass");
 
         public static void register(Consumer<ServerPlayerEntity> receiver) {
-            Platform.registerServerReceiver(LockRecoveryCompass.class, PACKET_ID,
-                buf -> new LockRecoveryCompass(),
+            Platform.registerServerReceiver(LockCompass.class, PACKET_ID,
+                buf -> new LockCompass(),
                 (packet, player) -> { if (packet != null && player instanceof ServerPlayerEntity p) receiver.accept(p); }
             );
         }

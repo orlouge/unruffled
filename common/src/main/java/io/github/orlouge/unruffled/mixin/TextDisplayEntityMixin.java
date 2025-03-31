@@ -36,14 +36,14 @@ public abstract class TextDisplayEntityMixin extends DisplayEntity implements Ha
     }
 
     @Inject(method = "initDataTracker", at = @At("TAIL"))
-    public void trackLodestone(DataTracker.Builder builder, CallbackInfo ci) {
-        builder.add(ATTACHED_LODESTONE, Optional.empty());
+    public void trackLodestone(CallbackInfo ci) {
+        this.dataTracker.startTracking(ATTACHED_LODESTONE, Optional.empty());
     }
 
     @Inject(method = "readCustomDataFromNbt", at = @At("TAIL"))
     public void readLodestone(NbtCompound nbt, CallbackInfo ci) {
         if (nbt.contains("attached_lodestone")) {
-            this.dataTracker.set(ATTACHED_LODESTONE, NbtHelper.toBlockPos(nbt, "attached_lodestone"));
+            this.dataTracker.set(ATTACHED_LODESTONE, Optional.ofNullable(NbtHelper.toBlockPos(nbt.getCompound("attached_lodestone"))));
         }
     }
 

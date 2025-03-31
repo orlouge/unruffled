@@ -26,6 +26,7 @@ import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectCategory;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.item.CompassItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -40,6 +41,9 @@ import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.structure.StructurePieceType;
+import net.minecraft.text.Style;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonSerializer;
@@ -69,9 +73,9 @@ public class UnruffledMod {
     public static final PigTeleportationCriterion PIG_TELEPORTATION_CRITERION = Criteria.register(new PigTeleportationCriterion(new Identifier(UnruffledMod.MOD_ID, "pig_teleportation")));
     public static final AquaAffinityCriterion AQUA_AFFINITY_CRITERION = Criteria.register(new AquaAffinityCriterion(new Identifier(UnruffledMod.MOD_ID, "aqua_affinity")));
     public static final PiercingCriterion PIERCING_CRITERION = Criteria.register(new PiercingCriterion(new Identifier(UnruffledMod.MOD_ID, "piercing")));
-    public static final KillWanderingTraderCriterion KILL_WANDERING_TRADER_CRITERION = Registry.register(Registries.CRITERION, Identifier.of(UnruffledMod.MOD_ID, "kill_wandering_trader"), new KillWanderingTraderCriterion());
-    public static final LockRecoveryCompassCriterion LOCK_RECOVERY_COMPASS = Registry.register(Registries.CRITERION, Identifier.of(UnruffledMod.MOD_ID, "lock_recovery_compass"), new LockRecoveryCompassCriterion());
-    public static final NameLodestoneCriterion NAME_LODESTONE_CRITERION = Registry.register(Registries.CRITERION, Identifier.of(UnruffledMod.MOD_ID, "name_lodestone"), new NameLodestoneCriterion());
+    public static final KillWanderingTraderCriterion KILL_WANDERING_TRADER_CRITERION = Criteria.register(new KillWanderingTraderCriterion(Identifier.of(UnruffledMod.MOD_ID, "kill_wandering_trader")));
+    public static final LockRecoveryCompassCriterion LOCK_RECOVERY_COMPASS = Criteria.register(new LockRecoveryCompassCriterion(Identifier.of(UnruffledMod.MOD_ID, "lock_recovery_compass")));
+    public static final NameLodestoneCriterion NAME_LODESTONE_CRITERION = Criteria.register(new NameLodestoneCriterion(Identifier.of(UnruffledMod.MOD_ID, "name_lodestone")));
 
     public static final Supplier<LootFunctionType> ITEM_ENCHANTMENTS_LOOT_FUNCTION_TYPE =
         Platform.registerLootFunctionType(new Identifier(MOD_ID, "item_enchantments"), new Serializer());
@@ -93,12 +97,12 @@ public class UnruffledMod {
     public static final StatusEffect SILENCE_EFFECT = (new StatusEffect(StatusEffectCategory.NEUTRAL, 0x0a5060) {})
         .addAttributeModifier(EntityAttributes.GENERIC_MOVEMENT_SPEED, "cf41effd-c046-42cc-a396-cce10f42858b", -0.50, EntityAttributeModifier.Operation.MULTIPLY_TOTAL)
         .addAttributeModifier(EntityAttributes.GENERIC_ATTACK_SPEED, "09e2cf3d-87e8-4a86-b6f2-4faa7936d75b", -0.50, EntityAttributeModifier.Operation.MULTIPLY_TOTAL);
-    public static final StatusEffect HIDDEN_SLOWNESS_EFFECT = new StatusEffect(StatusEffectCategory.HARMFUL, 0x2a7080) {}
+    public static final StatusEffect HIDDEN_SLOWNESS_EFFECT = new StatusEffect(StatusEffectCategory.HARMFUL, 0x4a90C0) {}
         .addAttributeModifier(EntityAttributes.GENERIC_MOVEMENT_SPEED, "56306bca-c1cd-4dc7-ad3e-8812633635d1", -0.50, EntityAttributeModifier.Operation.MULTIPLY_TOTAL)
         .addAttributeModifier(EntityAttributes.GENERIC_ATTACK_SPEED, "0e44fd12-2454-4f12-8712-91f83adfdeaa", -0.50, EntityAttributeModifier.Operation.MULTIPLY_TOTAL);
 
     public static final Potion TELEPORTATION_POTION = new Potion(new StatusEffectInstance(TELEPORTATION_EFFECT, 100, 0));
-    public static final Potion SILENCE_POTION = new Potion(new StatusEffectInstance(SILENCE_EFFECT, 1800, 0));
+    public static final Potion SILENCE_POTION = new Potion(new StatusEffectInstance(SILENCE_EFFECT, 600, 0));
     public static final Potion TERRIBLE_POTION =  new Potion(new StatusEffectInstance(HIDDEN_SLOWNESS_EFFECT, 100, 0, false, false, false));
     public static final Potion LONG_SILENCE_POTION = new Potion(new StatusEffectInstance(SILENCE_EFFECT, 1800, 0));
     public static final Potion FATIGUE_POTION = new Potion(new StatusEffectInstance(StatusEffects.MINING_FATIGUE, 1800, 0));
@@ -207,7 +211,26 @@ public class UnruffledMod {
             player.swingHand(Hand.MAIN_HAND, false);
         });
 
-        Packets.LockRecoveryCompass.register(player -> {
+        Packets.LockCompass.register(player -> {
+            if (Config.INSTANCE.get().navigationConfig.compassPointsNorth() && Config.INSTANCE.get().navigationConfig.compassToggleSpawn()) {
+                ItemStack compass = player.getMainHandStack();
+                if (!compass.isEmpty() && compass.isOf(Items.COMPASS) && !CompassItem.hasLodestone(compass)) {
+                    compass = compass.copy();
+                    if (compass.hasNbt() && compass.getNbt().contains("IsSpawnCompass")) {
+                        compass = new ItemStack(Items.COMPASS, compass.getCount());
+                    } else {
+                        NbtCompound display = new NbtCompound();
+                        NbtList lore = new NbtList();
+                        lore.add(NbtString.of(Text.Serializer.toJson(Text.translatable("item.minecraft.compass.spawn").getWithStyle(Style.EMPTY.withColor(Formatting.YELLOW)).get(0))));
+                        display.put("Lore", lore);
+                        compass.addEnchantment(Enchantments.BINDING_CURSE, 1);
+                        compass.setSubNbt("display", display);
+                        compass.addHideFlag(ItemStack.TooltipSection.ENCHANTMENTS);
+                        compass.setSubNbt("IsSpawnCompass", NbtByte.of((byte) 1));
+                    }
+                    player.setStackInHand(Hand.MAIN_HAND, compass);
+                }
+            }
             if (player instanceof HasLockedDeathPosition lockedDeathPosition && Config.INSTANCE.get().navigationConfig.recoveryCompassLocking()) {
                 ItemStack compass = player.getMainHandStack();
                 if (!compass.isEmpty() && compass.isOf(Items.RECOVERY_COMPASS)) {
@@ -224,7 +247,7 @@ public class UnruffledMod {
                         compass.addEnchantment(Enchantments.BINDING_CURSE, 1);
                         NbtCompound display = new NbtCompound();
                         NbtList lore = new NbtList();
-                        lore.add(NbtString.of("{\"text\":\"Locked\",\"color\":\"blue\"}"));
+                        lore.add(NbtString.of(Text.Serializer.toJson(Text.translatable("item.minecraft.recovery_compass.locked").getWithStyle(Style.EMPTY.withColor(Formatting.BLUE)).get(0))));
                         display.put("Lore", lore);
                         compass.setSubNbt("display", display);
                         compass.addHideFlag(ItemStack.TooltipSection.ENCHANTMENTS);

@@ -21,7 +21,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class ItemMixin {
     @Inject(method = "hasGlint", at = @At("HEAD"), cancellable = true)
     public void removeEnchantmentGlint(ItemStack stack, CallbackInfoReturnable<Boolean> cir) {
-        if (!stack.isOf(Items.ENCHANTED_BOOK) && !stack.isOf(Items.RECOVERY_COMPASS) && Config.INSTANCE.get().enchantmentsConfig.disableGlint()) {
+        if (!stack.isOf(Items.ENCHANTED_BOOK) && !stack.isOf(Items.RECOVERY_COMPASS) && !stack.isOf(Items.COMPASS) && Config.INSTANCE.get().enchantmentsConfig.disableGlint()) {
             cir.setReturnValue(false);
             cir.cancel();
         }

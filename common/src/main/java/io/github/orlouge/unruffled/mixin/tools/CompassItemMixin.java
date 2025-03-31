@@ -44,7 +44,7 @@ public abstract class CompassItemMixin extends Item {
 
     @Inject(method = "useOnBlock", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;playSound(Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/sound/SoundEvent;Lnet/minecraft/sound/SoundCategory;FF)V"))
     public void dontLockSpawnCompass(ItemUsageContext context, CallbackInfoReturnable<ActionResult> cir) {
-        if (context.getStack().hasNbt() && context.getStack().getNbt().getBoolean("Spawn")) {
+        if (context.getStack().hasNbt() && context.getStack().getNbt().getBoolean("IsSpawnCompass")) {
             cir.setReturnValue(super.useOnBlock(context));
             cir.cancel();
         }

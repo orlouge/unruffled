@@ -40,7 +40,19 @@ public class UnruffledFabric implements ModInitializer {
         Registry.register(Registries.FEATURE, new Identifier(UnruffledMod.MOD_ID, "underground_cabin"), UnruffledMod.UNDERGROUND_CABIN_FEATURE);
 
         Registry.register(Registries.STATUS_EFFECT, new Identifier(UnruffledMod.MOD_ID, "teleportation"), UnruffledMod.TELEPORTATION_EFFECT);
+        Registry.register(Registries.STATUS_EFFECT, new Identifier(UnruffledMod.MOD_ID, "silence"), UnruffledMod.SILENCE_EFFECT);
+        Registry.register(Registries.STATUS_EFFECT, new Identifier(UnruffledMod.MOD_ID, "hidden_slowness"), UnruffledMod.HIDDEN_SLOWNESS_EFFECT);
+
         Registry.register(Registries.POTION, new Identifier(UnruffledMod.MOD_ID, "teleportation"), UnruffledMod.TELEPORTATION_POTION);
+        Registry.register(Registries.POTION, new Identifier(UnruffledMod.MOD_ID, "silence"), UnruffledMod.SILENCE_POTION);
+        Registry.register(Registries.POTION, new Identifier(UnruffledMod.MOD_ID, "long_silence"), UnruffledMod.LONG_SILENCE_POTION);
+        Registry.register(Registries.POTION, new Identifier(UnruffledMod.MOD_ID, "terrible"), UnruffledMod.TERRIBLE_POTION);
+        Registry.register(Registries.POTION, new Identifier(UnruffledMod.MOD_ID, "fatigue"), UnruffledMod.FATIGUE_POTION);
+        Registry.register(Registries.POTION, new Identifier(UnruffledMod.MOD_ID, "strong_fatigue"), UnruffledMod.STRONG_FATIGUE_POTION);
+        Registry.register(Registries.POTION, new Identifier(UnruffledMod.MOD_ID, "long_fatigue"), UnruffledMod.LONG_FATIGUE_POTION);
+        Registry.register(Registries.POTION, new Identifier(UnruffledMod.MOD_ID, "haste"), UnruffledMod.HASTE_POTION);
+        Registry.register(Registries.POTION, new Identifier(UnruffledMod.MOD_ID, "strong_haste"), UnruffledMod.STRONG_HASTE_POTION);
+        Registry.register(Registries.POTION, new Identifier(UnruffledMod.MOD_ID, "long_haste"), UnruffledMod.LONG_HASTE_POTION);
 
         Registry.register(Registries.ITEM, new Identifier(UnruffledMod.MOD_ID, "golden_berries"), CustomItems.GOLDEN_BERRIES);
         Registry.register(Registries.ITEM, new Identifier(UnruffledMod.MOD_ID, "iron_bolster"), CustomItems.IRON_BOLSTER);
@@ -157,12 +169,10 @@ public class UnruffledFabric implements ModInitializer {
             EntitySleepEvents.ALLOW_SLEEP_TIME.register((player, pos, isNight) -> !isNight || (player.getWorld().getLunarTime() % 24000 < Config.INSTANCE.get().mechanicsConfig.sleepTime() /*player.getWorld().getAmbientDarkness() < 11*/ && !player.getWorld().isThundering()) ? ActionResult.FAIL : ActionResult.SUCCESS);
         }
 
-        FabricBrewingRecipeRegistryBuilder.BUILD.register(builder -> {
-            for (BrewingPotionRecipe brewingPotionRecipe : Config.INSTANCE.get().potionsConfig.recipes()) {
-                if (brewingPotionRecipe.ingredient().equals(Items.AIR)) continue;
-                builder.registerPotionRecipe(brewingPotionRecipe.input(), brewingPotionRecipe.ingredient(), brewingPotionRecipe.output());
-            }
-        });
+        for (BrewingPotionRecipe brewingPotionRecipe : Config.INSTANCE.get().potionsConfig.recipes()) {
+            if (brewingPotionRecipe.ingredient().equals(Items.AIR)) continue;
+            BrewingRecipeRegistryAccessor.registerPotionRecipe(brewingPotionRecipe.input(), brewingPotionRecipe.ingredient(), brewingPotionRecipe.output());
+        }
 
         UnruffledMod.init();
         BiomeModifications.addSpawn(

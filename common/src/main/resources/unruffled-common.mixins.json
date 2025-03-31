@@ -25,6 +25,7 @@
     "LivingEntityMixin",
     "TextDisplayEntityMixin",
     "TippedArrowRecipeMixin",
+    "WrittenBookItemMixin",
     "accessors.ItemAccessor",
     "accessors.ToolMaterialsAccessor",
     "enchanting.ChiseledBookshelfBlockEntityMixin",

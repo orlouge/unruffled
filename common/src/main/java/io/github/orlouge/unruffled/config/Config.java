@@ -197,9 +197,9 @@ public class Config {
     public record NavigationConfig(
         boolean forceReducedDebugInfo, boolean reducedDebugFacing, boolean reducedDebugBiome,
         int maxMapSize,
-        boolean recoveryCompassLocking) {
+        boolean recoveryCompassLocking, boolean compassPointsNorth, boolean compassToggleSpawn) {
         public NavigationConfig() {
-            this(false, true, true, 4, true);
+            this(false, true, true, 4, true, false, true);
         }
 
         public static final Codec<NavigationConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group(
@@ -207,7 +207,9 @@ public class Config {
             Codec.BOOL.fieldOf("show_facing_when_force_reduce_debug").forGetter(config -> config.reducedDebugFacing),
             Codec.BOOL.fieldOf("show_biome_when_force_reduce_debug").forGetter(config -> config.reducedDebugBiome),
             Codec.INT.fieldOf("max_map_size").forGetter(config -> config.maxMapSize),
-            Codec.BOOL.fieldOf("recovery_compass_locking").forGetter(config -> config.recoveryCompassLocking)
+            Codec.BOOL.fieldOf("recovery_compass_locking").forGetter(config -> config.recoveryCompassLocking),
+            Codec.BOOL.fieldOf("compass_points_north").forGetter(config -> config.compassPointsNorth),
+            Codec.BOOL.fieldOf("compass_points_north_toggle_spawn").forGetter(config -> config.compassToggleSpawn)
         ).apply(instance, NavigationConfig::new));
     }
 
