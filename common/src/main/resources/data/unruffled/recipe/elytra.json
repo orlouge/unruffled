@@ -5,12 +5,8 @@
     "P P"
   ],
   "key": {
-    "H": {
-      "item": "minecraft:tripwire_hook"
-    },
-    "P": {
-      "item": "minecraft:phantom_membrane"
-    }
+    "H": "minecraft:tripwire_hook",
+    "P": "minecraft:phantom_membrane"
   },
   "result": {
     "id": "minecraft:elytra",

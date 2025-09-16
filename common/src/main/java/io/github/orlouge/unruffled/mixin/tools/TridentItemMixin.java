@@ -7,16 +7,13 @@ import net.minecraft.item.TridentItem;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(TridentItem.class)
-public abstract class TridentItemMixin extends Item {
-    public TridentItemMixin(Settings settings) {
-        super(settings);
-    }
-
-    @Override
-    public boolean canRepair(ItemStack stack, ItemStack ingredient) {
-        return ingredient.isOf(Items.DIAMOND);
+public abstract class TridentItemMixin {
+    @ModifyVariable(method = "<init>", at = @At("LOAD"), argsOnly = true)
+    private static Item.Settings repairWithDiamond(Item.Settings settings) {
+        return settings.repairable(Items.DIAMOND);
     }
 }

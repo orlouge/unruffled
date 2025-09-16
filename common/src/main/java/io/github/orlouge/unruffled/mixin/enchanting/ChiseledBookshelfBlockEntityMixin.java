@@ -10,6 +10,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.tag.EnchantmentTags;
+import net.minecraft.storage.ReadView;
 import net.minecraft.util.collection.DefaultedList;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -22,8 +23,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class ChiseledBookshelfBlockEntityMixin {
     @Shadow @Final public DefaultedList<ItemStack> inventory;
 
-    @Inject(method = "readNbt", at = @At("TAIL"))
-    public void removeUnselectableEnchantedBooks(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup, CallbackInfo ci) {
+    @Inject(method = "readData", at = @At("TAIL"))
+    public void removeUnselectableEnchantedBooks(ReadView view, CallbackInfo ci) {
         if (!Config.INSTANCE.get().enchantmentsConfig.disenchantChiseledBookshelfBooks().orElse(false)) return;
         for (int idx = 0; idx < this.inventory.size(); idx++) {
             ItemStack stack = this.inventory.get(idx);

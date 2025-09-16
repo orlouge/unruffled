@@ -3,6 +3,8 @@ package io.github.orlouge.unruffled.mixin;
 import io.github.orlouge.unruffled.interfaces.HasFireImmunitySetting;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -15,14 +17,14 @@ public class ItemEntityMixin implements HasFireImmunitySetting {
     @Unique
     private boolean unruffled_fireImmune = false;
 
-    @Inject(method = "readCustomDataFromNbt", at = @At("TAIL"))
-    public void readFireImmunity(NbtCompound nbt, CallbackInfo ci) {
-        this.unruffled_fireImmune = nbt.getBoolean("DeathDropFireImmune");
+    @Inject(method = "readCustomData", at = @At("TAIL"))
+    public void readFireImmunity(ReadView view, CallbackInfo ci) {
+        this.unruffled_fireImmune = view.getBoolean("DeathDropFireImmune", false);
     }
 
-    @Inject(method = "writeCustomDataToNbt", at = @At("TAIL"))
-    public void writeFireImmunity(NbtCompound nbt, CallbackInfo ci) {
-        if (unruffled_fireImmune) nbt.putBoolean("DeathDropFireImmune", true);
+    @Inject(method = "writeCustomData", at = @At("TAIL"))
+    public void writeFireImmunity(WriteView view, CallbackInfo ci) {
+        if (unruffled_fireImmune) view.putBoolean("DeathDropFireImmune", true);
     }
 
     @Inject(method = "isFireImmune", at = @At("HEAD"), cancellable = true)

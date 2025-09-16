@@ -35,12 +35,14 @@ public class PlayerManagerMixin {
     public void findBackupSpawnIfNeeded(ServerPlayerEntity player, boolean alive, Entity.RemovalReason removalReason, CallbackInfoReturnable<ServerPlayerEntity> cir) {
         this.foundSpawnPoint = null;
         if (!(player instanceof HasBackupSpawnPoints backupSpawnPoints)) return;
-        HasBackupSpawnPoints.SpawnPoint originalPoint = new HasBackupSpawnPoints.SpawnPoint(player.getSpawnPointPosition(), player.getSpawnPointDimension(), player.getSpawnAngle(), player.isSpawnForced());
+        HasBackupSpawnPoints.SpawnPoint originalPoint = player.getRespawn() != null && player.getRespawn().pos() != null
+            ? new HasBackupSpawnPoints.SpawnPoint(player.getRespawn().pos(), player.getRespawn().dimension(), player.getRespawn().angle(), player.getRespawn().forced())
+            : new HasBackupSpawnPoints.SpawnPoint(null, null, 0, false);
         HasBackupSpawnPoints.SpawnPoint point = originalPoint;
         while (point != null) {
             ServerWorld backupWorld = this.server.getWorld(point.dimension());
             if (point.pos() != null && point.dimension() != null && backupWorld != null) {
-                Optional<ServerPlayerEntity.RespawnPos> respawnPos = ServerPlayerEntity.findRespawnPosition(backupWorld, point.pos(), point.angle(), point.forced(), alive);
+                Optional<ServerPlayerEntity.RespawnPos> respawnPos = ServerPlayerEntity.findRespawnPosition(backupWorld, new ServerPlayerEntity.Respawn(backupWorld.getRegistryKey(), point.pos(), point.angle(), point.forced()), alive);
                 if (respawnPos.isPresent()) {
                     this.foundSpawnPoint = new Pair<>(point, Optional.of(respawnPos.get().pos));
                     return;
@@ -49,13 +51,13 @@ public class PlayerManagerMixin {
             backupSpawnPoints.deleteBackupSpawnPoint(point);
             point = backupSpawnPoints.getTopBackupSpawnPoint();
         }
-        this.foundSpawnPoint = originalPoint.pos() == null ? null : new Pair<>(originalPoint, Optional.empty());
+        this.foundSpawnPoint = originalPoint == null || originalPoint.pos() == null ? null : new Pair<>(originalPoint, Optional.empty());
     }
 
     @Redirect(method = "respawnPlayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/network/ServerPlayerEntity;getRespawnTarget(ZLnet/minecraft/world/TeleportTarget$PostDimensionTransition;)Lnet/minecraft/world/TeleportTarget;"))
     public TeleportTarget replaceTeleportPos(ServerPlayerEntity instance, boolean alive, TeleportTarget.PostDimensionTransition postDimensionTransition) {
         if (foundSpawnPoint == null) return instance.getRespawnTarget(alive, postDimensionTransition);
-        return new TeleportTarget(instance.server.getWorld(foundSpawnPoint.getLeft().dimension()), foundSpawnPoint.getRight().orElse(Vec3d.ofCenter(foundSpawnPoint.getLeft().pos())), Vec3d.ZERO, foundSpawnPoint.getLeft().angle(), 0.0F, postDimensionTransition);
+        return new TeleportTarget(instance.getServer().getWorld(foundSpawnPoint.getLeft().dimension()), foundSpawnPoint.getRight().orElse(Vec3d.ofCenter(foundSpawnPoint.getLeft().pos())), Vec3d.ZERO, foundSpawnPoint.getLeft().angle(), 0.0F, postDimensionTransition);
     }
 
     @Inject(method = "respawnPlayer", at = @At(value = "RETURN"))

@@ -1,6 +1,5 @@
 accessWidener   v2  named
 accessible method net/minecraft/client/network/ClientPlayerEntity canSprint ()Z
-mutable field net/minecraft/item/ToolMaterials itemDurability I
 accessible field net/minecraft/entity/effect/StatusEffectInstance duration I
 accessible field net/minecraft/block/entity/BrewingStandBlockEntity brewTime I
 accessible field net/minecraft/block/entity/BrewingStandBlockEntity inventory Lnet/minecraft/util/collection/DefaultedList;
@@ -9,25 +8,22 @@ accessible method net/minecraft/block/entity/BrewingStandBlockEntity canCraft (L
 accessible field net/minecraft/block/entity/BrewingStandBlockEntity fuel I
 accessible class net/minecraft/village/TradeOffers$SellItemFactory
 accessible class net/minecraft/village/TradeOffers$BuyItemFactory
-accessible method net/minecraft/client/gui/DrawContext drawTexturedQuad (Lnet/minecraft/util/Identifier;IIIIIFFFFFFFF)V
 accessible method net/minecraft/block/entity/BrewingStandBlockEntity craft (Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/collection/DefaultedList;)V
 accessible method net/minecraft/entity/Entity getVelocityAffectingPos ()Lnet/minecraft/util/math/BlockPos;
 accessible class net/minecraft/village/TradeOffers$SellMapFactory
 accessible class net/minecraft/village/TradeOffers$SellDyedArmorFactory
-accessible field net/minecraft/block/DecoratedPotBlock FACING Lnet/minecraft/state/property/DirectionProperty;
 accessible method net/minecraft/entity/Entity setRotation (FF)V
 accessible method net/minecraft/entity/decoration/ItemFrameEntity setRotation (IZ)V
 accessible field net/minecraft/block/entity/ChiseledBookshelfBlockEntity inventory Lnet/minecraft/util/collection/DefaultedList;
 accessible field net/minecraft/world/WanderingTraderManager spawnChance I
 accessible field net/minecraft/world/WanderingTraderManager spawnDelay I
-mutable field net/minecraft/client/item/CompassAnglePredicateProvider compassTarget Lnet/minecraft/client/item/CompassAnglePredicateProvider$CompassTarget;
 accessible method net/minecraft/entity/projectile/PersistentProjectileEntity setPierceLevel (B)V
 accessible field net/minecraft/loot/LootTable pools Ljava/util/List;
-accessible method net/minecraft/server/network/ServerPlayerEntity findRespawnPosition (Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/util/math/BlockPos;FZZ)Ljava/util/Optional;
+accessible method net/minecraft/server/network/ServerPlayerEntity findRespawnPosition (Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/server/network/ServerPlayerEntity$Respawn;Z)Ljava/util/Optional;
 accessible class net/minecraft/server/network/ServerPlayerEntity$RespawnPos
 accessible field net/minecraft/server/network/ServerPlayerEntity$RespawnPos pos Lnet/minecraft/util/math/Vec3d;
-accessible field net/minecraft/client/gui/hud/InGameHud EXPERIENCE_BAR_BACKGROUND_TEXTURE Lnet/minecraft/util/Identifier;
-accessible field net/minecraft/client/gui/hud/InGameHud EXPERIENCE_BAR_PROGRESS_TEXTURE Lnet/minecraft/util/Identifier;
-accessible field net/minecraft/client/gui/DrawContext guiAtlasManager Lnet/minecraft/client/texture/GuiAtlasManager;
 accessible field net/minecraft/block/entity/DecoratedPotBlockEntity sherds Lnet/minecraft/block/entity/Sherds;
 accessible method net/minecraft/entity/decoration/DisplayEntity setBillboardMode (Lnet/minecraft/entity/decoration/DisplayEntity$BillboardMode;)V
+accessible field net/minecraft/entity/projectile/PersistentProjectileEntity damage D
+accessible field net/minecraft/client/gui/hud/bar/ExperienceBar BACKGROUND Lnet/minecraft/util/Identifier;
+accessible field net/minecraft/client/gui/hud/bar/ExperienceBar PROGRESS Lnet/minecraft/util/Identifier;

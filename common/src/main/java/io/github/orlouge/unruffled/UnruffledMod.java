@@ -18,9 +18,9 @@ import io.github.orlouge.unruffled.worldgen.UndergroundCabinFeature;
 import io.github.orlouge.unruffled.worldgen.UndergroundPondFeature;
 import net.minecraft.block.Block;
 import net.minecraft.component.ComponentChanges;
-import net.minecraft.component.ComponentMapImpl;
 import net.minecraft.component.ComponentType;
 import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.MergedComponentMap;
 import net.minecraft.component.type.LoreComponent;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.Enchantments;
@@ -97,28 +97,28 @@ public class UnruffledMod {
     public static StructurePieceType NORTHBOUND_GATE_STRUCTURE_PIECE = Registry.register(Registries.STRUCTURE_PIECE, Identifier.of(UnruffledMod.MOD_ID, "northbound_gate_piece"), (StructurePieceType.Simple) NorthboundGateStructure.Piece::new);
 
     public static final RegistryEntry<StatusEffect> HIDDEN_SLOWNESS_EFFECT = Registry.registerReference(Registries.STATUS_EFFECT, Identifier.of(UnruffledMod.MOD_ID, "hidden_slowness"), new StatusEffect(StatusEffectCategory.HARMFUL, 0x2a7080) {}
-        .addAttributeModifier(EntityAttributes.GENERIC_MOVEMENT_SPEED, Identifier.of(UnruffledMod.MOD_ID, "hidden_slowness"), -0.50, EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL)
-        .addAttributeModifier(EntityAttributes.GENERIC_ATTACK_SPEED, Identifier.of(UnruffledMod.MOD_ID, "hidden_slowness"), -0.50, EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
+        .addAttributeModifier(EntityAttributes.MOVEMENT_SPEED, Identifier.of(UnruffledMod.MOD_ID, "hidden_slowness"), -0.50, EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL)
+        .addAttributeModifier(EntityAttributes.ATTACK_SPEED, Identifier.of(UnruffledMod.MOD_ID, "hidden_slowness"), -0.50, EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
     public static final RegistryEntry<StatusEffect> TELEPORTATION_EFFECT = Registry.registerReference(Registries.STATUS_EFFECT, Identifier.of(UnruffledMod.MOD_ID, "teleportation"), new TeleportEffect()
-        .addAttributeModifier(EntityAttributes.GENERIC_MOVEMENT_SPEED, Identifier.of(UnruffledMod.MOD_ID, "teleport_slowness"), -0.50, EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL)
-        .addAttributeModifier(EntityAttributes.GENERIC_ATTACK_SPEED, Identifier.of(UnruffledMod.MOD_ID, "teleport_fatigue"), -0.50, EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
+        .addAttributeModifier(EntityAttributes.MOVEMENT_SPEED, Identifier.of(UnruffledMod.MOD_ID, "teleport_slowness"), -0.50, EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL)
+        .addAttributeModifier(EntityAttributes.ATTACK_SPEED, Identifier.of(UnruffledMod.MOD_ID, "teleport_fatigue"), -0.50, EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
     public static final RegistryEntry<StatusEffect> SILENCE_EFFECT = Registry.registerReference(Registries.STATUS_EFFECT, Identifier.of(UnruffledMod.MOD_ID, "silence"), new StatusEffect(StatusEffectCategory.NEUTRAL, 0x0a5060) {}
-        .addAttributeModifier(EntityAttributes.GENERIC_MOVEMENT_SPEED, Identifier.of(UnruffledMod.MOD_ID, "silence_slowness"), -0.50, EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL)
-        .addAttributeModifier(EntityAttributes.GENERIC_ATTACK_SPEED, Identifier.of(UnruffledMod.MOD_ID, "silence_fatigue"), -0.50, EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL)
+        .addAttributeModifier(EntityAttributes.MOVEMENT_SPEED, Identifier.of(UnruffledMod.MOD_ID, "silence_slowness"), -0.50, EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL)
+        .addAttributeModifier(EntityAttributes.ATTACK_SPEED, Identifier.of(UnruffledMod.MOD_ID, "silence_fatigue"), -0.50, EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL)
     );
 
-    public static final RegistryEntry<Potion> TERRIBLE_POTION = Registry.registerReference(Registries.POTION, Identifier.of(UnruffledMod.MOD_ID, "terrible"), new Potion(new StatusEffectInstance(HIDDEN_SLOWNESS_EFFECT, 100, 0, false, false, false)));
-    public static final RegistryEntry<Potion> TELEPORTATION_POTION = Registry.registerReference(Registries.POTION, Identifier.of(UnruffledMod.MOD_ID, "teleportation"), new Potion(new StatusEffectInstance(TELEPORTATION_EFFECT, 100, 0)));
-    public static final RegistryEntry<Potion> SILENCE_POTION = Registry.registerReference(Registries.POTION, Identifier.of(UnruffledMod.MOD_ID, "silence"), new Potion(new StatusEffectInstance(SILENCE_EFFECT, 600, 0)));
-    public static final RegistryEntry<Potion> LONG_SILENCE_POTION = Registry.registerReference(Registries.POTION, Identifier.of(UnruffledMod.MOD_ID, "long_silence"), new Potion(new StatusEffectInstance(SILENCE_EFFECT, 1800, 0)));
-    public static final RegistryEntry<Potion> FATIGUE_POTION = Registry.registerReference(Registries.POTION, Identifier.of(UnruffledMod.MOD_ID, "fatigue"), new Potion(new StatusEffectInstance(StatusEffects.MINING_FATIGUE, 1800, 0)));
-    public static final RegistryEntry<Potion> STRONG_FATIGUE_POTION = Registry.registerReference(Registries.POTION, Identifier.of(UnruffledMod.MOD_ID, "strong_fatigue"), new Potion(new StatusEffectInstance(StatusEffects.MINING_FATIGUE, 1800, 2)));
-    public static final RegistryEntry<Potion> LONG_FATIGUE_POTION = Registry.registerReference(Registries.POTION, Identifier.of(UnruffledMod.MOD_ID, "long_fatigue"), new Potion(new StatusEffectInstance(StatusEffects.MINING_FATIGUE, 4800, 0)));
-    public static final RegistryEntry<Potion> HASTE_POTION = Registry.registerReference(Registries.POTION, Identifier.of(UnruffledMod.MOD_ID, "haste"), new Potion(new StatusEffectInstance(StatusEffects.HASTE, 1800, 0)));
-    public static final RegistryEntry<Potion> STRONG_HASTE_POTION = Registry.registerReference(Registries.POTION, Identifier.of(UnruffledMod.MOD_ID, "strong_haste"), new Potion(new StatusEffectInstance(StatusEffects.HASTE, 1800, 1)));
-    public static final RegistryEntry<Potion> LONG_HASTE_POTION = Registry.registerReference(Registries.POTION, Identifier.of(UnruffledMod.MOD_ID, "long_haste"), new Potion(new StatusEffectInstance(StatusEffects.HASTE, 4800, 0)));
+    public static final RegistryEntry<Potion> TERRIBLE_POTION = Registry.registerReference(Registries.POTION, Identifier.of(UnruffledMod.MOD_ID, "terrible"), new Potion("terrible", new StatusEffectInstance(HIDDEN_SLOWNESS_EFFECT, 100, 0, false, false, false)));
+    public static final RegistryEntry<Potion> TELEPORTATION_POTION = Registry.registerReference(Registries.POTION, Identifier.of(UnruffledMod.MOD_ID, "teleportation"), new Potion("teleportation", new StatusEffectInstance(TELEPORTATION_EFFECT, 100, 0)));
+    public static final RegistryEntry<Potion> SILENCE_POTION = Registry.registerReference(Registries.POTION, Identifier.of(UnruffledMod.MOD_ID, "silence"), new Potion("silence", new StatusEffectInstance(SILENCE_EFFECT, 600, 0)));
+    public static final RegistryEntry<Potion> LONG_SILENCE_POTION = Registry.registerReference(Registries.POTION, Identifier.of(UnruffledMod.MOD_ID, "long_silence"), new Potion("long_silence", new StatusEffectInstance(SILENCE_EFFECT, 1800, 0)));
+    public static final RegistryEntry<Potion> FATIGUE_POTION = Registry.registerReference(Registries.POTION, Identifier.of(UnruffledMod.MOD_ID, "fatigue"), new Potion("fatigue", new StatusEffectInstance(StatusEffects.MINING_FATIGUE, 1800, 0)));
+    public static final RegistryEntry<Potion> STRONG_FATIGUE_POTION = Registry.registerReference(Registries.POTION, Identifier.of(UnruffledMod.MOD_ID, "strong_fatigue"), new Potion("strong_fatigue", new StatusEffectInstance(StatusEffects.MINING_FATIGUE, 1800, 2)));
+    public static final RegistryEntry<Potion> LONG_FATIGUE_POTION = Registry.registerReference(Registries.POTION, Identifier.of(UnruffledMod.MOD_ID, "long_fatigue"), new Potion("long_fatigue", new StatusEffectInstance(StatusEffects.MINING_FATIGUE, 4800, 0)));
+    public static final RegistryEntry<Potion> HASTE_POTION = Registry.registerReference(Registries.POTION, Identifier.of(UnruffledMod.MOD_ID, "haste"), new Potion("haste", new StatusEffectInstance(StatusEffects.HASTE, 1800, 0)));
+    public static final RegistryEntry<Potion> STRONG_HASTE_POTION = Registry.registerReference(Registries.POTION, Identifier.of(UnruffledMod.MOD_ID, "strong_haste"), new Potion("strong_haste", new StatusEffectInstance(StatusEffects.HASTE, 1800, 1)));
+    public static final RegistryEntry<Potion> LONG_HASTE_POTION = Registry.registerReference(Registries.POTION, Identifier.of(UnruffledMod.MOD_ID, "long_haste"), new Potion("long_haste", new StatusEffectInstance(StatusEffects.HASTE, 4800, 0)));
 
-    public static final ComponentType<Boolean> LOCKED_COMPASS_COMPONENT = ComponentType.<Boolean>builder().codec(Codec.BOOL).packetCodec(PacketCodecs.BOOL).build();
+    public static final ComponentType<Boolean> LOCKED_COMPASS_COMPONENT = ComponentType.<Boolean>builder().codec(Codec.BOOL).packetCodec(PacketCodecs.BOOLEAN).build();
 
     public static final Set<RegistryKey<Enchantment>> DEFAULT_DISABLED_ENCHANTMENTS = Set.of(
             Enchantments.PROTECTION, Enchantments.FIRE_PROTECTION, Enchantments.PROJECTILE_PROTECTION, Enchantments.BLAST_PROTECTION,
@@ -262,15 +262,15 @@ public class UnruffledMod {
         if (stackSizeConfig.foodStackSize() != 64) {
             for (Item item : Registries.ITEM.stream().toList()) {
                 if (item.getComponents().contains(DataComponentTypes.FOOD) && item.getMaxCount() > 16) {
-                    ((ItemAccessor) item).setComponents(ComponentMapImpl.create(item.getComponents(), ComponentChanges.builder().add(DataComponentTypes.MAX_STACK_SIZE, stackSizeConfig.foodStackSize()).build()));
+                    ((ItemAccessor) item).setComponents(MergedComponentMap.create(item.getComponents(), ComponentChanges.builder().add(DataComponentTypes.MAX_STACK_SIZE, stackSizeConfig.foodStackSize()).build()));
                 }
                 if (item instanceof TridentItem) {
-                    ((ItemAccessor) item).setComponents(ComponentMapImpl.create(item.getComponents(), ComponentChanges.builder().add(DataComponentTypes.MAX_DAMAGE, item.getComponents().get(DataComponentTypes.MAX_DAMAGE) * 4).build()));
+                    ((ItemAccessor) item).setComponents(MergedComponentMap.create(item.getComponents(), ComponentChanges.builder().add(DataComponentTypes.MAX_DAMAGE, item.getComponents().get(DataComponentTypes.MAX_DAMAGE) * 4).build()));
                 }
             }
         }
         for (Map.Entry<Item, Integer> itemStackSize : stackSizeConfig.itemStackSize().entrySet()) {
-            ((ItemAccessor) itemStackSize.getKey()).setComponents(ComponentMapImpl.create(itemStackSize.getKey().getComponents(), ComponentChanges.builder().add(DataComponentTypes.MAX_STACK_SIZE, itemStackSize.getValue()).build()));
+            ((ItemAccessor) itemStackSize.getKey()).setComponents(MergedComponentMap.create(itemStackSize.getKey().getComponents(), ComponentChanges.builder().add(DataComponentTypes.MAX_STACK_SIZE, itemStackSize.getValue()).build()));
         }
         //((ItemAccessor) Items.POTION).setMaxCount(16);
         //((ToolMaterialsAccessor) (Object) ToolMaterials.GOLD).setItemDurability(200);

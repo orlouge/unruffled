@@ -80,7 +80,7 @@ public abstract class WanderingTraderEntityMixin extends MerchantEntity implemen
     @Inject(method = "fillRecipes", at = @At("HEAD"), cancellable = true)
     public void addOffersOnFill(CallbackInfo ci) {
         if (this.offers != null) {
-            Config.INSTANCE.get().tradesConfig.wanderingTraderTrades().ifPresent(
+            io.github.orlouge.unruffled.config.Config.INSTANCE.get().tradesConfig.wanderingTraderTrades().ifPresent(
                 trades -> {
                     if (trades.enabled().orElse(true)) {
                         for (Trades.ConfiguredWanderingTraderPool pool : trades.pools()) {
@@ -92,7 +92,7 @@ public abstract class WanderingTraderEntityMixin extends MerchantEntity implemen
                 }
             );
         }
-        if (!Config.INSTANCE.get().tradesConfig.wanderingTraderTrades().flatMap(Trades.ConfiguredWanderingTraderTrades::addVanilla).orElse(true)) {
+        if (!io.github.orlouge.unruffled.config.Config.INSTANCE.get().tradesConfig.wanderingTraderTrades().flatMap(Trades.ConfiguredWanderingTraderTrades::addVanilla).orElse(true)) {
             ci.cancel();
         }
     }

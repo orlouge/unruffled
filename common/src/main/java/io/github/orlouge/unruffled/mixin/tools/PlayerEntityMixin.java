@@ -28,20 +28,18 @@ public abstract class PlayerEntityMixin extends LivingEntity {
         super(entityType, world);
     }
 
-    @Shadow public abstract ItemStack getEquippedStack(EquipmentSlot slot);
-
     @Shadow public abstract boolean isCreative();
 
     @Shadow public abstract boolean isSpectator();
 
-    @Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;updateTurtleHelmet()V", shift = At.Shift.AFTER))
+    @Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;isSubmergedIn(Lnet/minecraft/registry/tag/TagKey;)Z", shift = At.Shift.BY))
     public void updateBadOmenEvilTotem(CallbackInfo ci) {
         unruffled_lastBadOmenCheckTicks++;
         if (unruffled_lastBadOmenCheckTicks > 15) {
-            if (this.getEquippedStack(EquipmentSlot.OFFHAND).isOf(CustomItems.EVIL_TOTEM) && Config.INSTANCE.get().mechanicsConfig.badOmenFromEvilTotem()) {
+            if (this.getEquippedStack(EquipmentSlot.OFFHAND).isOf(CustomItems.EVIL_TOTEM) && io.github.orlouge.unruffled.config.Config.INSTANCE.get().mechanicsConfig.badOmenFromEvilTotem()) {
                 unruffled_accumulatedBadOmenTicks += unruffled_lastBadOmenCheckTicks;
                 if ((Object) this instanceof ServerPlayerEntity serverPlayer) {
-                    if (serverPlayer.getServerWorld().getRaidAt(this.getBlockPos()) == null) {
+                    if (serverPlayer.getWorld().getRaidAt(this.getBlockPos()) == null) {
                         this.addStatusEffect(new StatusEffectInstance(StatusEffects.BAD_OMEN, -1, MathHelper.clamp(unruffled_accumulatedBadOmenTicks / 6000, 0, 4), false, false, true));
                     } else {
                         this.removeStatusEffect(StatusEffects.BAD_OMEN);
@@ -56,7 +54,7 @@ public abstract class PlayerEntityMixin extends LivingEntity {
 
     @Inject(method = "hasReducedDebugInfo", at = @At("HEAD"), cancellable = true)
     public void overrideReducedDebugInfo(CallbackInfoReturnable<Boolean> cir) {
-        if (Config.INSTANCE.get().navigationConfig.forceReducedDebugInfo() && !this.isCreative() && !this.isSpectator()) {
+        if (io.github.orlouge.unruffled.config.Config.INSTANCE.get().navigationConfig.forceReducedDebugInfo() && !this.isCreative() && !this.isSpectator()) {
             cir.setReturnValue(true);
             cir.cancel();
         }

@@ -4,10 +4,10 @@ import io.github.orlouge.unruffled.UnruffledMod;
 import io.github.orlouge.unruffled.interfaces.TeleporterEntity;
 import io.github.orlouge.unruffled.potions.TeleportEffect;
 import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.ConsumableComponent;
 import net.minecraft.component.type.PotionContentsComponent;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.PotionItem;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.world.World;
@@ -18,10 +18,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.stream.StreamSupport;
 
-@Mixin(PotionItem.class)
-public class PotionItemMixin {
-    @Inject(method = "finishUsing", at = @At("HEAD"), cancellable = true)
-    public void checkTeleport(ItemStack stack, World world, LivingEntity user, CallbackInfoReturnable<ItemStack> cir) {
+@Mixin(ConsumableComponent.class)
+public class ConsumableComponentMixin {
+    @Inject(method = "finishConsumption", at = @At("HEAD"), cancellable = true)
+    public void checkTeleport(World world, LivingEntity user, ItemStack stack, CallbackInfoReturnable<ItemStack> cir) {
         if (StreamSupport.stream(stack.getOrDefault(DataComponentTypes.POTION_CONTENTS, PotionContentsComponent.DEFAULT).getEffects().spliterator(), false)
             .anyMatch(eff -> eff.equals(UnruffledMod.TELEPORTATION_EFFECT))) {
             if (world.isClient) {

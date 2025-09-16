@@ -9,6 +9,8 @@ import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.decoration.DisplayEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtHelper;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -40,17 +42,16 @@ public abstract class TextDisplayEntityMixin extends DisplayEntity implements Ha
         builder.add(ATTACHED_LODESTONE, Optional.empty());
     }
 
-    @Inject(method = "readCustomDataFromNbt", at = @At("TAIL"))
-    public void readLodestone(NbtCompound nbt, CallbackInfo ci) {
-        if (nbt.contains("attached_lodestone")) {
-            this.dataTracker.set(ATTACHED_LODESTONE, NbtHelper.toBlockPos(nbt, "attached_lodestone"));
-        }
+    @Inject(method = "readCustomData", at = @At("TAIL"))
+    public void readLodestone(ReadView view, CallbackInfo ci) {
+        Optional<BlockPos> pos = view.read("attached_lodestone", BlockPos.CODEC);
+        this.dataTracker.set(ATTACHED_LODESTONE, pos);
     }
 
-    @Inject(method = "writeCustomDataToNbt", at = @At("TAIL"))
-    public void writeLodestone(NbtCompound nbt, CallbackInfo ci) {
+    @Inject(method = "writeCustomData", at = @At("TAIL"))
+    public void writeLodestone(WriteView view, CallbackInfo ci) {
         if (this.dataTracker.get(ATTACHED_LODESTONE).isPresent()) {
-            nbt.put("attached_lodestone", NbtHelper.fromBlockPos(this.dataTracker.get(ATTACHED_LODESTONE).get()));
+            view.put("attached_lodestone", BlockPos.CODEC, this.dataTracker.get(ATTACHED_LODESTONE).get());
         }
     }
 

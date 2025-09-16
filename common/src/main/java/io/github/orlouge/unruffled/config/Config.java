@@ -151,13 +151,13 @@ public class Config {
 
     public record EnchantmentsConfig(
         boolean disableEnchantingTable, boolean disableGrindstone, boolean disableRepairXpCost, boolean disableGlint, boolean showLevelNumber,
-        Optional<Boolean> disenchantChiseledBookshelfBooks, Optional<Boolean> filterStructureItemFrames, Optional<Boolean> filterStructureChiseledBookshelves, Optional<Boolean> filterStructureDecoratedPots,
+        Optional<Boolean> disenchantChiseledBookshelfBooks, /* Optional<Boolean> filterStructureItemFrames, Optional<Boolean> filterStructureChiseledBookshelves, Optional<Boolean> filterStructureDecoratedPots, */
         Set<RegistryKey<Enchantment>> disabledEnchantments, Map<Item, Map<RegistryKey<Enchantment>, Integer>> itemEnchantments) {
 
         public EnchantmentsConfig() {
             this(
                 true, true, true, true, false,
-                Optional.of(false), Optional.of(true), Optional.of(true), Optional.of(true),
+                Optional.of(false), /* Optional.of(true), Optional.of(true), Optional.of(true), */
                 UnruffledMod.DEFAULT_DISABLED_ENCHANTMENTS, UnruffledMod.DEFAULT_ITEM_ENCHANTMENTS);
         }
 
@@ -170,9 +170,9 @@ public class Config {
             Codec.BOOL.fieldOf("disable_glint").forGetter(EnchantmentsConfig::disableGlint),
             Codec.BOOL.fieldOf("display_xp_level_over_bar").forGetter(EnchantmentsConfig::showLevelNumber),
             Codec.BOOL.optionalFieldOf("disenchant_chiseled_bookshelf_books").forGetter(EnchantmentsConfig::disenchantChiseledBookshelfBooks),
-            Codec.BOOL.optionalFieldOf("filter_structure_item_frames").forGetter(EnchantmentsConfig::filterStructureItemFrames),
-            Codec.BOOL.optionalFieldOf("filter_structure_chiseled_bookshelves").forGetter(EnchantmentsConfig::filterStructureChiseledBookshelves),
-            Codec.BOOL.optionalFieldOf("filter_structure_decorated_pots").forGetter(EnchantmentsConfig::filterStructureDecoratedPots),
+            //Codec.BOOL.optionalFieldOf("filter_structure_item_frames").forGetter(EnchantmentsConfig::filterStructureItemFrames),
+            //Codec.BOOL.optionalFieldOf("filter_structure_chiseled_bookshelves").forGetter(EnchantmentsConfig::filterStructureChiseledBookshelves),
+            //Codec.BOOL.optionalFieldOf("filter_structure_decorated_pots").forGetter(EnchantmentsConfig::filterStructureDecoratedPots),
             ENCHANTMENT_SET_CODEC.fieldOf("disabled_enchantments").forGetter(config -> config.disabledEnchantments),
             Codec.unboundedMap(Registries.ITEM.getCodec(), ENCHANTMENT_MAP_CODEC).fieldOf("intrinsic_enchantments").forGetter(config -> config.itemEnchantments)
             ).apply(instance, EnchantmentsConfig::new)
@@ -275,7 +275,7 @@ public class Config {
         public static final Codec<LootConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Codec.unboundedMap(RegistryKey.createCodec(RegistryKeys.LOOT_TABLE), new ListCodec<>(Codecs.rangedInt(1, 50), 0, 50)).fieldOf("ancient_codices_numbers_chest").forGetter(config -> config.lootCodicesAdd),
             Codec.unboundedMap(RegistryKey.createCodec(RegistryKeys.LOOT_TABLE), new ListCodec<>(Codecs.rangedInt(1, 50), 0, 50)).fieldOf("ancient_codices_numbers_archaeology").forGetter(config -> config.lootCodicesModify),
-            Codec.unboundedMap(RegistryKey.createCodec(RegistryKeys.LOOT_TABLE), new ListCodec<>(Codecs.NONNEGATIVE_INT, 0, 2)).fieldOf("assorted_potions_chest").forGetter(config -> config.assortedPotionsAdd)
+            Codec.unboundedMap(RegistryKey.createCodec(RegistryKeys.LOOT_TABLE), new ListCodec<>(Codecs.NON_NEGATIVE_INT, 0, 2)).fieldOf("assorted_potions_chest").forGetter(config -> config.assortedPotionsAdd)
         ).apply(instance, LootConfig::new));
     }
 

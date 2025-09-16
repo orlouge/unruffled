@@ -1,5 +1,7 @@
 package io.github.orlouge.unruffled.utils;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.orlouge.unruffled.config.Config;
 import io.github.orlouge.unruffled.UnruffledMod;
 import net.minecraft.nbt.NbtCompound;
@@ -7,38 +9,38 @@ import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtHelper;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.util.Uuids;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.PersistentState;
 import net.minecraft.world.PersistentStateManager;
+import net.minecraft.world.PersistentStateType;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class PeacefulChunks extends PersistentState {
     public static final int PEACEFUL_RANGE = 7;
-    private final Map<ChunkPos, Set<UUID>> chunkPlayerMap = new HashMap<>();
-    private final Map<UUID, ChunkPos> playerCenterMap = new HashMap<>();
-    private static final PersistentState.Type<PeacefulChunks> TYPE = new Type<>(
-        PeacefulChunks::new, PeacefulChunks::new, null
+    private final HashMap<ChunkPos, HashSet<UUID>> chunkPlayerMap;
+    private final HashMap<UUID, ChunkPos> playerCenterMap;
+    public static final Codec<PeacefulChunks> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+        ExtraCodecs.mapAsListOfPairs(ChunkPos.CODEC, Codec.list(Uuids.STRING_CODEC)).xmap(
+            mapOfLists -> new HashMap<>(mapOfLists.entrySet().stream().collect(Collectors.toMap(e -> e.getKey(), e -> new HashSet<UUID>(e.getValue())))),
+            mapOfSets -> new HashMap<>(mapOfSets.entrySet().stream().collect(Collectors.toMap(e -> e.getKey(), e -> new ArrayList<>(e.getValue()))))
+        ).fieldOf("chunks").forGetter(state -> state.chunkPlayerMap),
+        Codec.unboundedMap(Uuids.STRING_CODEC, ChunkPos.CODEC).fieldOf("centers").forGetter(state -> state.playerCenterMap)
+    ).apply(instance, PeacefulChunks::new));
+    private static final PersistentStateType<PeacefulChunks> TYPE = new PersistentStateType<>(
+        UnruffledMod.MOD_ID + "_peaceful_chunks", PeacefulChunks::new, CODEC, null
     );
 
-    public PeacefulChunks() {}
+    public PeacefulChunks() {
+        this.chunkPlayerMap = new HashMap<>();
+        this.playerCenterMap = new HashMap<>();
+    }
 
-    public PeacefulChunks(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        for (NbtElement chunkElement : nbt.getList("chunks", NbtElement.COMPOUND_TYPE)) {
-            NbtCompound chunkEntry = (NbtCompound) chunkElement;
-            ChunkPos pos = new ChunkPos(chunkEntry.getInt("x"), chunkEntry.getInt("z"));
-            Set<UUID> uuids = new HashSet<>();
-            for (NbtElement uuidElement : chunkEntry.getList("uuids", NbtElement.INT_ARRAY_TYPE)) {
-                uuids.add(NbtHelper.toUuid(uuidElement));
-            }
-            chunkPlayerMap.put(pos, uuids);
-        }
-
-        for (NbtElement centerElement : nbt.getList("centers", NbtElement.COMPOUND_TYPE)) {
-            NbtCompound centerEntry = (NbtCompound) centerElement;
-            ChunkPos pos = new ChunkPos(centerEntry.getInt("x"), centerEntry.getInt("z"));
-            playerCenterMap.put(centerEntry.getUuid("uuid"), pos);
-        }
+    public PeacefulChunks(Map<ChunkPos, HashSet<UUID>> chunks, Map<UUID, ChunkPos> centers) {
+        this.chunkPlayerMap = new HashMap<>(chunks);
+        this.playerCenterMap = new HashMap<>(centers);
     }
 
     public void add(UUID uuid, ChunkPos pos, int range) {
@@ -81,43 +83,14 @@ public class PeacefulChunks extends PersistentState {
     }
 
     public boolean isPeaceful(ChunkPos pos) {
-        return Config.INSTANCE.get().mechanicsConfig.peacefulChunks() && !this.chunkPlayerMap.getOrDefault(pos, Collections.emptySet()).isEmpty();
+        return Config.INSTANCE.get().mechanicsConfig.peacefulChunks() && !this.chunkPlayerMap.getOrDefault(pos, new HashSet<>()).isEmpty();
     }
 
     public Set<UUID> peacefulChunkBedOwners(ChunkPos pos) {
-        return Config.INSTANCE.get().mechanicsConfig.peacefulChunks() ? this.chunkPlayerMap.getOrDefault(pos, Collections.emptySet()) : Collections.emptySet();
+        return Config.INSTANCE.get().mechanicsConfig.peacefulChunks() ? this.chunkPlayerMap.getOrDefault(pos, new HashSet<>()) : Collections.emptySet();
     }
 
     public static PeacefulChunks get(PersistentStateManager persistentStateManager) {
-        return persistentStateManager.getOrCreate(TYPE, UnruffledMod.MOD_ID + "_peaceful_chunks");
-    }
-
-    @Override
-    public NbtCompound writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        NbtList chunkList = new NbtList();
-        for (Map.Entry<ChunkPos, Set<UUID>> entry : this.chunkPlayerMap.entrySet()) {
-            if (entry.getValue().size() == 0) continue;
-            NbtCompound chunkEntry = new NbtCompound();
-            chunkEntry.putInt("x", entry.getKey().x);
-            chunkEntry.putInt("z", entry.getKey().z);
-            NbtList uuidList = new NbtList();
-            for (UUID uuid : entry.getValue()) {
-                uuidList.add(NbtHelper.fromUuid(uuid));
-            }
-            chunkEntry.put("uuids", uuidList);
-            chunkList.add(chunkEntry);
-        }
-        nbt.put("chunks", chunkList);
-
-        NbtList centerList = new NbtList();
-        for (Map.Entry<UUID, ChunkPos> entry : this.playerCenterMap.entrySet()) {
-            NbtCompound centerEntry = new NbtCompound();
-            centerEntry.putUuid("uuid", entry.getKey());
-            centerEntry.putInt("x", entry.getValue().x);
-            centerEntry.putInt("z", entry.getValue().z);
-            centerList.add(centerEntry);
-        }
-        nbt.put("centers", centerList);
-        return nbt;
+        return persistentStateManager.getOrCreate(TYPE);
     }
 }

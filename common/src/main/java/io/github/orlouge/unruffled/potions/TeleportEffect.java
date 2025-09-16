@@ -46,9 +46,9 @@ public class TeleportEffect extends StatusEffect  {
     }
 
     @Override
-    public boolean applyUpdateEffect(LivingEntity entity, int amplifier) {
+    public boolean applyUpdateEffect(ServerWorld world, LivingEntity entity, int amplifier) {
         if (entity instanceof TeleporterEntity teleporter && teleporter.isTeleporting() && entity instanceof ServerPlayerEntity player) {
-            ServerWorld playerWorld = player.getServerWorld();
+            ServerWorld playerWorld = player.getWorld();
             Collection<Entity> teleportTargets = teleporter.getTeleportTargets();
             teleporter.clearTeleporting();
             Optional<Pair<ServerWorld, Pair<BlockPos, Vec3d>>> teleportPosWorld = getTeleportPos(player);
@@ -60,13 +60,13 @@ public class TeleportEffect extends StatusEffect  {
                 float yaw = (float) MathHelper.atan2(deltaVec.getZ(), deltaVec.getX()) * 57 + 90;
                 float pitch = (float) Math.asin(MathHelper.clamp(deltaVec.getY(), -1, 1)) * 57;
                 for (Entity targetEntity : teleportTargets) {
-                    targetEntity.teleport(targetWorld, teleportPos.getX(), teleportPos.getY(), teleportPos.getZ(), new HashSet<>(), yaw, pitch);
+                    targetEntity.teleport(targetWorld, teleportPos.getX(), teleportPos.getY(), teleportPos.getZ(), new HashSet<>(), yaw, pitch, false);
                     if (targetEntity instanceof PigEntity && targetWorld != playerWorld && targetWorld.getDimensionEntry().getKey().map(k -> k.equals(DimensionTypes.THE_END)).orElse(false)) {
                         UnruffledMod.PIG_TELEPORTATION_CRITERION.trigger(player);
                     }
                 }
                 teleporter.setTeleportCooldown(200);
-                player.teleport(targetWorld, teleportPos.getX(), teleportPos.getY(), teleportPos.getZ(), yaw, pitch);
+                player.teleport(targetWorld, teleportPos.getX(), teleportPos.getY(), teleportPos.getZ(), new HashSet<>(), yaw, pitch, false);
                 targetWorld.playSound(null, lodestonePos, SoundEvents.ITEM_CHORUS_FRUIT_TELEPORT, SoundCategory.PLAYERS, 1f, 1f);
                 UnruffledMod.TELEPORTATION_CRITERION.trigger(player);
                 return false;
@@ -76,7 +76,7 @@ public class TeleportEffect extends StatusEffect  {
     }
 
     public static Optional<Pair<ServerWorld, Pair<BlockPos, Vec3d>>> getTeleportPos(ServerPlayerEntity player) {
-        ServerWorld playerWorld = player.getServerWorld();
+        ServerWorld playerWorld = player.getWorld();
         ServerWorld targetWorld = null;
         BlockPos targetPos = null;
         boolean hasCompass = false;
@@ -120,7 +120,7 @@ public class TeleportEffect extends StatusEffect  {
                 for (int y = up > 0 ? 0 : 1; y <= 2; y++) {
                     for (int x = -2; x <= 2; x++) {
                         for (int z = -2; z <= 2; z++) {
-                            teleportPos = ServerPlayerEntity.findRespawnPosition(targetWorld, targetPos.add(x, y * up, z), 0f, true, true).map(r -> r.pos);
+                            teleportPos = ServerPlayerEntity.findRespawnPosition(targetWorld, new ServerPlayerEntity.Respawn(targetWorld.getRegistryKey(), targetPos.add(x, y * up, z), 0f, true), true).map(r -> r.pos);
                             if (teleportPos.isPresent()) break found;
                         }
                     }

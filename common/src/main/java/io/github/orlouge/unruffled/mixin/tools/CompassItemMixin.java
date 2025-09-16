@@ -34,11 +34,11 @@ public class CompassItemMixin extends Item {
             )
         ) {
             ItemStack buyStack = stack.copyComponentsToNewStack(Items.COMPASS, 1);
-            TradedCompasses.get(serverPlayer.getServerWorld().getPersistentStateManager()).addBuy(serverPlayer, buyStack);
+            TradedCompasses.get(serverPlayer.getWorld().getPersistentStateManager()).addBuy(serverPlayer, buyStack);
         }
     }
 
-    @Inject(method = "useOnBlock", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;playSound(Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/sound/SoundEvent;Lnet/minecraft/sound/SoundCategory;FF)V"))
+    @Inject(method = "useOnBlock", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;playSound(Lnet/minecraft/entity/Entity;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/sound/SoundEvent;Lnet/minecraft/sound/SoundCategory;FF)V"))
     public void dontLockSpawnCompass(ItemUsageContext context, CallbackInfoReturnable<ActionResult> cir) {
         if (context.getStack().contains(UnruffledMod.LOCKED_COMPASS_COMPONENT)) {
             cir.setReturnValue(super.useOnBlock(context));

@@ -18,14 +18,15 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(ServerPlayerEntity.class)
 public abstract class ServerPlayerEntityMixin extends PlayerEntity {
-    public ServerPlayerEntityMixin(World world, BlockPos blockPos, float f, GameProfile gameProfile) {
-        super(world, blockPos, f, gameProfile);
-    }
 
-    @Shadow public abstract ServerWorld getServerWorld();
+    @Shadow public abstract ServerWorld getWorld();
 
     private BlockPos lastSprintBlockPos = new BlockPos(0, 0, 0);
     private boolean isOnPath = false;
+
+    public ServerPlayerEntityMixin(World world, GameProfile profile) {
+        super(world, profile);
+    }
 
     @Redirect(method = "swingHand", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/network/ServerPlayerEntity;resetLastAttackedTicks()V"))
     public void onSwingHandAttackCooldown(ServerPlayerEntity player) {
@@ -45,10 +46,10 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity {
     public float decreaseSprintingExhaustionOnPaths(float constant) {
         if (!this.lastSprintBlockPos.equals(this.getBlockPos())) {
             this.lastSprintBlockPos = this.getBlockPos();
-            if (Config.INSTANCE.get().hungerConfig.steadyBlockBlacklist()) {
-                this.isOnPath = !this.getServerWorld().getBlockState(this.getVelocityAffectingPos()).isIn(UnruffledMod.UNSTEADY);
+            if (io.github.orlouge.unruffled.config.Config.INSTANCE.get().hungerConfig.steadyBlockBlacklist()) {
+                this.isOnPath = !this.getWorld().getBlockState(this.getVelocityAffectingPos()).isIn(UnruffledMod.UNSTEADY);
             } else {
-                this.isOnPath = this.getServerWorld().getBlockState(this.getVelocityAffectingPos()).isIn(UnruffledMod.STEADY);
+                this.isOnPath = this.getWorld().getBlockState(this.getVelocityAffectingPos()).isIn(UnruffledMod.STEADY);
             }
         }
         return this.isOnPath ? constant * 0.5f : constant;

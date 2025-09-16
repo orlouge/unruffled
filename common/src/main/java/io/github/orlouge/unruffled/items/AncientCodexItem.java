@@ -16,9 +16,9 @@ import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.text.TextColor;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
-import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 
@@ -58,14 +58,14 @@ public class AncientCodexItem extends Item {
     }
 
     @Override
-    public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
+    public ActionResult use(World world, PlayerEntity user, Hand hand) {
         ItemStack stack = user.getStackInHand(hand);
         if (stack.contains(NUMBER) && stack.get(NUMBER) > 0 && stack.get(NUMBER) <= CONTENTS.size()) {
             if (user instanceof ServerPlayerEntity player) {
                 player.networkHandler.sendPacket(new OpenWrittenBookS2CPacket(hand));
             }
             user.incrementStat(Stats.USED.getOrCreateStat(this));
-            return TypedActionResult.success(stack, world.isClient());
+            return ActionResult.SUCCESS;
         } else {
             return super.use(world, user, hand);
         }

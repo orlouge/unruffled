@@ -24,7 +24,7 @@ public class EnchantmentsHelperMixin {
     private static void evilTotemThornsEffect(ServerWorld serverWorld, Entity user, DamageSource damageSource, ItemStack itemStack, CallbackInfo ci) {
         Entity attacker = damageSource.getAttacker();
         if (attacker != null && user instanceof LivingEntity livingUser && livingUser.getEquippedStack(EquipmentSlot.OFFHAND).isOf(CustomItems.EVIL_TOTEM)) {
-            attacker.damage(user.getDamageSources().thorns(attacker), 1 + user.getRandom().nextInt(4));
+            attacker.damage(serverWorld, user.getDamageSources().thorns(attacker), 1 + user.getRandom().nextInt(4));
             if (attacker instanceof LivingEntity livingAttacker) {
                 livingAttacker.addStatusEffect(new StatusEffectInstance(StatusEffects.WEAKNESS, 100, 0, false, true, true));
                 livingAttacker.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 100, 0, false, false, true));

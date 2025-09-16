@@ -6,15 +6,9 @@
     "Y"
   ],
   "key": {
-    "#": {
-      "item": "minecraft:iron_nugget"
-    },
-    "X": {
-      "item": "minecraft:iron_ingot"
-    },
-    "Y": {
-      "item": "minecraft:feather"
-    }
+    "#": "minecraft:iron_nugget",
+    "X": "minecraft:iron_ingot",
+    "Y": "minecraft:feather"
   },
   "result": {
     "id": "unruffled:piercing_arrow",

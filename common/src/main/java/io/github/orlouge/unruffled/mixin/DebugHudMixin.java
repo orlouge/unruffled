@@ -86,7 +86,7 @@ public abstract class DebugHudMixin {
                     extra.add("Client Light: " + light + " (" + sky + " sky, " + block + " block)");
 
                     if (Config.INSTANCE.get().navigationConfig.reducedDebugBiome()) {
-                        if (blockPos.getY() >= this.client.world.getBottomY() && blockPos.getY() < this.client.world.getTopY()) {
+                        if (this.client.world.isInHeightLimit(blockPos.getY())) {
                             extra.add("Biome: " + getBiomeString(this.client.world.getBiome(blockPos)));
                         }
                     }

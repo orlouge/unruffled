@@ -15,9 +15,11 @@ import net.minecraft.block.entity.DecoratedPotBlockEntity;
 import net.minecraft.block.entity.Sherds;
 import net.minecraft.block.enums.*;
 import net.minecraft.component.ComponentChanges;
-import net.minecraft.component.ComponentMapImpl;
 import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.MergedComponentMap;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.decoration.ItemFrameEntity;
 import net.minecraft.entity.decoration.painting.PaintingEntity;
@@ -162,7 +164,13 @@ public class UndergroundCabinFeature extends Feature<DefaultFeatureConfig> {
             new BlockTemplate[] {
                 BlockTemplate.block(Blocks.TNT),
                 BlockTemplate.sideEffect(Blocks.RAIL.getDefaultState().with(RailBlock.SHAPE, RailShape.EAST_WEST),
-                        (world, pos) -> world.spawnEntity(new TntMinecartEntity(world.toServerWorld(), (double) pos.getX() + 0.5, (double) pos.getY() + 0.5, (double) pos.getZ() + 0.5))
+                        (world, pos) -> {
+                            TntMinecartEntity tntMinecart = EntityType.TNT_MINECART.create(world.toServerWorld(), SpawnReason.CHUNK_GENERATION);
+                            if (tntMinecart != null) {
+                                tntMinecart.initPosition((double) pos.getX() + (double) 0.5F, (double) pos.getY() + (double) 0.5F, (double) pos.getZ() + (double) 0.5F);
+                                world.spawnEntity(tntMinecart);
+                            }
+                        }
                 ),
                 BlockTemplate.block(Blocks.SPRUCE_WALL_SIGN.getDefaultState().with(WallSignBlock.FACING, Direction.WEST))
             },
@@ -193,7 +201,13 @@ public class UndergroundCabinFeature extends Feature<DefaultFeatureConfig> {
             },
             new BlockTemplate[]{
                 BlockTemplate.sideEffect(Blocks.RAIL.getDefaultState().with(RailBlock.SHAPE, RailShape.SOUTH_WEST),
-                    (world, pos) -> world.spawnEntity(new MinecartEntity(world.toServerWorld(), (double) pos.getX() + 0.5, (double) pos.getY() + 0.5, (double) pos.getZ() + 0.5))
+                    (world, pos) -> {
+                        MinecartEntity minecart = EntityType.MINECART.create(world.toServerWorld(), SpawnReason.CHUNK_GENERATION);
+                        if (minecart != null) {
+                            minecart.initPosition((double) pos.getX() + (double) 0.5F, (double) pos.getY() + (double) 0.5F, (double) pos.getZ() + (double) 0.5F);
+                            world.spawnEntity(minecart);
+                        }
+                    }
                 ),
                 BlockTemplate.block(Blocks.SPRUCE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.TOP)),
                 BlockTemplate.block(Blocks.BLACK_CANDLE.getDefaultState().with(CandleBlock.LIT, true).with(CandleBlock.CANDLES, 2))
@@ -287,7 +301,7 @@ public class UndergroundCabinFeature extends Feature<DefaultFeatureConfig> {
                         itemFrame.setInvisible(true);
                         itemFrame.setHeldItemStack(switch (ctx.random().nextInt(9)) {
                             case 0 -> Items.IRON_AXE.getDefaultStack();
-                            case 1 -> ItemEnchantmentsHelper.createWithItemEnchantments(CustomItems.SACRED_SWORD, ctx.world().getRegistryManager().createRegistryLookup());
+                            case 1 -> ItemEnchantmentsHelper.createWithItemEnchantments(CustomItems.SACRED_SWORD, ctx.world().getRegistryManager());
                             case 2 -> Items.DIAMOND_SWORD.getDefaultStack();
                             case 3 -> Items.DIAMOND_AXE.getDefaultStack();
                             default -> Items.IRON_SWORD.getDefaultStack();
@@ -335,7 +349,7 @@ public class UndergroundCabinFeature extends Feature<DefaultFeatureConfig> {
                 BlockTemplate.block(Blocks.BROWN_BED.getDefaultState().with(BedBlock.PART, BedPart.HEAD).with(BedBlock.FACING, Direction.WEST)),
                 null,
                 BlockTemplate.sideEffect(BlockTemplate.empty(), (ctx) -> {
-                    Optional<RegistryEntry.Reference<PaintingVariant>> variant = ctx.world().getRegistryManager().createRegistryLookup().getOptionalEntry(RegistryKeys.PAINTING_VARIANT, switch (ctx.random().nextInt(4)) {
+                    Optional<RegistryEntry.Reference<PaintingVariant>> variant = ctx.world().getRegistryManager().getOptionalEntry(switch (ctx.random().nextInt(4)) {
                         case 0 -> PaintingVariants.POOL;
                         case 1 -> PaintingVariants.COURBET;
                         case 2 -> PaintingVariants.SUNSET;
@@ -683,7 +697,7 @@ public class UndergroundCabinFeature extends Feature<DefaultFeatureConfig> {
             //System.out.println("No opening found " + center);
             return false;
         }
-        Direction doorDirection = Direction.fromVector(entranceOffset.getX(), 0, entranceOffset.getZ());
+        Direction doorDirection = Direction.fromVector(entranceOffset.getX(), 0, entranceOffset.getZ(), Direction.NORTH);
         int entranceDepth = Math.abs(entranceOffset.getComponentAlongAxis(doorDirection.getAxis()));
         Vec3i doorShiftVec = doorDirection.rotateYClockwise().getVector();
 
@@ -837,7 +851,7 @@ public class UndergroundCabinFeature extends Feature<DefaultFeatureConfig> {
                 default -> new Sherds(Items.BRICK, Items.BRICK, Items.BRICK, sherd);
             };
             decoratedPot.sherds = sherds;
-            decoratedPot.setComponents(ComponentMapImpl.create(decoratedPot.getComponents(), ComponentChanges.builder().add(DataComponentTypes.POT_DECORATIONS, sherds).build()));
+            decoratedPot.setComponents(MergedComponentMap.create(decoratedPot.getComponents(), ComponentChanges.builder().add(DataComponentTypes.POT_DECORATIONS, sherds).build()));
             decoratedPot.setLootTable(UnruffledMod.DECORATED_POT_LOOT_TABLE);
             decoratedPot.markDirty();
         }

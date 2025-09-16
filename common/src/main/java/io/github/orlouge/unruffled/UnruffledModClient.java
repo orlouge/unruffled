@@ -2,9 +2,6 @@ package io.github.orlouge.unruffled;
 
 import io.github.orlouge.unruffled.config.Config;
 import io.github.orlouge.unruffled.interfaces.ExtendedHungerManager;
-import net.minecraft.client.item.CompassAnglePredicateProvider;
-import net.minecraft.client.item.ModelPredicateProvider;
-import net.minecraft.client.item.ModelPredicateProviderRegistry;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.player.PlayerEntity;
@@ -32,28 +29,6 @@ public class UnruffledModClient {
         });
 
         Packets.LockedDeathPositionUpdate.register((pos) -> { lockedDeathPosition = pos; });
-
-        if (Config.INSTANCE.get().navigationConfig.recoveryCompassLocking()) {
-            ModelPredicateProvider recoveryCompassProvider = ModelPredicateProviderRegistry.get(Items.RECOVERY_COMPASS.getDefaultStack(), Identifier.ofVanilla("angle"));
-            if (recoveryCompassProvider instanceof CompassAnglePredicateProvider compassAnglePredicateProvider) {
-                CompassAnglePredicateProvider.CompassTarget originalTarget = compassAnglePredicateProvider.compassTarget;
-                compassAnglePredicateProvider.compassTarget = (world, stack, entity) ->
-                    lockedDeathPosition.filter((pos) ->
-                        stack.contains(UnruffledMod.LOCKED_COMPASS_COMPONENT)).orElse(originalTarget.getPos(world, stack, entity)
-                    );
-            }
-        }
-
-        if (Config.INSTANCE.get().navigationConfig.compassPointsNorth()) {
-            ModelPredicateProvider compassProvider = ModelPredicateProviderRegistry.get(Items.COMPASS.getDefaultStack(), Identifier.ofVanilla("angle"));
-            if (compassProvider instanceof CompassAnglePredicateProvider compassAnglePredicateProvider) {
-                CompassAnglePredicateProvider.CompassTarget originalTarget = compassAnglePredicateProvider.compassTarget;
-                compassAnglePredicateProvider.compassTarget = (world, stack, entity) ->
-                    stack.contains(DataComponentTypes.LODESTONE_TRACKER) || stack.contains(UnruffledMod.LOCKED_COMPASS_COMPONENT)
-                        ? originalTarget.getPos(world, stack, entity)
-                        : new GlobalPos(entity.getWorld().getRegistryKey(), entity.getBlockPos().north(10000));
-            }
-        }
 
         return 0;
     }

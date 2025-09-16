@@ -27,10 +27,10 @@ public abstract class VillagerEntityMixin extends MerchantEntity {
     @Inject(method = "fillRecipes", at = @At(value = "HEAD"), cancellable = true)
     public void modifyOffers(CallbackInfo ci) {
         VillagerData villagerData = this.getVillagerData();
-        Config.INSTANCE.get().tradesConfig.villagerTrades().ifPresent(trades -> {
-            Trades.ConfiguredVillagerTrades villagerTrades = trades.get(villagerData.getProfession());
-            if (villagerTrades != null && villagerTrades.enabled().orElse(true) && villagerTrades.pools().length >= villagerData.getLevel()) {
-                Trades.ConfiguredVillagerPool pool = villagerTrades.pools()[villagerData.getLevel() - 1];
+        io.github.orlouge.unruffled.config.Config.INSTANCE.get().tradesConfig.villagerTrades().ifPresent(trades -> {
+            Trades.ConfiguredVillagerTrades villagerTrades = trades.get(villagerData.profession().getKey().get());
+            if (villagerTrades != null && villagerTrades.enabled().orElse(true) && villagerTrades.pools().length >= villagerData.level()) {
+                Trades.ConfiguredVillagerPool pool = villagerTrades.pools()[villagerData.level() - 1];
                 this.fillRecipesFromPool(this.getOffers(), Arrays.stream(pool.trades()).map(
                     trade -> trade.toFactory(this.getWorld().getRegistryManager())
                 ).toArray(TradeOffers.Factory[]::new), pool.count());

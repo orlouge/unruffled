@@ -10,7 +10,9 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.List;
@@ -26,7 +28,7 @@ public class BundleContentsComponentMixin {
     public static class BuilderMixin {
         @Shadow @Final private List<ItemStack> stacks;
 
-        @ModifyExpressionValue(method = "addInternal", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;areItemsAndComponentsEqual(Lnet/minecraft/item/ItemStack;Lnet/minecraft/item/ItemStack;)Z"))
+        @ModifyExpressionValue(method = "getInsertionIndex", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;areItemsAndComponentsEqual(Lnet/minecraft/item/ItemStack;Lnet/minecraft/item/ItemStack;)Z"))
         public boolean preventStackingAbove99(boolean original, ItemStack stack, @Local int slot) {
             return original && (this.stacks.get(slot).getCount() + stack.getCount() <= 99);
         }

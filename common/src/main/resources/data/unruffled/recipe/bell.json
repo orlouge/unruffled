@@ -5,15 +5,9 @@
     "SGS"
   ],
   "key": {
-    "S": {
-      "item": "minecraft:stone"
-    },
-    "G": {
-      "item": "minecraft:gold_ingot"
-    },
-    "T": {
-      "item": "minecraft:stick"
-    }
+    "S": "minecraft:stone",
+    "G": "minecraft:gold_ingot",
+    "T": "minecraft:stick"
   },
   "result": {
     "id": "minecraft:bell",

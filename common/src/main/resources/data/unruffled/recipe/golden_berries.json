@@ -6,15 +6,9 @@
     "NGN"
   ],
   "key": {
-    "B": {
-      "item": "minecraft:glow_berries"
-    },
-    "G": {
-      "item": "minecraft:gold_ingot"
-    },
-    "N": {
-      "item": "minecraft:gold_nugget"
-    }
+    "B": "minecraft:glow_berries",
+    "G": "minecraft:gold_ingot",
+    "N": "minecraft:gold_nugget"
   },
   "result": {
     "id": "unruffled:golden_berries"

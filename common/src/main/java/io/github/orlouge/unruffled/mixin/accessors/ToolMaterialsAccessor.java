@@ -1,26 +1,27 @@
 package io.github.orlouge.unruffled.mixin.accessors;
 
-import net.minecraft.item.ToolMaterials;
+import net.minecraft.block.Block;
+import net.minecraft.item.ToolMaterial;
+import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.registry.tag.TagKey;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.function.Supplier;
-
-@Mixin(ToolMaterials.class)
+@Mixin(ToolMaterial.class)
 public abstract class ToolMaterialsAccessor {
-    @Accessor
-    public abstract void setItemDurability(int durability);
+    private boolean isGold = false;
 
-    @Inject(method = "<init>", at = @At("RETURN"))
-    public void modifyInitDurability(String string, int i, TagKey inverseTag, int itemDurability, float miningSpeed, float attackDamage, int enchantability, Supplier repairIngredient, CallbackInfo ci) {
-        if (string.equals("GOLD")) {
-            this.setItemDurability(200);
-        } else {
-            this.setItemDurability(itemDurability * 2);
-        }
+    @ModifyArg(method = "applyBaseSettings", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/Item$Settings;maxDamage(I)Lnet/minecraft/item/Item$Settings;"))
+    public int modifyDurability(int maxDamage) {
+        return isGold ? 200 : maxDamage * 2;
+    }
+
+    @Inject(method = "<init>", at = @At("TAIL"))
+    public void storeIsGold(TagKey<Block> tagKey, int durability, float f, float g, int j, TagKey<Block> tagKey2, CallbackInfo ci) {
+        if (tagKey == BlockTags.INCORRECT_FOR_GOLD_TOOL) isGold = true;
     }
 }

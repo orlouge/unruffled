@@ -25,10 +25,10 @@ public class BedBlockMixin {
             if (bedPart == BedPart.FOOT) {
                 pos = pos.offset(state.get(BedBlock.FACING));
             }
-            if (serverPlayer.getSpawnPointPosition() != null && serverPlayer.getSpawnPointPosition().equals(pos)) {
+            if (serverPlayer.getRespawn() != null && serverPlayer.getRespawn().pos() != null && serverPlayer.getRespawn().pos().equals(pos)) {
                 PeacefulChunks.get(serverWorld.getPersistentStateManager()).remove(serverPlayer.getUuid(), new ChunkPos(pos), PeacefulChunks.PEACEFUL_RANGE);
-                if (serverPlayer.getSpawnPointDimension().equals(world.getRegistryKey())) {
-                    serverPlayer.setSpawnPoint(null, null, 0, false, false);
+                if (serverPlayer.getRespawn().dimension().equals(world.getRegistryKey())) {
+                    serverPlayer.setSpawnPoint(null, false);
                 }
             }
         }

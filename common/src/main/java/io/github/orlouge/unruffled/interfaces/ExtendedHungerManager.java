@@ -19,7 +19,7 @@ import net.minecraft.world.dimension.DimensionType;
 
 public interface ExtendedHungerManager {
     default float getAttackExhaustion(PlayerEntity player, float cooldownProgress) {
-        double attackSpeed = player.getAttributeValue(EntityAttributes.GENERIC_ATTACK_SPEED);
+        double attackSpeed = player.getAttributeValue(EntityAttributes.ATTACK_SPEED);
         cooldownProgress = (float) Math.pow(cooldownProgress, 2.5f);
         return (float) Math.min(6f, Math.max(0.02, Config.INSTANCE.get().hungerConfig.attackExhaustionFactor() * 20 * getStaminaRegenerationRate(0f) / (cooldownProgress * attackSpeed * getStaminaDepletionRate())));
     }

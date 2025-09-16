@@ -26,16 +26,17 @@ import java.util.Optional;
 
 @Mixin(StructureTemplate.class)
 public class StructureTemplateMixin {
+    /*
     @ModifyVariable(method = "spawnEntities", at = @At(value = "STORE"))
     public NbtCompound removeEnchantmentsFromItemFrames(NbtCompound nbt, ServerWorldAccess world) {
         if (Config.INSTANCE.get().enchantmentsConfig.filterStructureItemFrames().orElse(true) && nbt.contains("id")) {
-            Identifier id = Identifier.of(nbt.getString("id"));
+            Identifier id = Identifier.of(nbt.getString("id", ""));
             if (id.equals(Identifier.ofVanilla("item_frame")) || id.equals(Identifier.ofVanilla("glow_item_frame"))) {
                 if (nbt.contains("Item")) {
                     Optional<ItemStack> stack = ItemStack.fromNbt(world.getRegistryManager(), nbt.get("Item"));
                     stack.ifPresent(itemStack -> nbt.put("Item", ItemEnchantmentsHelper.processItem(
                         itemStack,
-                        world.getRegistryManager().createRegistryLookup(),
+                        world.getRegistryManager(),
                         false
                     ).encode(world.getRegistryManager())));
                 }
@@ -77,4 +78,6 @@ public class StructureTemplateMixin {
         }
         cir.setReturnValue(blocks);
     }
+
+     */
 }

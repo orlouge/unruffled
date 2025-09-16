@@ -9,9 +9,11 @@ import net.minecraft.item.CompassItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.screen.*;
+import net.minecraft.screen.slot.ForgingSlotsManager;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -28,9 +30,10 @@ public abstract class AnvilScreenHandlerMixin extends ForgingScreenHandler {
     @Shadow @Final private Property levelCost;
     private boolean isRenaming = false;
 
-    public AnvilScreenHandlerMixin(ScreenHandlerType<?> type, int syncId, PlayerInventory playerInventory, ScreenHandlerContext context) {
-        super(type, syncId, playerInventory, context);
+    public AnvilScreenHandlerMixin(@Nullable ScreenHandlerType<?> type, int syncId, PlayerInventory playerInventory, ScreenHandlerContext context, ForgingSlotsManager forgingSlotsManager) {
+        super(type, syncId, playerInventory, context, forgingSlotsManager);
     }
+
 
     @Redirect(method = "updateResult", at = @At(value = "INVOKE", target = "Ljava/lang/Math;min(II)I", ordinal = 0))
     public int calculateRepairAmount(int dmg, int maxDmg4) {
@@ -61,7 +64,7 @@ public abstract class AnvilScreenHandlerMixin extends ForgingScreenHandler {
 
         if (player instanceof ServerPlayerEntity serverPlayer && stack.contains(DataComponentTypes.LODESTONE_TRACKER)) {
             ItemStack buyStack = stack.copyComponentsToNewStack(Items.COMPASS, 1);
-            TradedCompasses.get(serverPlayer.getServerWorld().getPersistentStateManager()).addBuy(serverPlayer, buyStack);
+            TradedCompasses.get(serverPlayer.getWorld().getPersistentStateManager()).addBuy(serverPlayer, buyStack);
         }
     }
 

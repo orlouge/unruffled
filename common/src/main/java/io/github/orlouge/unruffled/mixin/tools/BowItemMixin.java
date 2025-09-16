@@ -1,5 +1,6 @@
 package io.github.orlouge.unruffled.mixin.tools;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import io.github.orlouge.unruffled.config.Config;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.Entity;
@@ -19,10 +20,10 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
 @Mixin(RangedWeaponItem.class)
 public class BowItemMixin {
-    @ModifyVariable(method = "shootAll", at = @At(value = "STORE"))
+    @ModifyExpressionValue(method = "shootAll", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/projectile/ProjectileEntity;spawn(Lnet/minecraft/entity/projectile/ProjectileEntity;Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/item/ItemStack;Ljava/util/function/Consumer;)Lnet/minecraft/entity/projectile/ProjectileEntity;"))
     public ProjectileEntity modifyArrowProperties(ProjectileEntity entity, ServerWorld world, LivingEntity shooter, Hand hand, ItemStack weapon) {
         if (Config.INSTANCE.get().enchantmentsConfig.disabledEnchantments().contains(Enchantments.POWER) && weapon.isIn(ItemTags.BOW_ENCHANTABLE) && entity instanceof PersistentProjectileEntity arrowEntity) {
-            arrowEntity.setDamage(arrowEntity.getDamage() + 2.);
+            arrowEntity.setDamage(arrowEntity.damage + 2.);
         }
         return entity;
     }

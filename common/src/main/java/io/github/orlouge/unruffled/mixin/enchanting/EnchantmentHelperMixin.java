@@ -4,7 +4,9 @@ import io.github.orlouge.unruffled.config.Config;
 import io.github.orlouge.unruffled.items.ItemEnchantmentsHelper;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.EquippableComponent;
 import net.minecraft.component.type.ItemEnchantmentsComponent;
+import net.minecraft.component.type.RepairableComponent;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
@@ -13,9 +15,9 @@ import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.damage.DamageTypes;
-import net.minecraft.item.ArmorItem;
-import net.minecraft.item.ArmorMaterials;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.item.equipment.ArmorMaterials;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.tag.DamageTypeTags;
 import net.minecraft.server.world.ServerWorld;
@@ -51,11 +53,13 @@ public class EnchantmentHelperMixin {
         float protection = cir.getReturnValueF();
         if (source.isIn(DamageTypeTags.IS_FIRE)) {
             if (Config.INSTANCE.get().enchantmentsConfig.disabledEnchantments().contains(Enchantments.FIRE_PROTECTION)) {
-                for (ItemStack item : user.getEquippedItems()) {
-                    if (item.getItem() instanceof ArmorItem armor) {
-                        if (armor.getMaterial() == ArmorMaterials.DIAMOND) {
+                for (EquipmentSlot equipmentSlot : EquipmentSlot.VALUES) {
+                    ItemStack item = user.getEquippedStack(equipmentSlot);
+                    RepairableComponent repairable = item.get(DataComponentTypes.REPAIRABLE);
+                    if (repairable != null && item.get(DataComponentTypes.EQUIPPABLE) != null) {
+                        if (repairable.matches(new ItemStack(Items.DIAMOND))) {
                             protection += 4;
-                        } else if (armor.getMaterial() == ArmorMaterials.NETHERITE) {
+                        } else if (repairable.matches(new ItemStack(Items.NETHERITE_INGOT))) {
                             protection += 8;
                         }
                     }
@@ -63,11 +67,13 @@ public class EnchantmentHelperMixin {
             }
         } else if (source.isIn(DamageTypeTags.IS_EXPLOSION)) {
             if (Config.INSTANCE.get().enchantmentsConfig.disabledEnchantments().contains(Enchantments.BLAST_PROTECTION)) {
-                for (ItemStack item : user.getEquippedItems()) {
-                    if (item.getItem() instanceof ArmorItem armor) {
-                        if (armor.getMaterial() == ArmorMaterials.DIAMOND) {
+                for (EquipmentSlot equipmentSlot : EquipmentSlot.VALUES) {
+                    ItemStack item = user.getEquippedStack(equipmentSlot);
+                    RepairableComponent repairable = item.get(DataComponentTypes.REPAIRABLE);
+                    if (repairable != null && item.get(DataComponentTypes.EQUIPPABLE) != null) {
+                        if (repairable.matches(new ItemStack(Items.DIAMOND))) {
                             protection += 4;
-                        } else if (armor.getMaterial() == ArmorMaterials.NETHERITE) {
+                        } else if (repairable.matches(new ItemStack(Items.NETHERITE_INGOT))) {
                             protection += 6;
                         }
                     }
@@ -75,21 +81,23 @@ public class EnchantmentHelperMixin {
             }
         } else if (source.isIn(DamageTypeTags.IS_FALL)) {
             if (Config.INSTANCE.get().enchantmentsConfig.disabledEnchantments().contains(Enchantments.FEATHER_FALLING)) {
-                for (ItemStack item : user.getEquippedItems()) {
-                    if (item.getItem() instanceof ArmorItem armor && armor.getSlotType() == EquipmentSlot.FEET) {
-                        if (armor.getMaterial() == ArmorMaterials.LEATHER) {
-                            protection += 16;
-                        } else {
-                            protection += 10;
-                        }
+                ItemStack item = user.getEquippedStack(EquipmentSlot.FEET);
+                RepairableComponent repairable = item.get(DataComponentTypes.REPAIRABLE);
+                if (repairable != null && item.get(DataComponentTypes.EQUIPPABLE) != null) {
+                    if (repairable.matches(new ItemStack(Items.LEATHER))) {
+                        protection += 16;
+                    } else {
+                        protection += 10;
                     }
                 }
             }
         } else if (!source.isIn(DamageTypeTags.BYPASSES_INVULNERABILITY)) {
             if (Config.INSTANCE.get().enchantmentsConfig.disabledEnchantments().contains(Enchantments.PROTECTION)) {
-                for (ItemStack item : user.getEquippedItems()) {
-                    if (item.getItem().getComponents().contains(DataComponentTypes.DAMAGE)) {
-                        if (source.isOf(DamageTypes.WITHER) && item.getItem() instanceof ArmorItem armor && armor.getMaterial() == ArmorMaterials.NETHERITE) {
+                for (EquipmentSlot equipmentSlot : EquipmentSlot.VALUES) {
+                    ItemStack item = user.getEquippedStack(equipmentSlot);
+                    RepairableComponent repairable = item.get(DataComponentTypes.REPAIRABLE);
+                    if (repairable != null && item.get(DataComponentTypes.EQUIPPABLE) != null) {
+                        if (source.isOf(DamageTypes.WITHER) && repairable.matches(new ItemStack(Items.NETHERITE_INGOT))) {
                             protection += 6;
                         } else {
                             protection += 2;

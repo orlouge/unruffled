@@ -27,6 +27,6 @@ public class DrownedEntityMixin extends ZombieEntity {
 
     @Inject(method = "initEquipment", at = @At("TAIL"))
     public void updateDropChancesOnInitEquipment(Random random, LocalDifficulty localDifficulty, CallbackInfo ci) {
-        this.updateDropChances(EquipmentSlot.MAINHAND);
+        this.setDropGuaranteed(EquipmentSlot.MAINHAND);
     }
 }

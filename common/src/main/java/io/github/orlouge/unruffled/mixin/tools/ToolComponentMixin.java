@@ -4,8 +4,6 @@ import io.github.orlouge.unruffled.config.Config;
 import net.minecraft.block.BlockState;
 import net.minecraft.component.type.ToolComponent;
 import net.minecraft.enchantment.Enchantments;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.MiningToolItem;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;

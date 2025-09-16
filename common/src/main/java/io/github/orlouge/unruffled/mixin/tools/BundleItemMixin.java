@@ -16,11 +16,6 @@ public abstract class BundleItemMixin extends Item {
         super(settings);
     }
 
-    @ModifyConstant(method = "appendTooltip", constant = @Constant(intValue = 64))
-    public int modifyAppendTooltip(int max) {
-        return Config.INSTANCE.get().mechanicsConfig.bundleSize();
-    }
-
     /*
     @Inject(method = "addToBundle", at = @At("HEAD"), cancellable = true)
     private static void disableBundleNesting(ItemStack bundle, ItemStack stack, CallbackInfoReturnable<Integer> cir) {

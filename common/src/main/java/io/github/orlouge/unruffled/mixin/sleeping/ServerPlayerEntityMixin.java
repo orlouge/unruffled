@@ -16,6 +16,8 @@ import net.minecraft.recipe.Recipe;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.GlobalPos;
@@ -34,40 +36,34 @@ import java.util.Optional;
 @Mixin(ServerPlayerEntity.class)
 public abstract class ServerPlayerEntityMixin extends PlayerEntity implements HasBackupSpawnPoints, HasLockedDeathPosition {
 
-    public ServerPlayerEntityMixin(World world, BlockPos pos, float yaw, GameProfile gameProfile) {
-        super(world, pos, yaw, gameProfile);
-    }
-
-    @Shadow public abstract ServerWorld getServerWorld();
-
-    @Shadow @Nullable private BlockPos spawnPointPosition = null;
-    @Shadow private RegistryKey<World> spawnPointDimension = null;
-    @Shadow private float spawnAngle = 0f;
-    @Shadow private boolean spawnForced = false;
 
     private Optional<GlobalPos> unruffled_lockedDeathPos = Optional.empty();
 
-    @Shadow public abstract void updateInput(float sidewaysSpeed, float forwardSpeed, boolean jumping, boolean sneaking);
+    @Shadow @Nullable private ServerPlayerEntity.Respawn respawn;
 
-    @Shadow public abstract void setSpawnPoint(RegistryKey<World> dimension, @Nullable BlockPos pos, float angle, boolean forced, boolean sendMessage);
+    public ServerPlayerEntityMixin(World world, GameProfile profile) {
+        super(world, profile);
+    }
+
+    @Shadow public abstract ServerWorld getWorld();
 
     @Inject(method = "wakeUp", at = @At("HEAD"))
     public void updatePeacefulChunksOnWakeUp(boolean skipSleepTimer, boolean updateSleepingPlayers, CallbackInfo ci) {
-        if (skipSleepTimer || updateSleepingPlayers || this.spawnPointPosition == null || !this.isSleeping()) return;
-        PeacefulChunks.get(this.getServerWorld().getPersistentStateManager()).add(this.getUuid(), new ChunkPos(this.spawnPointPosition), PeacefulChunks.PEACEFUL_RANGE);
+        if (skipSleepTimer || updateSleepingPlayers || this.respawn == null || this.respawn.pos() == null || !this.isSleeping()) return;
+        PeacefulChunks.get(this.getWorld().getPersistentStateManager()).add(this.getUuid(), new ChunkPos(this.respawn.pos()), PeacefulChunks.PEACEFUL_RANGE);
     }
 
     @Inject(method = "setSpawnPoint", at = @At("HEAD"))
-    public void updatePeacefulChunksOnSetSpawnPoint(RegistryKey<World> dimension, BlockPos pos, float angle, boolean forced, boolean sendMessage, CallbackInfo ci) {
-        if (this.spawnPointPosition == null || (this.spawnPointPosition.equals(pos) && this.spawnPointDimension.equals(dimension))) return;
-        SpawnPoint currentSpawnPos = new SpawnPoint(this.spawnPointPosition, this.spawnPointDimension, this.spawnAngle, this.spawnForced);
+    public void updatePeacefulChunksOnSetSpawnPoint(ServerPlayerEntity.Respawn respawn, boolean sendMessage, CallbackInfo ci) {
+        if (this.respawn == null || this.respawn.pos() == null || (this.respawn.pos().equals(respawn == null ? null : respawn.pos()) && this.respawn.dimension().equals(respawn.dimension()))) return;
+        SpawnPoint currentSpawnPos = new SpawnPoint(this.respawn.pos(), this.respawn.dimension(), this.respawn.angle(), this.respawn.forced());
         //if (pos == null) this.deleteBackupSpawnPoint(currentSpawnPos);
-        PeacefulChunks peacefulChunks = PeacefulChunks.get(this.getServerWorld().getPersistentStateManager());
+        PeacefulChunks peacefulChunks = PeacefulChunks.get(this.getWorld().getPersistentStateManager());
         ChunkPos centerPos = peacefulChunks.getCenterPos(this.getUuid());
-        if (/* sendMessage && */ centerPos != null && centerPos.equals(new ChunkPos(this.spawnPointPosition))) {
+        if (/* sendMessage && */ centerPos != null && centerPos.equals(new ChunkPos(this.respawn.pos()))) {
             this.addBackupSpawnPoint(currentSpawnPos);
         }
-        peacefulChunks.remove(this.getUuid(), new ChunkPos(this.spawnPointPosition), PeacefulChunks.PEACEFUL_RANGE);
+        peacefulChunks.remove(this.getUuid(), new ChunkPos(this.respawn.pos()), PeacefulChunks.PEACEFUL_RANGE);
     }
 
     @Inject(method = "copyFrom", at = @At("TAIL"))
@@ -80,34 +76,24 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements Ha
         }
     }
 
-    @Inject(method = "readCustomDataFromNbt", at = @At("TAIL"))
-    public void readBackupSpawnPoint(NbtCompound nbt, CallbackInfo ci) {
+    @Inject(method = "readCustomData", at = @At("TAIL"))
+    public void readBackupSpawnPoint(ReadView view, CallbackInfo ci) {
         this.unruffled_backupSpawnPoints = new LinkedList<>();
-        if (nbt.contains("BackupSpawn", NbtElement.LIST_TYPE)) {
-            NbtList spawnList = nbt.getList("BackupSpawn", NbtElement.COMPOUND_TYPE);
-            for (NbtElement spawnPointNbt : spawnList) {
-                unruffled_backupSpawnPoints.add(SpawnPoint.fromNbt((NbtCompound) spawnPointNbt));
-            }
-        }
-        if (nbt.contains("LockedDeathLocation", NbtElement.COMPOUND_TYPE)) {
-            DataResult<GlobalPos> parsedPos = GlobalPos.CODEC.parse(NbtOps.INSTANCE, nbt.get("LockedDeathLocation"));
-            this.unruffled_lockedDeathPos = parsedPos.result();
-        } else {
-            this.unruffled_lockedDeathPos = Optional.empty();
-        }
+        Optional<ReadView.TypedListReadView<SpawnPoint>> spawnList = view.getOptionalTypedListView("BackupSpawn", SpawnPoint.CODEC);
+        spawnList.ifPresent(spawnPoints -> unruffled_backupSpawnPoints.addAll(spawnPoints.stream().toList()));
+
+        this.unruffled_lockedDeathPos = view.read("LockedDeathLocation", GlobalPos.CODEC);
     }
 
-    @Inject(method = "writeCustomDataToNbt", at = @At("TAIL"))
-    public void writeBackupSpawnPoint(NbtCompound nbt, CallbackInfo ci) {
+    @Inject(method = "writeCustomData", at = @At("TAIL"))
+    public void writeBackupSpawnPoint(WriteView view, CallbackInfo ci) {
         if (this.unruffled_backupSpawnPoints != null) {
-            NbtList spawnList = new NbtList();
+            WriteView.ListAppender<SpawnPoint> spawnList = view.getListAppender("BackupSpawn", SpawnPoint.CODEC);
             for (SpawnPoint point : this.unruffled_backupSpawnPoints) {
-                spawnList.add(point.toNbt());
+                spawnList.add(point);
             }
-            nbt.put("BackupSpawn", spawnList);
         }
-        this.unruffled_lockedDeathPos.flatMap((pos) -> GlobalPos.CODEC.encodeStart(NbtOps.INSTANCE, pos).result())
-            .ifPresent((encoded) -> nbt.put("LockedDeathLocation", encoded));
+        this.unruffled_lockedDeathPos.ifPresent(pos -> view.put("LockedDeathLocation", GlobalPos.CODEC, pos));
     }
 
     private LinkedList<SpawnPoint> unruffled_backupSpawnPoints = new LinkedList<>();
@@ -119,12 +105,12 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements Ha
 
     @Override
     public void addBackupSpawnPoint(SpawnPoint pos) {
-        if (Config.INSTANCE.get().mechanicsConfig.backupSpawnPoints() == 0) {
+        if (io.github.orlouge.unruffled.config.Config.INSTANCE.get().mechanicsConfig.backupSpawnPoints() == 0) {
             unruffled_backupSpawnPoints.clear();
             return;
         }
         deleteBackupSpawnPoint(pos);
-        while (unruffled_backupSpawnPoints.size() >= Config.INSTANCE.get().mechanicsConfig.backupSpawnPoints()) {
+        while (unruffled_backupSpawnPoints.size() >= io.github.orlouge.unruffled.config.Config.INSTANCE.get().mechanicsConfig.backupSpawnPoints()) {
             unruffled_backupSpawnPoints.removeLast();
         }
         unruffled_backupSpawnPoints.addFirst(pos);

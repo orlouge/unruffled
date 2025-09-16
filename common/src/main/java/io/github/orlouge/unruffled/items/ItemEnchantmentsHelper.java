@@ -7,6 +7,7 @@ import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.BundleContentsComponent;
 import net.minecraft.component.type.ContainerComponent;
 import net.minecraft.component.type.ItemEnchantmentsComponent;
+import net.minecraft.component.type.TooltipDisplayComponent;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.item.Item;
@@ -38,10 +39,13 @@ public class ItemEnchantmentsHelper {
         }
         if (enchantments == null) return stack;
         for (Map.Entry<RegistryKey<Enchantment>, Integer> entry : enchantments.entrySet()) {
-            Optional<RegistryEntry.Reference<Enchantment>> enchantment = lookup.getOptionalEntry(RegistryKeys.ENCHANTMENT, entry.getKey());
+            Optional<RegistryEntry.Reference<Enchantment>> enchantment = lookup.getOptionalEntry(entry.getKey());
             enchantment.ifPresent(ref -> stack.addEnchantment(ref, entry.getValue()));
         }
-        if (hide && stack.get(DataComponentTypes.ENCHANTMENTS) != null) stack.set(DataComponentTypes.ENCHANTMENTS, stack.get(DataComponentTypes.ENCHANTMENTS).withShowInTooltip(false));
+        if (hide && stack.get(DataComponentTypes.ENCHANTMENTS) != null) {
+            stack.set(DataComponentTypes.ENCHANTMENTS, stack.get(DataComponentTypes.ENCHANTMENTS));
+            stack.set(DataComponentTypes.TOOLTIP_DISPLAY, Optional.ofNullable(stack.get(DataComponentTypes.TOOLTIP_DISPLAY)).orElse(TooltipDisplayComponent.DEFAULT).with(DataComponentTypes.ENCHANTMENTS, true));
+        }
         return stack;
     }
 

@@ -26,7 +26,7 @@ public abstract class ForgingScreenHandlerMixin extends ScreenHandler {
         ItemStack stack = this.slots.get(slot).getStack();
         if (player instanceof ServerPlayerEntity serverPlayer && stack.contains(DataComponentTypes.LODESTONE_TRACKER)) {
             ItemStack buyStack = stack.copyComponentsToNewStack(Items.COMPASS, 1);
-            TradedCompasses.get(serverPlayer.getServerWorld().getPersistentStateManager()).addBuy(serverPlayer, buyStack);
+            TradedCompasses.get(serverPlayer.getWorld().getPersistentStateManager()).addBuy(serverPlayer, buyStack);
         }
     }
 }

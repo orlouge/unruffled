@@ -22,9 +22,10 @@ import net.minecraft.item.map.MapDecorationTypes;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.Potions;
-import net.minecraft.predicate.ComponentPredicate;
+import net.minecraft.predicate.component.ComponentMapPredicate;
 import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.tag.StructureTags;
@@ -104,7 +105,7 @@ public class Trades {
             sellWithPotion(Items.POTION, Potions.STRONG_REGENERATION, 2, 3, 16, 2),
             sellWithPotion(Items.POTION, Potions.LONG_REGENERATION, 1, 3, 16, 1)
     };
-    private static final Map<VillagerProfession, List<ConfiguredTrade[]>> VILLAGER_TRADES = Map.ofEntries(
+    private static final Map<RegistryKey<VillagerProfession>, List<ConfiguredTrade[]>> VILLAGER_TRADES = Map.ofEntries(
             Map.entry(VillagerProfession.ARMORER, List.of(
                     new ConfiguredTrade[] {
                             sellItem(Items.IRON_HELMET, 1, 1, 12, 1, 0.2F),
@@ -531,7 +532,7 @@ public class Trades {
         return stack;
     }
 
-    private static BiFunction<VillagerType, ItemStack, ItemStack> setCodexBasedOnBiome(int add) {
+    private static BiFunction<RegistryKey<VillagerType>, ItemStack, ItemStack> setCodexBasedOnBiome(int add) {
         return (type, stack) -> {
             int base = 10;
             if (type == VillagerType.DESERT) base = 0;
@@ -584,7 +585,7 @@ public class Trades {
                     if (potion.isPresent()) {
                         itemFunction = stack -> { stack = stack.copy(); stack.set(DataComponentTypes.POTION_CONTENTS, new PotionContentsComponent(potion.get())); return stack; };
                     } else if (applyItemEnchantments.orElse(false)) {
-                        itemFunction = item -> ItemEnchantmentsHelper.setItemEnchantments(item, registryManager.createRegistryLookup());
+                        itemFunction = item -> ItemEnchantmentsHelper.setItemEnchantments(item, registryManager);
                     }
                 }
                 if (tradeItem != null) {
@@ -655,9 +656,9 @@ public class Trades {
         ).apply(instance, ConfiguredVillagerTrades::new));
     }
 
-    public record TradesConfig(Optional<Map<VillagerProfession, ConfiguredVillagerTrades>> villagerTrades, Optional<ConfiguredWanderingTraderTrades> wanderingTraderTrades) {
+    public record TradesConfig(Optional<Map<RegistryKey<VillagerProfession>, ConfiguredVillagerTrades>> villagerTrades, Optional<ConfiguredWanderingTraderTrades> wanderingTraderTrades) {
         public static final Codec<TradesConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            Codec.unboundedMap(Registries.VILLAGER_PROFESSION.getCodec(), ConfiguredVillagerTrades.CODEC).optionalFieldOf("villagers").forGetter(TradesConfig::villagerTrades),
+            Codec.unboundedMap(RegistryKey.createCodec(RegistryKeys.VILLAGER_PROFESSION), ConfiguredVillagerTrades.CODEC).optionalFieldOf("villagers").forGetter(TradesConfig::villagerTrades),
             ConfiguredWanderingTraderTrades.CODEC.optionalFieldOf("wandering_trader").forGetter(TradesConfig::wanderingTraderTrades)
         ).apply(instance, TradesConfig::new));
     }
@@ -714,7 +715,7 @@ public class Trades {
                     for (int i = 0; i < 5; i++) {
                         ItemStack compass = compasses.getBuy(world, player);
                         if (compass != null) {
-                            TradedItem offerCompass = new TradedItem(compass.getRegistryEntry(), this.count, ComponentPredicate.of(compass.getComponents()));
+                            TradedItem offerCompass = new TradedItem(compass.getRegistryEntry(), this.count, ComponentMapPredicate.of(compass.getComponents()));
                             return new TradeOffer(offerCompass, new ItemStack(Items.EMERALD, this.payment), this.maxUses, this.experience, this.multiplier);
                         }
                     }
@@ -780,27 +781,27 @@ public class Trades {
         public TradeOffer create(Entity entity, Random random) {
             ItemStack buyStack = this.buy.copy();
             buyStack.setCount(this.count);
-            return new TradeOffer(new TradedItem(this.buy.getRegistryEntry(), this.count, ComponentPredicate.of(this.buy.getComponents())), new ItemStack(Items.EMERALD, this.payment), this.maxUses, this.experience, this.multiplier);
+            return new TradeOffer(new TradedItem(this.buy.getRegistryEntry(), this.count, ComponentMapPredicate.of(this.buy.getComponents())), new ItemStack(Items.EMERALD, this.payment), this.maxUses, this.experience, this.multiplier);
         }
     }
 
     public static class TypeAwareBuyComponentsItemFactory implements TradeOffers.Factory {
-        private final Map<VillagerType, ItemStack> buy;
+        private final Map<RegistryKey<VillagerType>, ItemStack> buy;
         private final int count;
         private final int payment;
         private final int maxUses;
         private final int experience;
         private final float multiplier;
 
-        public TypeAwareBuyComponentsItemFactory(ItemConvertible item, BiFunction<VillagerType, ItemStack, ItemStack> processor, int count, int payment, int maxUses, int experience) {
+        public TypeAwareBuyComponentsItemFactory(ItemConvertible item, BiFunction<RegistryKey<VillagerType>, ItemStack, ItemStack> processor, int count, int payment, int maxUses, int experience) {
             this(
-                    Registries.VILLAGER_TYPE.stream().map(
+                    Registries.VILLAGER_TYPE.streamKeys().map(
                             type -> Map.entry(type, process(item, stack -> processor.apply(type, stack)))
                     ).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)), count, payment, maxUses, experience
             );
         }
 
-        public TypeAwareBuyComponentsItemFactory(Map<VillagerType, ItemStack> item, int count, int payment, int maxUses, int experience) {
+        public TypeAwareBuyComponentsItemFactory(Map<RegistryKey<VillagerType>, ItemStack> item, int count, int payment, int maxUses, int experience) {
             this.buy = item;
             this.count = count;
             this.payment = payment;
@@ -812,12 +813,12 @@ public class Trades {
         public TradeOffer create(Entity entity, Random random) {
             ItemStack buyStack;
             if (entity instanceof VillagerDataContainer villager) {
-                buyStack = this.buy.get(villager.getVillagerData().getType()).copy();
+                buyStack = this.buy.get(villager.getVillagerData().type().getKey().get()).copy();
             } else {
                 buyStack = this.buy.values().stream().findFirst().get().copy();
             }
             buyStack.setCount(this.count);
-            return new TradeOffer(new TradedItem(buyStack.getRegistryEntry(), this.count, ComponentPredicate.of(buyStack.getComponents())), new ItemStack(Items.EMERALD, this.payment), this.maxUses, this.experience, this.multiplier);
+            return new TradeOffer(new TradedItem(buyStack.getRegistryEntry(), this.count, ComponentMapPredicate.of(buyStack.getComponents())), new ItemStack(Items.EMERALD, this.payment), this.maxUses, this.experience, this.multiplier);
         }
     }
 }

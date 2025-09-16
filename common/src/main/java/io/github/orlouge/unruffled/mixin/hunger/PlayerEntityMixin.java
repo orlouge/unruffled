@@ -5,6 +5,7 @@ import io.github.orlouge.unruffled.UnruffledMod;
 import io.github.orlouge.unruffled.UnruffledModClient;
 import io.github.orlouge.unruffled.interfaces.ExtendedHungerManager;
 import io.github.orlouge.unruffled.interfaces.HasFireImmunitySetting;
+import net.minecraft.component.type.BlocksAttacksComponent;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ItemEntity;
@@ -19,6 +20,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -74,7 +76,7 @@ public abstract class PlayerEntityMixin extends LivingEntity {
     @Redirect(method = "attack", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;getAttributeValue(Lnet/minecraft/registry/entry/RegistryEntry;)D", ordinal = 1))
     public double increaseSweepingRatio(PlayerEntity playerEntity, RegistryEntry<EntityAttribute> registryEntry) {
         double normal = playerEntity.getAttributeValue(registryEntry);
-        int mouseSweepLevel = Math.min(3, (2 + (int) Math.abs(playerEntity.headYaw - playerEntity.prevHeadYaw)) / 10);
+        int mouseSweepLevel = Math.min(3, (2 + (int) Math.abs(playerEntity.headYaw - playerEntity.lastHeadYaw)) / 10);
         return Math.max(normal, (double) mouseSweepLevel / (mouseSweepLevel + 1));
     }
 
@@ -136,31 +138,10 @@ public abstract class PlayerEntityMixin extends LivingEntity {
         }
     }
 
-    @Inject(method = "damageShield", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;damage(ILnet/minecraft/entity/LivingEntity;Lnet/minecraft/entity/EquipmentSlot;)V"))
-    public void consumeStaminaOnShieldHit(float amount, CallbackInfo ci) {
-        if (this.getHungerManager() instanceof ExtendedHungerManager extendedHungerManager) {
-            extendedHungerManager.addStamina(Math.min(0.33f, -amount / 30f));
-        }
-    }
-
     @Inject(method = "applyDamage", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;setHealth(F)V"))
-    public void addWearinessOnDamage(DamageSource source, float amount, CallbackInfo ci) {
+    public void addWearinessOnDamage(ServerWorld world, DamageSource source, float amount, CallbackInfo ci) {
         if (this.getHungerManager() instanceof ExtendedHungerManager extendedHungerManager) {
             extendedHungerManager.addWeariness(amount / 2000f);
         }
-    }
-
-    @ModifyConstant(method = "Lnet/minecraft/entity/player/PlayerEntity;dropItem(Lnet/minecraft/item/ItemStack;ZZ)Lnet/minecraft/entity/ItemEntity;", constant = @Constant(floatValue = 0.5f, ordinal = 0))
-    public float modifyDropSpread(float velocity) {
-        return velocity * Config.INSTANCE.get().mechanicsConfig.dropSpreadFactor();
-    }
-
-    @ModifyVariable(method = "dropItem(Lnet/minecraft/item/ItemStack;ZZ)Lnet/minecraft/entity/ItemEntity;", at = @At("STORE"))
-    public ItemEntity makeDeathDropsFireImmune(ItemEntity drop, ItemStack stack, boolean throwRandomly, boolean retainOwnership)
-    {
-        if (throwRandomly && !retainOwnership && this.hasStatusEffect(StatusEffects.FIRE_RESISTANCE) && drop instanceof HasFireImmunitySetting immuneDrop) {
-            immuneDrop.setFireImmune(true);
-        }
-        return drop;
     }
 }

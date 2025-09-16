@@ -36,22 +36,22 @@ public abstract class LivingEntityMixin extends Entity {
 
     @Shadow @Nullable public abstract EntityAttributeInstance getAttributeInstance(RegistryEntry<EntityAttribute> attribute);
 
-    @ModifyConstant(method = "travel", constant = @Constant(doubleValue = 0.9900000095367432))
+    @ModifyConstant(method = "calcGlidingVelocity", constant = @Constant(doubleValue = 0.9900000095367432))
     public double decreaseHorizontalElytraSpeed(double speed) {
         return speed * Config.INSTANCE.get().elytraConfig.horizontalGlidingSpeedFactor();
     }
 
-    @ModifyConstant(method = "travel", constant = @Constant(doubleValue = 0.9800000190734863, ordinal = 0))
+    @ModifyConstant(method = "calcGlidingVelocity", constant = @Constant(doubleValue = 0.9800000190734863, ordinal = 0))
     public double decreaseVerticalElytraSpeed(double speed) {
         return speed * Config.INSTANCE.get().elytraConfig.verticalGlidingSpeedFactor();
     }
 
-    @Inject(method = "tryUseTotem", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "tryUseDeathProtector", at = @At("HEAD"), cancellable = true)
     public void disableTotemAttempt(DamageSource source, CallbackInfoReturnable<Boolean> cir) {
         if (Config.INSTANCE.get().mechanicsConfig.disableTotemOfUndying()) cir.cancel();
     }
 
-    @Redirect(method = "travel", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;getAttributeValue(Lnet/minecraft/registry/entry/RegistryEntry;)D", ordinal = 0))
+    @Redirect(method = "travelInFluid", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;getAttributeValue(Lnet/minecraft/registry/entry/RegistryEntry;)D", ordinal = 0))
     public double increaseSwimmingSpeedIfWaterBreathing(LivingEntity entity, RegistryEntry<EntityAttribute> attribute) {
         return Math.max(StatusEffectUtil.hasWaterBreathing(entity) ? 1 : 0, entity.getAttributeValue(attribute));
     }
@@ -60,7 +60,7 @@ public abstract class LivingEntityMixin extends Entity {
 
     @Inject(method = "tickMovement", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;addPowderSnowSlowIfNeeded()V", shift = At.Shift.AFTER))
     public void addSoulSpeedBoostWithNetheriteBoots(CallbackInfo ci) {
-        EntityAttributeInstance speedAttribute = this.getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED);
+        EntityAttributeInstance speedAttribute = this.getAttributeInstance(EntityAttributes.MOVEMENT_SPEED);
         if (speedAttribute != null) {
             boolean isOnSoulBlock = this.getLandingBlockState().isIn(BlockTags.SOUL_SPEED_BLOCKS);
             boolean hasSpeedBoost = speedAttribute.hasModifier(SOUL_BLOCKS_NETHERITE_BOOST);

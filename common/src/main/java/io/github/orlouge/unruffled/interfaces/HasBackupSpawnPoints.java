@@ -1,9 +1,12 @@
 package io.github.orlouge.unruffled.interfaces;
 
+import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -18,27 +21,12 @@ public interface HasBackupSpawnPoints {
     void setBackupSpawnPoints(Collection<SpawnPoint> spawnPoints);
 
     record SpawnPoint(BlockPos pos, RegistryKey<World> dimension, float angle, boolean forced) {
-        public static SpawnPoint fromNbt(NbtCompound nbt) {
-            BlockPos pos = new BlockPos(nbt.getInt("X"), nbt.getInt("Y"), nbt.getInt("Z"));
-            boolean forced = nbt.getBoolean("Forced");
-            float angle = nbt.getFloat("Angle");
-            DataResult<RegistryKey<World>> decoded = World.CODEC.parse(NbtOps.INSTANCE, nbt.get("Dimension"));
-            RegistryKey<World> dimension = decoded.resultOrPartial((err) -> {}).orElse(World.OVERWORLD);
-            return new SpawnPoint(pos, dimension, angle, forced);
-        }
-
-        public NbtCompound toNbt() {
-            NbtCompound nbt = new NbtCompound();
-            nbt.putInt("X", pos.getX());
-            nbt.putInt("Y", pos.getY());
-            nbt.putInt("Z", pos.getZ());
-            nbt.putBoolean("Forced", forced);
-            nbt.putFloat("Angle", angle);
-            Identifier.CODEC.encodeStart(NbtOps.INSTANCE, dimension.getValue()).resultOrPartial((err) -> {}).ifPresent((encoded) -> {
-                nbt.put("Dimension", encoded);
-            });
-            return nbt;
-        }
+        public static Codec<SpawnPoint> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+            BlockPos.CODEC.fieldOf("Position").forGetter(SpawnPoint::pos),
+            RegistryKey.createCodec(RegistryKeys.WORLD).fieldOf("Dimension").forGetter(SpawnPoint::dimension),
+            Codec.FLOAT.fieldOf("angle").forGetter(SpawnPoint::angle),
+            Codec.BOOL.fieldOf("forced").forGetter(SpawnPoint::forced)
+        ).apply(instance, SpawnPoint::new));
 
         @Override
         public boolean equals(Object o) {

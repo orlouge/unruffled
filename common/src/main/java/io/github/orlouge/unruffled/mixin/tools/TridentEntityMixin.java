@@ -12,6 +12,8 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LightningEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.mob.DrownedEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
 import net.minecraft.entity.projectile.TridentEntity;
 import net.minecraft.item.ItemStack;
@@ -20,6 +22,8 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
@@ -45,7 +49,7 @@ public abstract class TridentEntityMixin extends PersistentProjectileEntity {
         if (blockState != null) {
             if (blockState.isIn(BlockTags.WOOL)) {
                 ItemStack newStack = this.getItemStack().copyComponentsToNewStack(CustomItems.CHARGED_TRIDENT, 1);
-                newStack = ItemEnchantmentsHelper.setItemEnchantments(newStack, this.getWorld().getRegistryManager().createRegistryLookup());
+                newStack = ItemEnchantmentsHelper.setItemEnchantments(newStack, this.getWorld().getRegistryManager());
                 this.setStack(newStack);
                 if (this.getOwner() instanceof ServerPlayerEntity player) {
                     UnruffledMod.CHARGED_TRIDENT_CRITERION.trigger(player);
@@ -61,7 +65,7 @@ public abstract class TridentEntityMixin extends PersistentProjectileEntity {
         super.onStruckByLightning(world, lightning);
         if (this.isOnLightningRod) {
             ItemStack newStack = this.getItemStack().copyComponentsToNewStack(CustomItems.MAGNETIC_TRIDENT, 1);
-            newStack = ItemEnchantmentsHelper.setItemEnchantments(newStack, world.getRegistryManager().createRegistryLookup());
+            newStack = ItemEnchantmentsHelper.setItemEnchantments(newStack, world.getRegistryManager());
             this.setStack(newStack);
             this.isOnLightningRod = false;
             if (this.getOwner() instanceof ServerPlayerEntity player) {
@@ -70,10 +74,10 @@ public abstract class TridentEntityMixin extends PersistentProjectileEntity {
         }
     }
 
-    @Redirect(method = "onEntityHit", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;damage(Lnet/minecraft/entity/damage/DamageSource;F)Z"))
+    @Redirect(method = "onEntityHit", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;sidedDamage(Lnet/minecraft/entity/damage/DamageSource;F)Z"))
     public boolean impalingForUnderwaterMobs(Entity instance, DamageSource source, float amount) {
-        if (Config.INSTANCE.get().enchantmentsConfig.disabledEnchantments().contains(Enchantments.IMPALING) && instance instanceof LivingEntity livingEntity && livingEntity.isWet()) amount += 12.5f;
-        return instance.damage(source, amount);
+        if (Config.INSTANCE.get().enchantmentsConfig.disabledEnchantments().contains(Enchantments.IMPALING) && instance instanceof LivingEntity livingEntity && livingEntity.isTouchingWaterOrRain() && !(source.getAttacker() instanceof DrownedEntity)) amount += 12.5f;
+        return instance.sidedDamage(source, amount);
     }
 
     @ModifyVariable(method = "age", at = @At("STORE"), ordinal = 0)
@@ -81,13 +85,13 @@ public abstract class TridentEntityMixin extends PersistentProjectileEntity {
         return 3;
     }
 
-    @Inject(method = "readCustomDataFromNbt", at = @At("TAIL"))
-    public void readOnLightningRod(NbtCompound nbt, CallbackInfo ci) {
-        this.isOnLightningRod = nbt.getBoolean("IsOnLightningRod");
+    @Inject(method = "readCustomData", at = @At("TAIL"))
+    public void readOnLightningRod(ReadView view, CallbackInfo ci) {
+        this.isOnLightningRod = view.getBoolean("IsOnLightningRod", false);
     }
 
-    @Inject(method = "writeCustomDataToNbt", at = @At("TAIL"))
-    public void writeOnLightningRod(NbtCompound nbt, CallbackInfo ci) {
-        nbt.putBoolean("IsOnLightningRod", this.isOnLightningRod);
+    @Inject(method = "writeCustomData", at = @At("TAIL"))
+    public void writeOnLightningRod(WriteView view, CallbackInfo ci) {
+        view.putBoolean("IsOnLightningRod", this.isOnLightningRod);
     }
 }

@@ -9,6 +9,8 @@ import net.minecraft.entity.player.HungerManager;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.util.Pair;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameRules;
@@ -24,7 +26,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class HungerManagerMixin implements ExtendedHungerManager {
     @Shadow private int foodLevel;
     @Shadow private int foodTickTimer;
-    @Shadow private int prevFoodLevel;
     @Shadow private float saturationLevel;
     @Shadow private float exhaustion;
 
@@ -45,7 +46,7 @@ public abstract class HungerManagerMixin implements ExtendedHungerManager {
     private float health = 20f;
 
     @Inject(method = "update", at = @At("HEAD"), cancellable = true)
-    public void onUpdate(PlayerEntity player, CallbackInfo ci) {
+    public void onUpdate(ServerPlayerEntity player, CallbackInfo ci) {
         Vec3d playerPos = player.getPos();
 
         if (player.getVehicle() != null && new Vec3d(player.getVelocity().getX(), 0, player.getVelocity().getZ()).length() < 0.01f) {
@@ -73,7 +74,6 @@ public abstract class HungerManagerMixin implements ExtendedHungerManager {
             travelAmount = playerPos.subtract(this.averagePos);
             this.averagePos = playerPos.multiply(0.0002).add(this.averagePos.multiply(0.9998));
         }
-        this.prevFoodLevel = this.foodLevel;
         if (this.inventoryWeightTimer++ >= 50) {
             Pair<Float, Float> weight = this.calculateWeight(player);
             this.inventoryWeight = weight.getLeft();
@@ -158,24 +158,18 @@ public abstract class HungerManagerMixin implements ExtendedHungerManager {
         }
     }
 
-    @Inject(method = "writeNbt", at = @At("RETURN"))
-    public void onWriteNbt(NbtCompound nbt, CallbackInfo ci) {
+    @Inject(method = "writeData", at = @At("RETURN"))
+    public void onWriteNbt(WriteView nbt, CallbackInfo ci) {
         nbt.putFloat("stamina", stamina);
         nbt.putFloat("baseWeariness", baseWeariness);
         nbt.putFloat("amortizedWeariness", amortizedWeariness);
     }
 
-    @Inject(method = "readNbt", at = @At("RETURN"))
-    public void onReadNbt(NbtCompound nbt, CallbackInfo ci) {
-        if (nbt.contains("stamina")) {
-            this.stamina = nbt.getFloat("stamina");
-        }
-        if (nbt.contains("baseWeariness")) {
-            this.baseWeariness = nbt.getFloat("baseWeariness");
-        }
-        if (nbt.contains("amortizedWeariness")) {
-            this.amortizedWeariness = nbt.getFloat("amortizedWeariness");
-        }
+    @Inject(method = "readData", at = @At("RETURN"))
+    public void onReadNbt(ReadView nbt, CallbackInfo ci) {
+        this.stamina = nbt.getFloat("stamina", 1);
+        this.baseWeariness = nbt.getFloat("baseWeariness", 0);
+        this.amortizedWeariness = nbt.getFloat("amortizedWeariness", 0);
     }
 
     /*

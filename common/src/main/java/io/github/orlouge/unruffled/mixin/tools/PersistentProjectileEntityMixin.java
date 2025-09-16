@@ -25,7 +25,7 @@ public abstract class PersistentProjectileEntityMixin {
     @Shadow protected abstract ItemStack asItemStack();
 
 
-    @Inject(method = "onEntityHit", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/projectile/PersistentProjectileEntity;isShotFromCrossbow()Z", shift = At.Shift.BEFORE, ordinal = 0))
+    @Inject(method = "onEntityHit", at = @At(value = "INVOKE", target = "Ljava/util/List;add(Ljava/lang/Object;)Z", shift = At.Shift.AFTER, ordinal = 0))
     public void triggerPiercingArrowAdvancement(EntityHitResult entityHitResult, CallbackInfo ci) {
         if (this.piercingKilledEntities != null && this.piercingKilledEntities.size() >= 2 && this.asItemStack().isOf(CustomItems.PIERCING_ARROW) && ((Object) this) instanceof ProjectileEntity projectile && projectile.getOwner() instanceof ServerPlayerEntity player) {
             UnruffledMod.PIERCING_CRITERION.trigger(player);

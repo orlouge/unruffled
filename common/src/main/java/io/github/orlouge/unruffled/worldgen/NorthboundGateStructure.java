@@ -231,45 +231,45 @@ public class NorthboundGateStructure extends Structure {
         };
 
         public static final BlockState[] SOUTH_WALL = new BlockState[] {
-            Blocks.STONE_BRICK_WALL.getDefaultState().with(WallBlock.SOUTH_SHAPE, WallShape.LOW),
-            Blocks.STONE_BRICK_WALL.getDefaultState().with(WallBlock.SOUTH_SHAPE, WallShape.LOW),
-            Blocks.MOSSY_STONE_BRICK_WALL.getDefaultState().with(WallBlock.SOUTH_SHAPE, WallShape.LOW),
-            Blocks.MOSSY_COBBLESTONE_WALL.getDefaultState().with(WallBlock.SOUTH_SHAPE, WallShape.LOW),
+            Blocks.STONE_BRICK_WALL.getDefaultState().with(WallBlock.SOUTH_WALL_SHAPE, WallShape.LOW),
+            Blocks.STONE_BRICK_WALL.getDefaultState().with(WallBlock.SOUTH_WALL_SHAPE, WallShape.LOW),
+            Blocks.MOSSY_STONE_BRICK_WALL.getDefaultState().with(WallBlock.SOUTH_WALL_SHAPE, WallShape.LOW),
+            Blocks.MOSSY_COBBLESTONE_WALL.getDefaultState().with(WallBlock.SOUTH_WALL_SHAPE, WallShape.LOW),
         };
 
         public static final BlockState[] WEST_WALL = new BlockState[] {
-            Blocks.STONE_BRICK_WALL.getDefaultState().with(WallBlock.WEST_SHAPE, WallShape.LOW),
-            Blocks.STONE_BRICK_WALL.getDefaultState().with(WallBlock.WEST_SHAPE, WallShape.LOW),
-            Blocks.MOSSY_STONE_BRICK_WALL.getDefaultState().with(WallBlock.WEST_SHAPE, WallShape.LOW),
-            Blocks.MOSSY_COBBLESTONE_WALL.getDefaultState().with(WallBlock.WEST_SHAPE, WallShape.LOW),
+            Blocks.STONE_BRICK_WALL.getDefaultState().with(WallBlock.WEST_WALL_SHAPE, WallShape.LOW),
+            Blocks.STONE_BRICK_WALL.getDefaultState().with(WallBlock.WEST_WALL_SHAPE, WallShape.LOW),
+            Blocks.MOSSY_STONE_BRICK_WALL.getDefaultState().with(WallBlock.WEST_WALL_SHAPE, WallShape.LOW),
+            Blocks.MOSSY_COBBLESTONE_WALL.getDefaultState().with(WallBlock.WEST_WALL_SHAPE, WallShape.LOW),
         };
 
         public static final BlockState[] EAST_WALL = new BlockState[] {
-            Blocks.STONE_BRICK_WALL.getDefaultState().with(WallBlock.EAST_SHAPE, WallShape.LOW),
-            Blocks.STONE_BRICK_WALL.getDefaultState().with(WallBlock.EAST_SHAPE, WallShape.LOW),
-            Blocks.MOSSY_STONE_BRICK_WALL.getDefaultState().with(WallBlock.EAST_SHAPE, WallShape.LOW),
-            Blocks.MOSSY_COBBLESTONE_WALL.getDefaultState().with(WallBlock.EAST_SHAPE, WallShape.LOW),
+            Blocks.STONE_BRICK_WALL.getDefaultState().with(WallBlock.EAST_WALL_SHAPE, WallShape.LOW),
+            Blocks.STONE_BRICK_WALL.getDefaultState().with(WallBlock.EAST_WALL_SHAPE, WallShape.LOW),
+            Blocks.MOSSY_STONE_BRICK_WALL.getDefaultState().with(WallBlock.EAST_WALL_SHAPE, WallShape.LOW),
+            Blocks.MOSSY_COBBLESTONE_WALL.getDefaultState().with(WallBlock.EAST_WALL_SHAPE, WallShape.LOW),
         };
 
         public static final BlockState[] NORTH_WEST_WALL = new BlockState[] {
-            Blocks.STONE_BRICK_WALL.getDefaultState().with(WallBlock.WEST_SHAPE, WallShape.LOW).with(WallBlock.NORTH_SHAPE, WallShape.TALL),
-            Blocks.STONE_BRICK_WALL.getDefaultState().with(WallBlock.WEST_SHAPE, WallShape.LOW).with(WallBlock.NORTH_SHAPE, WallShape.TALL),
-            Blocks.MOSSY_STONE_BRICK_WALL.getDefaultState().with(WallBlock.WEST_SHAPE, WallShape.LOW).with(WallBlock.NORTH_SHAPE, WallShape.TALL),
-            Blocks.MOSSY_COBBLESTONE_WALL.getDefaultState().with(WallBlock.WEST_SHAPE, WallShape.LOW).with(WallBlock.NORTH_SHAPE, WallShape.TALL),
+            Blocks.STONE_BRICK_WALL.getDefaultState().with(WallBlock.WEST_WALL_SHAPE, WallShape.LOW).with(WallBlock.NORTH_WALL_SHAPE, WallShape.TALL),
+            Blocks.STONE_BRICK_WALL.getDefaultState().with(WallBlock.WEST_WALL_SHAPE, WallShape.LOW).with(WallBlock.NORTH_WALL_SHAPE, WallShape.TALL),
+            Blocks.MOSSY_STONE_BRICK_WALL.getDefaultState().with(WallBlock.WEST_WALL_SHAPE, WallShape.LOW).with(WallBlock.NORTH_WALL_SHAPE, WallShape.TALL),
+            Blocks.MOSSY_COBBLESTONE_WALL.getDefaultState().with(WallBlock.WEST_WALL_SHAPE, WallShape.LOW).with(WallBlock.NORTH_WALL_SHAPE, WallShape.TALL),
         };
 
         public static final BlockState[] NORTH_EAST_WALL = new BlockState[] {
-            Blocks.STONE_BRICK_WALL.getDefaultState().with(WallBlock.EAST_SHAPE, WallShape.LOW).with(WallBlock.NORTH_SHAPE, WallShape.TALL),
-            Blocks.STONE_BRICK_WALL.getDefaultState().with(WallBlock.EAST_SHAPE, WallShape.LOW).with(WallBlock.NORTH_SHAPE, WallShape.TALL),
-            Blocks.MOSSY_STONE_BRICK_WALL.getDefaultState().with(WallBlock.EAST_SHAPE, WallShape.LOW).with(WallBlock.NORTH_SHAPE, WallShape.TALL),
-            Blocks.MOSSY_COBBLESTONE_WALL.getDefaultState().with(WallBlock.EAST_SHAPE, WallShape.LOW).with(WallBlock.NORTH_SHAPE, WallShape.TALL),
+            Blocks.STONE_BRICK_WALL.getDefaultState().with(WallBlock.EAST_WALL_SHAPE, WallShape.LOW).with(WallBlock.NORTH_WALL_SHAPE, WallShape.TALL),
+            Blocks.STONE_BRICK_WALL.getDefaultState().with(WallBlock.EAST_WALL_SHAPE, WallShape.LOW).with(WallBlock.NORTH_WALL_SHAPE, WallShape.TALL),
+            Blocks.MOSSY_STONE_BRICK_WALL.getDefaultState().with(WallBlock.EAST_WALL_SHAPE, WallShape.LOW).with(WallBlock.NORTH_WALL_SHAPE, WallShape.TALL),
+            Blocks.MOSSY_COBBLESTONE_WALL.getDefaultState().with(WallBlock.EAST_WALL_SHAPE, WallShape.LOW).with(WallBlock.NORTH_WALL_SHAPE, WallShape.TALL),
         };
 
         public static final BlockState[] EAST_WEST_WALL = new BlockState[] {
-            Blocks.STONE_BRICK_WALL.getDefaultState().with(WallBlock.EAST_SHAPE, WallShape.LOW).with(WallBlock.WEST_SHAPE, WallShape.LOW),
-            Blocks.STONE_BRICK_WALL.getDefaultState().with(WallBlock.EAST_SHAPE, WallShape.LOW).with(WallBlock.WEST_SHAPE, WallShape.LOW),
-            Blocks.MOSSY_STONE_BRICK_WALL.getDefaultState().with(WallBlock.EAST_SHAPE, WallShape.LOW).with(WallBlock.WEST_SHAPE, WallShape.LOW),
-            Blocks.MOSSY_COBBLESTONE_WALL.getDefaultState().with(WallBlock.EAST_SHAPE, WallShape.LOW).with(WallBlock.WEST_SHAPE, WallShape.LOW),
+            Blocks.STONE_BRICK_WALL.getDefaultState().with(WallBlock.EAST_WALL_SHAPE, WallShape.LOW).with(WallBlock.WEST_WALL_SHAPE, WallShape.LOW),
+            Blocks.STONE_BRICK_WALL.getDefaultState().with(WallBlock.EAST_WALL_SHAPE, WallShape.LOW).with(WallBlock.WEST_WALL_SHAPE, WallShape.LOW),
+            Blocks.MOSSY_STONE_BRICK_WALL.getDefaultState().with(WallBlock.EAST_WALL_SHAPE, WallShape.LOW).with(WallBlock.WEST_WALL_SHAPE, WallShape.LOW),
+            Blocks.MOSSY_COBBLESTONE_WALL.getDefaultState().with(WallBlock.EAST_WALL_SHAPE, WallShape.LOW).with(WallBlock.WEST_WALL_SHAPE, WallShape.LOW),
         };
 
         public static final BlockState[] BRICKS = new BlockState[] {

@@ -2,15 +2,9 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "#": {
-      "item": "minecraft:copper_ingot"
-    },
-    "C": {
-      "item": "minecraft:diamond"
-    },
-    "S": {
-      "item": "minecraft:bolt_armor_trim_smithing_template"
-    }
+    "#": "minecraft:copper_ingot",
+    "C": "minecraft:diamond",
+    "S": "minecraft:bolt_armor_trim_smithing_template"
   },
   "pattern": [
     "#S#",

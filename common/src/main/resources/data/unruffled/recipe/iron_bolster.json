@@ -6,12 +6,8 @@
     "N  "
   ],
   "key": {
-    "I": {
-      "item": "minecraft:iron_ingot"
-    },
-    "N": {
-      "item": "minecraft:iron_nugget"
-    }
+    "I": "minecraft:iron_ingot",
+    "N": "minecraft:iron_nugget"
   },
   "result": {
     "id": "unruffled:iron_bolster",

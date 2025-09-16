@@ -40,7 +40,7 @@ public class ItemMixin {
             } else {
                 compassDB.deleteLodestoneName(pos, serverWorld);
             }
-            cir.setReturnValue(ActionResult.SUCCESS_NO_ITEM_USED);
+            cir.setReturnValue(ActionResult.SUCCESS);
             cir.cancel();
         }
     }

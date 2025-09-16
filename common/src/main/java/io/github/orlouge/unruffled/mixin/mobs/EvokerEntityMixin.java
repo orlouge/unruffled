@@ -9,6 +9,7 @@ import net.minecraft.entity.mob.EvokerEntity;
 import net.minecraft.entity.mob.SpellcastingIllagerEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.village.raid.Raid;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
@@ -24,7 +25,7 @@ public abstract class EvokerEntityMixin extends SpellcastingIllagerEntity {
 
     @Override
     public void onDeath(DamageSource damageSource) {
-        if (!this.raidSpawned && this.getRaid() == null && damageSource.getAttacker() instanceof PlayerEntity playerEntity) {
+        if (!this.raidSpawned && this.getRaid() == null && damageSource.getAttacker() instanceof ServerPlayerEntity playerEntity) {
             /*
             if (Config.INSTANCE.get().mechanicsConfig.badOmenFromEvilTotem()) {
                 StatusEffectInstance playerBadOmen = playerEntity.getStatusEffect(StatusEffects.BAD_OMEN);
@@ -43,12 +44,12 @@ public abstract class EvokerEntityMixin extends SpellcastingIllagerEntity {
                 }
             }
              */
-            if (Config.INSTANCE.get().mechanicsConfig.evokerDropsEvilTotem()) {
+            if (io.github.orlouge.unruffled.config.Config.INSTANCE.get().mechanicsConfig.evokerDropsEvilTotem()) {
                 ItemStack totem = new ItemStack(CustomItems.EVIL_TOTEM);
-                if (Config.INSTANCE.get().mechanicsConfig.badOmenFromEvilTotem()) {
-                    ItemEnchantmentsHelper.setItemEnchantments(totem, this.getRegistryManager().createRegistryLookup());
+                if (io.github.orlouge.unruffled.config.Config.INSTANCE.get().mechanicsConfig.badOmenFromEvilTotem()) {
+                    ItemEnchantmentsHelper.setItemEnchantments(totem, this.getRegistryManager());
                 }
-                this.dropStack(totem);
+                this.dropStack(playerEntity.getWorld(), totem);
             }
         }
 

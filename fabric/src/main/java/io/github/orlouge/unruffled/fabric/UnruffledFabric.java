@@ -15,7 +15,7 @@ import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.fabricmc.fabric.api.loot.v3.LootTableEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.registry.FabricBrewingRecipeRegistryBuilder;
-import net.fabricmc.fabric.api.registry.FuelRegistry;
+import net.fabricmc.fabric.api.registry.FuelRegistryEvents;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.item.ItemGroups;
@@ -54,28 +54,28 @@ public class UnruffledFabric implements ModInitializer {
         Registry.register(Registries.DATA_COMPONENT_TYPE, Identifier.of(UnruffledMod.MOD_ID, "codex_number"), AncientCodexItem.NUMBER);
         Registry.register(Registries.DATA_COMPONENT_TYPE, Identifier.of(UnruffledMod.MOD_ID, "locked_compass"), UnruffledMod.LOCKED_COMPASS_COMPONENT);
 
-        Registry.register(Registries.ITEM, Identifier.of(UnruffledMod.MOD_ID, "golden_berries"), CustomItems.GOLDEN_BERRIES);
-        Registry.register(Registries.ITEM, Identifier.of(UnruffledMod.MOD_ID, "iron_bolster"), CustomItems.IRON_BOLSTER);
-        Registry.register(Registries.ITEM, Identifier.of(UnruffledMod.MOD_ID, "diamond_bolster"), CustomItems.DIAMOND_BOLSTER);
-        Registry.register(Registries.ITEM, Identifier.of(UnruffledMod.MOD_ID, "netherite_bolster"), CustomItems.NETHERITE_BOLSTER);
-        Registry.register(Registries.ITEM, Identifier.of(UnruffledMod.MOD_ID, "charged_trident"), CustomItems.CHARGED_TRIDENT);
-        Registry.register(Registries.ITEM, Identifier.of(UnruffledMod.MOD_ID, "magnetic_trident"), CustomItems.MAGNETIC_TRIDENT);
-        Registry.register(Registries.ITEM, Identifier.of(UnruffledMod.MOD_ID, "piercing_arrow"), CustomItems.PIERCING_ARROW);
-        Registry.register(Registries.ITEM, Identifier.of(UnruffledMod.MOD_ID, "igniting_arrow"), CustomItems.IGNITING_ARROW);
-        Registry.register(Registries.ITEM, Identifier.of(UnruffledMod.MOD_ID, "ancient_codex"), CustomItems.ANCIENT_CODEX);
-        Registry.register(Registries.ITEM, Identifier.of(UnruffledMod.MOD_ID, "evil_totem"), CustomItems.EVIL_TOTEM);
-        Registry.register(Registries.ITEM, Identifier.of(UnruffledMod.MOD_ID, "blazing_sword"), CustomItems.BLAZING_SWORD);
-        Registry.register(Registries.ITEM, Identifier.of(UnruffledMod.MOD_ID, "sacred_sword"), CustomItems.SACRED_SWORD);
+        Registry.register(Registries.ITEM, CustomItems.GOLDEN_BERRIES_KEY, CustomItems.GOLDEN_BERRIES);
+        Registry.register(Registries.ITEM, CustomItems.IRON_BOLSTER_KEY, CustomItems.IRON_BOLSTER);
+        Registry.register(Registries.ITEM, CustomItems.DIAMOND_BOLSTER_KEY, CustomItems.DIAMOND_BOLSTER);
+        Registry.register(Registries.ITEM, CustomItems.NETHERITE_BOLSTER_KEY, CustomItems.NETHERITE_BOLSTER);
+        Registry.register(Registries.ITEM, CustomItems.CHARGED_TRIDENT_KEY, CustomItems.CHARGED_TRIDENT);
+        Registry.register(Registries.ITEM, CustomItems.MAGNETIC_TRIDENT_KEY, CustomItems.MAGNETIC_TRIDENT);
+        Registry.register(Registries.ITEM, CustomItems.PIERCING_ARROW_KEY, CustomItems.PIERCING_ARROW);
+        Registry.register(Registries.ITEM, CustomItems.IGNITING_ARROW_KEY, CustomItems.IGNITING_ARROW);
+        Registry.register(Registries.ITEM, CustomItems.ANCIENT_CODEX_KEY, CustomItems.ANCIENT_CODEX);
+        Registry.register(Registries.ITEM, CustomItems.EVIL_TOTEM_KEY, CustomItems.EVIL_TOTEM);
+        Registry.register(Registries.ITEM, CustomItems.BLAZING_SWORD_KEY, CustomItems.BLAZING_SWORD);
+        Registry.register(Registries.ITEM, CustomItems.SACRED_SWORD_KEY, CustomItems.SACRED_SWORD);
 
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.TOOLS).register(content -> {
-            RegistryEntryLookup.RegistryLookup lookup = content.getContext().lookup().createRegistryLookup();
+            RegistryEntryLookup.RegistryLookup lookup = content.getContext().lookup();
             content.add(ItemEnchantmentsHelper.createWithItemEnchantments(CustomItems.IRON_BOLSTER, lookup));
             content.add(ItemEnchantmentsHelper.createWithItemEnchantments(CustomItems.DIAMOND_BOLSTER, lookup));
             content.add(ItemEnchantmentsHelper.createWithItemEnchantments(CustomItems.NETHERITE_BOLSTER, lookup));
         });
 
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.COMBAT).register(content -> {
-            RegistryEntryLookup.RegistryLookup lookup = content.getContext().lookup().createRegistryLookup();
+            RegistryEntryLookup.RegistryLookup lookup = content.getContext().lookup();
             content.add(ItemEnchantmentsHelper.createWithItemEnchantments(CustomItems.CHARGED_TRIDENT, lookup));
             content.add(ItemEnchantmentsHelper.createWithItemEnchantments(CustomItems.MAGNETIC_TRIDENT, lookup));
             content.add(ItemEnchantmentsHelper.createWithItemEnchantments(CustomItems.PIERCING_ARROW, lookup));
@@ -151,6 +151,10 @@ public class UnruffledFabric implements ModInitializer {
             }
         });
 
+        FuelRegistryEvents.BUILD.register(((builder, context) -> {
+            builder.add(Items.LAVA_BUCKET, 200);
+        }));
+
         UnruffledMod.init();
         BiomeModifications.addSpawn(
                 ctx -> ctx.getBiomeKey().getValue().equals(Identifier.ofVanilla("nether_wastes")),
@@ -172,7 +176,5 @@ public class UnruffledFabric implements ModInitializer {
                 BiomeSelectors.tag(BiomeTags.IS_OCEAN), GenerationStep.Feature.UNDERGROUND_ORES,
                 RegistryKey.of(RegistryKeys.PLACED_FEATURE, Identifier.of(UnruffledMod.MOD_ID, "ore_prismarine"))
         );
-
-        FuelRegistry.INSTANCE.add(Items.LAVA_BUCKET, 200);
     }
 }

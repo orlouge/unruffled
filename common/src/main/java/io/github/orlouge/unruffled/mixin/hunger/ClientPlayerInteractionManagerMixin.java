@@ -29,7 +29,7 @@ public class ClientPlayerInteractionManagerMixin {
     @Inject(method = "interactItem", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerInteractionManager;syncSelectedSlot()V"))
     public void extraItemActions(PlayerEntity player, Hand hand, CallbackInfoReturnable<ActionResult> cir) {
         if (UnruffledModClient.onItemUse(player)) {
-            cir.setReturnValue(ActionResult.SUCCESS_NO_ITEM_USED);
+            cir.setReturnValue(ActionResult.SUCCESS);
             cir.cancel();
         }
     }
