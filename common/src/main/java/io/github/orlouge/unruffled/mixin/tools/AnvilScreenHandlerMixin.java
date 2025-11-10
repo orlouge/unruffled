@@ -64,7 +64,7 @@ public abstract class AnvilScreenHandlerMixin extends ForgingScreenHandler {
 
         if (player instanceof ServerPlayerEntity serverPlayer && stack.contains(DataComponentTypes.LODESTONE_TRACKER)) {
             ItemStack buyStack = stack.copyComponentsToNewStack(Items.COMPASS, 1);
-            TradedCompasses.get(serverPlayer.getWorld().getPersistentStateManager()).addBuy(serverPlayer, buyStack);
+            TradedCompasses.get(serverPlayer.getEntityWorld().getPersistentStateManager()).addBuy(serverPlayer, buyStack);
         }
     }
 

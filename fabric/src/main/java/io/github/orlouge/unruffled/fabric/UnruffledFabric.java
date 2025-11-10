@@ -141,7 +141,7 @@ public class UnruffledFabric implements ModInitializer {
         });
 
         if (Config.INSTANCE.get().mechanicsConfig.sleepTime() >= 0) {
-            EntitySleepEvents.ALLOW_SLEEP_TIME.register((player, pos, isNight) -> !isNight || (player.getWorld().getLunarTime() % 24000 < Config.INSTANCE.get().mechanicsConfig.sleepTime() /*player.getWorld().getAmbientDarkness() < 11*/ && !player.getWorld().isThundering()) ? ActionResult.FAIL : ActionResult.SUCCESS);
+            EntitySleepEvents.ALLOW_SLEEP_TIME.register((player, pos, isNight) -> !isNight || (player.getEntityWorld().getLunarTime() % 24000 < Config.INSTANCE.get().mechanicsConfig.sleepTime() /*player.getWorld().getAmbientDarkness() < 11*/ && !player.getEntityWorld().isThundering()) ? ActionResult.FAIL : ActionResult.SUCCESS);
         }
 
         FabricBrewingRecipeRegistryBuilder.BUILD.register(builder -> {

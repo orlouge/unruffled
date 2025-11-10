@@ -47,7 +47,7 @@ public abstract class HungerManagerMixin implements ExtendedHungerManager {
 
     @Inject(method = "update", at = @At("HEAD"), cancellable = true)
     public void onUpdate(ServerPlayerEntity player, CallbackInfo ci) {
-        Vec3d playerPos = player.getPos();
+        Vec3d playerPos = player.getEntityPos();
 
         if (player.getVehicle() != null && new Vec3d(player.getVelocity().getX(), 0, player.getVelocity().getZ()).length() < 0.01f) {
             baseWeariness = baseWeariness * Config.INSTANCE.get().hungerConfig.wearinessDecreaseFactorOnStillEntities();
@@ -55,14 +55,14 @@ public abstract class HungerManagerMixin implements ExtendedHungerManager {
             baseWeariness = baseWeariness * Config.INSTANCE.get().hungerConfig.wearinessDecreaseFactor();
         }
 
-        DimensionType currentDimension = player.getWorld().getDimension();
+        DimensionType currentDimension = player.getEntityWorld().getDimension();
         if (currentDimension != dimensionType) {
             averagePos = playerPos;
         }
         dimensionType = currentDimension;
         health = player.getHealth();
-        isNight = player.getWorld().isNight();
-        isUnderground = player.getPos().getY() < player.getWorld().getSeaLevel() * 0.9 || player.isSubmergedInWater();
+        isNight = player.getEntityWorld().isNight();
+        isUnderground = player.getEntityPos().getY() < player.getEntityWorld().getSeaLevel() * 0.9 || player.isSubmergedInWater();
         float targetWeariness = this.getTargetWeariness();
         amortizedWeariness = Math.min(1f, 0.997f * amortizedWeariness + 0.003f * targetWeariness);
 
@@ -104,7 +104,7 @@ public abstract class HungerManagerMixin implements ExtendedHungerManager {
             this.stamina = Math.max(0f, stamina - consumedStamina);
             this.addWeariness(Math.min(0.15f, consumedStamina) * (Config.INSTANCE.get().hungerConfig.wearinessIncreaseFactor() * (0.1f + this.amortizedWeariness)));
         }
-        if (this.stamina > 0.05 && player.getHealth() < player.getMaxHealth() && player.getWorld().getGameRules().getBoolean(GameRules.NATURAL_REGENERATION)) {
+        if (this.stamina > 0.05 && player.getHealth() < player.getMaxHealth() && player.getEntityWorld().getGameRules().getBoolean(GameRules.NATURAL_REGENERATION)) {
             ++this.foodTickTimer;
             if (this.foodTickTimer >= 200 / Math.min(this.stamina, 0.4)) {
                 player.heal(1f);

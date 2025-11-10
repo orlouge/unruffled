@@ -26,14 +26,14 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
         super(world, profile);
     }
 
-    @Redirect(method = "canSprint", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/HungerManager;getFoodLevel()I"))
+    @Redirect(method = "canSprint()Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/HungerManager;getFoodLevel()I"))
     public int redirectGetFoodLevel(HungerManager instance) {
         return (instance instanceof ExtendedHungerManager ext) ? (int) (UnruffledModClient.stamina * 9 / (0.1 * ext.getStaminaDepletionRate())) : instance.getFoodLevel();
     }
 
-    @Redirect(method = "canStartSprinting", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;canSprint()Z"))
-    public boolean redirectCanSprint(ClientPlayerEntity instance) {
-        return instance.canSprint() && this.sprintingCooldown <= 0;
+    @Redirect(method = "canStartSprinting", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;canSprint(Z)Z"))
+    public boolean redirectCanSprint(ClientPlayerEntity instance, boolean allowTouchingWater) {
+        return instance.canSprint(this.getAbilities().flying) && this.sprintingCooldown <= 0;
     }
 
     @Inject(method = "tick", at = @At("HEAD"))

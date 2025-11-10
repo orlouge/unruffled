@@ -45,11 +45,11 @@ public abstract class TridentEntityMixin extends PersistentProjectileEntity {
     protected void onBlockHit(BlockHitResult blockHitResult) {
         super.onBlockHit(blockHitResult);
         if (!this.getItemStack().isOf(Items.TRIDENT)) return;
-        BlockState blockState = this.getWorld().getBlockState(blockHitResult.getBlockPos());
+        BlockState blockState = this.getEntityWorld().getBlockState(blockHitResult.getBlockPos());
         if (blockState != null) {
             if (blockState.isIn(BlockTags.WOOL)) {
                 ItemStack newStack = this.getItemStack().copyComponentsToNewStack(CustomItems.CHARGED_TRIDENT, 1);
-                newStack = ItemEnchantmentsHelper.setItemEnchantments(newStack, this.getWorld().getRegistryManager());
+                newStack = ItemEnchantmentsHelper.setItemEnchantments(newStack, this.getEntityWorld().getRegistryManager());
                 this.setStack(newStack);
                 if (this.getOwner() instanceof ServerPlayerEntity player) {
                     UnruffledMod.CHARGED_TRIDENT_CRITERION.trigger(player);

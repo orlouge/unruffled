@@ -4,6 +4,7 @@ import io.github.orlouge.unruffled.interfaces.HasAttachedLodestone;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.command.OrderedRenderCommandQueue;
 import net.minecraft.client.render.entity.DisplayEntityRenderer;
 import net.minecraft.client.render.entity.state.TextDisplayEntityRenderState;
 import net.minecraft.client.util.math.MatrixStack;
@@ -16,8 +17,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(DisplayEntityRenderer.TextDisplayEntityRenderer.class)
 public class DisplayEntityRenderMixin {
-    @Inject(method = "render(Lnet/minecraft/client/render/entity/state/TextDisplayEntityRenderState;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;IF)V", at = @At("HEAD"), cancellable = true)
-    public void hideLodestoneText(TextDisplayEntityRenderState textDisplayEntityRenderState, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i, float f, CallbackInfo ci) {
+    @Inject(method = "render(Lnet/minecraft/client/render/entity/state/TextDisplayEntityRenderState;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/command/OrderedRenderCommandQueue;IF)V", at = @At("HEAD"), cancellable = true)
+    public void hideLodestoneText(TextDisplayEntityRenderState textDisplayEntityRenderState, MatrixStack matrixStack, OrderedRenderCommandQueue orderedRenderCommandQueue, int i, float f, CallbackInfo ci) {
         if (textDisplayEntityRenderState instanceof HasAttachedLodestone attachedLodestone && attachedLodestone.getAttachedLodestone().isPresent()) {
             MinecraftClient client = MinecraftClient.getInstance();
             if (client == null || client.world == null ||

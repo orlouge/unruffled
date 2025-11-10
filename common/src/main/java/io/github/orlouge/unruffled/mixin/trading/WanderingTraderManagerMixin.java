@@ -20,7 +20,7 @@ public class WanderingTraderManagerMixin {
     @Shadow private int spawnChance;
 
     @ModifyConstant(method = "spawn", constant = @Constant(intValue = 25))
-    public int decreaseMinimumChanceAndIncrement(int constant, ServerWorld world, boolean spawnMonsters, boolean spawnAnimals) {
+    public int decreaseMinimumChanceAndIncrement(int constant, ServerWorld world) {
         return Config.INSTANCE.get().mechanicsConfig.wanderingSpawnFrequency() * (1 + (int) (4 / (1 + world.getTime() / 200000)));
     }
 
@@ -30,7 +30,7 @@ public class WanderingTraderManagerMixin {
     }
 
     @Inject(method = "spawn", at = @At("RETURN"))
-    public void alwaysSaveSpawnChance(ServerWorld world, boolean spawnMonsters, boolean spawnAnimals, CallbackInfo ci) {
+    public void alwaysSaveSpawnChance(ServerWorld world, boolean spawnMonsters, CallbackInfo ci) {
         this.properties.setWanderingTraderSpawnChance(this.spawnChance);
     }
 

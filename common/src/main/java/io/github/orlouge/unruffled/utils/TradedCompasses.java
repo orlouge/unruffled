@@ -209,10 +209,10 @@ public class TradedCompasses extends PersistentState {
                     duplicateLore = usedLores.getOrDefault(compassLore, 0) > 1;
                 }
                 if (duplicateName && duplicateLore) {
-                    Optional<GameProfile> profile = Optional.ofNullable(world.getServer().getUserCache()).flatMap(cache -> cache.getByUuid(uuid));
+                    Optional<GameProfile> profile = Optional.ofNullable(world.getServer().getApiServices().profileResolver()).flatMap(resolver -> resolver.getProfileById(uuid));
                     if (profile.isPresent()) {
                         if (lore == null) lore = new ArrayList<>();
-                        lore.addAll(Text.of(String.format("%s / %04d", profile.get().getName(), Math.abs(pos.hashCode()) % 10000)).getWithStyle(Style.EMPTY.withColor(Formatting.GRAY)));
+                        lore.addAll(Text.of(String.format("%s / %04d", profile.get().name(), Math.abs(pos.hashCode()) % 10000)).getWithStyle(Style.EMPTY.withColor(Formatting.GRAY)));
                     }
                 }
                 if (name != null) stack.set(DataComponentTypes.CUSTOM_NAME, name);

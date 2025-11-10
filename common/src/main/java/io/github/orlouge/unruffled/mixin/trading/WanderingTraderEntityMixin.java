@@ -42,7 +42,7 @@ public abstract class WanderingTraderEntityMixin extends MerchantEntity implemen
 
     @Inject(method = "afterUsing", at = @At("HEAD"))
     public void increaseSpawnChangeAfterTrading(TradeOffer offer, CallbackInfo ci) {
-        if (this.getWorld() instanceof ServerWorld world) {
+        if (this.getEntityWorld() instanceof ServerWorld world) {
             if (unruffled_spawnChanceDiff < 30 && this.unruffled_wanderingTraderManager != null) {
                 ServerWorldProperties properties = world.getServer().getSaveProperties().getMainWorldProperties();
                 unruffled_spawnChanceIncrease += offer.getMerchantExperience() * 0.8f;
@@ -65,7 +65,7 @@ public abstract class WanderingTraderEntityMixin extends MerchantEntity implemen
     @Override
     public void onDeath(DamageSource damageSource) {
         super.onDeath(damageSource);
-        if (damageSource.getAttacker() instanceof PlayerEntity && this.getWorld() instanceof ServerWorld world && this.unruffled_wanderingTraderManager != null) {
+        if (damageSource.getAttacker() instanceof PlayerEntity && this.getEntityWorld() instanceof ServerWorld world && this.unruffled_wanderingTraderManager != null) {
             ServerWorldProperties properties = world.getServer().getSaveProperties().getMainWorldProperties();
             this.unruffled_wanderingTraderManager.spawnChance = 1 + unruffled_spawnChanceDiff;
             properties.setWanderingTraderSpawnChance(this.unruffled_wanderingTraderManager.spawnChance);
@@ -85,7 +85,7 @@ public abstract class WanderingTraderEntityMixin extends MerchantEntity implemen
                     if (trades.enabled().orElse(true)) {
                         for (Trades.ConfiguredWanderingTraderPool pool : trades.pools()) {
                             this.fillRecipesFromPool(this.offers, Arrays.stream(pool.trades()).map(
-                                configuredTrade -> configuredTrade.toFactory(this.getWorld().getRegistryManager())
+                                configuredTrade -> configuredTrade.toFactory(this.getEntityWorld().getRegistryManager())
                             ).toArray(TradeOffers.Factory[]::new), pool.count());
                         }
                     }
@@ -109,8 +109,8 @@ public abstract class WanderingTraderEntityMixin extends MerchantEntity implemen
 
     @Override
     public PlayerEntity getNearbyPlayer(int index) {
-        if (this.unruffled_nearbyPlayers == null && this.getWorld() instanceof ServerWorld world) {
-            this.unruffled_nearbyPlayers = world.getPlayers(player -> player.getPos().distanceTo(this.getPos()) < 48, 20);
+        if (this.unruffled_nearbyPlayers == null && this.getEntityWorld() instanceof ServerWorld world) {
+            this.unruffled_nearbyPlayers = world.getPlayers(player -> player.getEntityPos().distanceTo(this.getEntityPos()) < 48, 20);
             Collections.shuffle(this.unruffled_nearbyPlayers, new Random(this.getRandom().nextLong()));
         }
         if (this.unruffled_nearbyPlayers != null && index < this.unruffled_nearbyPlayers.size()) {

@@ -28,6 +28,7 @@ import net.minecraft.util.math.GlobalPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldProperties;
 import net.minecraft.world.dimension.DimensionTypes;
 import net.minecraft.world.poi.PointOfInterestTypes;
 
@@ -48,7 +49,7 @@ public class TeleportEffect extends StatusEffect  {
     @Override
     public boolean applyUpdateEffect(ServerWorld world, LivingEntity entity, int amplifier) {
         if (entity instanceof TeleporterEntity teleporter && teleporter.isTeleporting() && entity instanceof ServerPlayerEntity player) {
-            ServerWorld playerWorld = player.getWorld();
+            ServerWorld playerWorld = player.getEntityWorld();
             Collection<Entity> teleportTargets = teleporter.getTeleportTargets();
             teleporter.clearTeleporting();
             Optional<Pair<ServerWorld, Pair<BlockPos, Vec3d>>> teleportPosWorld = getTeleportPos(player);
@@ -76,7 +77,7 @@ public class TeleportEffect extends StatusEffect  {
     }
 
     public static Optional<Pair<ServerWorld, Pair<BlockPos, Vec3d>>> getTeleportPos(ServerPlayerEntity player) {
-        ServerWorld playerWorld = player.getWorld();
+        ServerWorld playerWorld = player.getEntityWorld();
         ServerWorld targetWorld = null;
         BlockPos targetPos = null;
         boolean hasCompass = false;
@@ -120,7 +121,7 @@ public class TeleportEffect extends StatusEffect  {
                 for (int y = up > 0 ? 0 : 1; y <= 2; y++) {
                     for (int x = -2; x <= 2; x++) {
                         for (int z = -2; z <= 2; z++) {
-                            teleportPos = ServerPlayerEntity.findRespawnPosition(targetWorld, new ServerPlayerEntity.Respawn(targetWorld.getRegistryKey(), targetPos.add(x, y * up, z), 0f, true), true).map(r -> r.pos);
+                            teleportPos = ServerPlayerEntity.findRespawnPosition(targetWorld, new ServerPlayerEntity.Respawn(new WorldProperties.SpawnPoint(new GlobalPos(targetWorld.getRegistryKey(), targetPos.add(x, y * up, z)), 0f, 0f), true), true).map(r -> r.pos);
                             if (teleportPos.isPresent()) break found;
                         }
                     }

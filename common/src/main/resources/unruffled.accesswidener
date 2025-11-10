@@ -14,7 +14,6 @@ accessible class net/minecraft/village/TradeOffers$SellMapFactory
 accessible class net/minecraft/village/TradeOffers$SellDyedArmorFactory
 accessible method net/minecraft/entity/Entity setRotation (FF)V
 accessible method net/minecraft/entity/decoration/ItemFrameEntity setRotation (IZ)V
-accessible field net/minecraft/block/entity/ChiseledBookshelfBlockEntity inventory Lnet/minecraft/util/collection/DefaultedList;
 accessible field net/minecraft/world/WanderingTraderManager spawnChance I
 accessible field net/minecraft/world/WanderingTraderManager spawnDelay I
 accessible method net/minecraft/entity/projectile/PersistentProjectileEntity setPierceLevel (B)V
@@ -27,3 +26,4 @@ accessible method net/minecraft/entity/decoration/DisplayEntity setBillboardMode
 accessible field net/minecraft/entity/projectile/PersistentProjectileEntity damage D
 accessible field net/minecraft/client/gui/hud/bar/ExperienceBar BACKGROUND Lnet/minecraft/util/Identifier;
 accessible field net/minecraft/client/gui/hud/bar/ExperienceBar PROGRESS Lnet/minecraft/util/Identifier;
+accessible method net/minecraft/client/network/ClientPlayerEntity canSprint (Z)Z

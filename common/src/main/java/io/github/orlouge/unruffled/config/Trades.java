@@ -678,9 +678,9 @@ public class Trades {
 
         @Override
         public TradeOffer create(Entity entity, Random random) {
-            if (entity.getWorld() instanceof ServerWorld world) {
+            if (entity.getEntityWorld() instanceof ServerWorld world) {
                 TradedCompasses compasses = TradedCompasses.get(world.getPersistentStateManager());
-                ItemStack compass = compasses.getRandomSell(5, world, random, entity.getPos());
+                ItemStack compass = compasses.getRandomSell(5, world, random, entity.getEntityPos());
                 if (compass == null) return null;
                 compass.setCount(1);
                 return new TradeOffer(new TradedItem(Items.EMERALD, this.price), compass, this.maxUses, this.experience, this.multiplier);
@@ -708,7 +708,7 @@ public class Trades {
 
         @Override
         public TradeOffer create(Entity entity, Random random) {
-            if (entity.getWorld() instanceof ServerWorld world && entity instanceof NearbyPlayersTracker nearbyPlayersTracker) {
+            if (entity.getEntityWorld() instanceof ServerWorld world && entity instanceof NearbyPlayersTracker nearbyPlayersTracker) {
                 TradedCompasses compasses = TradedCompasses.get(world.getPersistentStateManager());
                 PlayerEntity player = nearbyPlayersTracker.getNearbyPlayer(index);
                 if (player != null) {

@@ -24,7 +24,7 @@ public class ConsumableComponentMixin {
     public void checkTeleport(World world, LivingEntity user, ItemStack stack, CallbackInfoReturnable<ItemStack> cir) {
         if (StreamSupport.stream(stack.getOrDefault(DataComponentTypes.POTION_CONTENTS, PotionContentsComponent.DEFAULT).getEffects().spliterator(), false)
             .anyMatch(eff -> eff.equals(UnruffledMod.TELEPORTATION_EFFECT))) {
-            if (world.isClient) {
+            if (world.isClient()) {
                 cir.setReturnValue(stack);
                 cir.cancel();
             }

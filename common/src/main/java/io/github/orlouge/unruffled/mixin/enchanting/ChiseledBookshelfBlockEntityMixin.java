@@ -21,13 +21,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ChiseledBookshelfBlockEntity.class)
 public class ChiseledBookshelfBlockEntityMixin {
-    @Shadow @Final public DefaultedList<ItemStack> inventory;
+    @Shadow @Final private DefaultedList<ItemStack> heldStacks;
 
     @Inject(method = "readData", at = @At("TAIL"))
     public void removeUnselectableEnchantedBooks(ReadView view, CallbackInfo ci) {
         if (!Config.INSTANCE.get().enchantmentsConfig.disenchantChiseledBookshelfBooks().orElse(false)) return;
-        for (int idx = 0; idx < this.inventory.size(); idx++) {
-            ItemStack stack = this.inventory.get(idx);
+        for (int idx = 0; idx < this.heldStacks.size(); idx++) {
+            ItemStack stack = this.heldStacks.get(idx);
             if (!stack.isEmpty() && stack.isOf(Items.ENCHANTED_BOOK)) {
                 boolean removeEnchantments = false;
                 for (RegistryEntry<Enchantment> enchantment : EnchantmentHelper.getEnchantments(stack).getEnchantments()) {
@@ -37,7 +37,7 @@ public class ChiseledBookshelfBlockEntityMixin {
                     }
                 }
                 if (removeEnchantments) {
-                    this.inventory.set(idx, new ItemStack(Items.BOOK));
+                    this.heldStacks.set(idx, new ItemStack(Items.BOOK));
                 }
             }
         }

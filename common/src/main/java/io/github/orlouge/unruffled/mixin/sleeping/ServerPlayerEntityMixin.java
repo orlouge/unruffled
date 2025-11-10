@@ -41,29 +41,29 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements Ha
 
     @Shadow @Nullable private ServerPlayerEntity.Respawn respawn;
 
+    @Shadow public abstract ServerWorld getEntityWorld();
+
     public ServerPlayerEntityMixin(World world, GameProfile profile) {
         super(world, profile);
     }
 
-    @Shadow public abstract ServerWorld getWorld();
-
     @Inject(method = "wakeUp", at = @At("HEAD"))
     public void updatePeacefulChunksOnWakeUp(boolean skipSleepTimer, boolean updateSleepingPlayers, CallbackInfo ci) {
-        if (skipSleepTimer || updateSleepingPlayers || this.respawn == null || this.respawn.pos() == null || !this.isSleeping()) return;
-        PeacefulChunks.get(this.getWorld().getPersistentStateManager()).add(this.getUuid(), new ChunkPos(this.respawn.pos()), PeacefulChunks.PEACEFUL_RANGE);
+        if (skipSleepTimer || updateSleepingPlayers || this.respawn == null || this.respawn.respawnData().getPos() == null || !this.isSleeping()) return;
+        PeacefulChunks.get(this.getEntityWorld().getPersistentStateManager()).add(this.getUuid(), new ChunkPos(this.respawn.respawnData().getPos()), PeacefulChunks.PEACEFUL_RANGE);
     }
 
     @Inject(method = "setSpawnPoint", at = @At("HEAD"))
     public void updatePeacefulChunksOnSetSpawnPoint(ServerPlayerEntity.Respawn respawn, boolean sendMessage, CallbackInfo ci) {
-        if (this.respawn == null || this.respawn.pos() == null || (this.respawn.pos().equals(respawn == null ? null : respawn.pos()) && this.respawn.dimension().equals(respawn.dimension()))) return;
-        SpawnPoint currentSpawnPos = new SpawnPoint(this.respawn.pos(), this.respawn.dimension(), this.respawn.angle(), this.respawn.forced());
+        if (this.respawn == null || this.respawn.respawnData().getPos() == null || (this.respawn.respawnData().getPos().equals(respawn == null ? null : respawn.respawnData().getPos()) && this.respawn.respawnData().getDimension().equals(respawn.respawnData().getDimension()))) return;
+        SpawnPoint currentSpawnPos = new SpawnPoint(this.respawn.respawnData().getPos(), this.respawn.respawnData().getDimension(), this.respawn.respawnData().yaw(), this.respawn.respawnData().pitch(), this.respawn.forced());
         //if (pos == null) this.deleteBackupSpawnPoint(currentSpawnPos);
-        PeacefulChunks peacefulChunks = PeacefulChunks.get(this.getWorld().getPersistentStateManager());
+        PeacefulChunks peacefulChunks = PeacefulChunks.get(this.getEntityWorld().getPersistentStateManager());
         ChunkPos centerPos = peacefulChunks.getCenterPos(this.getUuid());
-        if (/* sendMessage && */ centerPos != null && centerPos.equals(new ChunkPos(this.respawn.pos()))) {
+        if (/* sendMessage && */ centerPos != null && centerPos.equals(new ChunkPos(this.respawn.respawnData().getPos()))) {
             this.addBackupSpawnPoint(currentSpawnPos);
         }
-        peacefulChunks.remove(this.getUuid(), new ChunkPos(this.respawn.pos()), PeacefulChunks.PEACEFUL_RANGE);
+        peacefulChunks.remove(this.getUuid(), new ChunkPos(this.respawn.respawnData().getPos()), PeacefulChunks.PEACEFUL_RANGE);
     }
 
     @Inject(method = "copyFrom", at = @At("TAIL"))

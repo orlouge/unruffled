@@ -4,17 +4,16 @@ import io.github.orlouge.unruffled.UnruffledMod;
 import io.github.orlouge.unruffled.interfaces.HasBackupSpawnPoints;
 import net.minecraft.entity.Entity;
 import net.minecraft.network.ClientConnection;
-import net.minecraft.registry.RegistryKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ConnectedClientData;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Pair;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.GlobalPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.TeleportTarget;
-import net.minecraft.world.World;
+import net.minecraft.world.WorldProperties;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -35,14 +34,14 @@ public class PlayerManagerMixin {
     public void findBackupSpawnIfNeeded(ServerPlayerEntity player, boolean alive, Entity.RemovalReason removalReason, CallbackInfoReturnable<ServerPlayerEntity> cir) {
         this.foundSpawnPoint = null;
         if (!(player instanceof HasBackupSpawnPoints backupSpawnPoints)) return;
-        HasBackupSpawnPoints.SpawnPoint originalPoint = player.getRespawn() != null && player.getRespawn().pos() != null
-            ? new HasBackupSpawnPoints.SpawnPoint(player.getRespawn().pos(), player.getRespawn().dimension(), player.getRespawn().angle(), player.getRespawn().forced())
-            : new HasBackupSpawnPoints.SpawnPoint(null, null, 0, false);
+        HasBackupSpawnPoints.SpawnPoint originalPoint = player.getRespawn() != null && player.getRespawn().respawnData().getPos() != null
+            ? new HasBackupSpawnPoints.SpawnPoint(player.getRespawn().respawnData().getPos(), player.getRespawn().respawnData().getDimension(), player.getRespawn().respawnData().yaw(), player.getRespawn().respawnData().pitch(), player.getRespawn().forced())
+            : new HasBackupSpawnPoints.SpawnPoint(null, null, 0, 0, false);
         HasBackupSpawnPoints.SpawnPoint point = originalPoint;
         while (point != null) {
             ServerWorld backupWorld = this.server.getWorld(point.dimension());
             if (point.pos() != null && point.dimension() != null && backupWorld != null) {
-                Optional<ServerPlayerEntity.RespawnPos> respawnPos = ServerPlayerEntity.findRespawnPosition(backupWorld, new ServerPlayerEntity.Respawn(backupWorld.getRegistryKey(), point.pos(), point.angle(), point.forced()), alive);
+                Optional<ServerPlayerEntity.RespawnPos> respawnPos = ServerPlayerEntity.findRespawnPosition(backupWorld, new ServerPlayerEntity.Respawn(new WorldProperties.SpawnPoint(new GlobalPos(backupWorld.getRegistryKey(), point.pos()), point.yaw(), point.pitch()), point.forced()), alive);
                 if (respawnPos.isPresent()) {
                     this.foundSpawnPoint = new Pair<>(point, Optional.of(respawnPos.get().pos));
                     return;
@@ -57,7 +56,7 @@ public class PlayerManagerMixin {
     @Redirect(method = "respawnPlayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/network/ServerPlayerEntity;getRespawnTarget(ZLnet/minecraft/world/TeleportTarget$PostDimensionTransition;)Lnet/minecraft/world/TeleportTarget;"))
     public TeleportTarget replaceTeleportPos(ServerPlayerEntity instance, boolean alive, TeleportTarget.PostDimensionTransition postDimensionTransition) {
         if (foundSpawnPoint == null) return instance.getRespawnTarget(alive, postDimensionTransition);
-        return new TeleportTarget(instance.getServer().getWorld(foundSpawnPoint.getLeft().dimension()), foundSpawnPoint.getRight().orElse(Vec3d.ofCenter(foundSpawnPoint.getLeft().pos())), Vec3d.ZERO, foundSpawnPoint.getLeft().angle(), 0.0F, postDimensionTransition);
+        return new TeleportTarget(instance.getEntityWorld().getServer().getWorld(foundSpawnPoint.getLeft().dimension()), foundSpawnPoint.getRight().orElse(Vec3d.ofCenter(foundSpawnPoint.getLeft().pos())), Vec3d.ZERO, foundSpawnPoint.getLeft().yaw(), 0.0F, postDimensionTransition);
     }
 
     @Inject(method = "respawnPlayer", at = @At(value = "RETURN"))

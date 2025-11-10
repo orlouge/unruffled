@@ -49,7 +49,7 @@ public abstract class EvokerEntityMixin extends SpellcastingIllagerEntity {
                 if (io.github.orlouge.unruffled.config.Config.INSTANCE.get().mechanicsConfig.badOmenFromEvilTotem()) {
                     ItemEnchantmentsHelper.setItemEnchantments(totem, this.getRegistryManager());
                 }
-                this.dropStack(playerEntity.getWorld(), totem);
+                this.dropStack(playerEntity.getEntityWorld(), totem);
             }
         }
 

@@ -12,6 +12,7 @@ import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.HeldItemContext;
 import net.minecraft.util.StringIdentifiable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.GlobalPos;
@@ -35,10 +36,11 @@ public class ExtendedCompassProperty extends NeedleAngleState implements Numeric
     }
 
     @Override
-    protected float getAngle(ItemStack stack, ClientWorld world, int seed, Entity user) {
-        GlobalPos globalPos = this.target.getPosition(world, stack, user);
+    protected float getAngle(ItemStack stack, ClientWorld world, int seed, HeldItemContext context) {
         long l = world.getTime();
-        return !canPointTo(user, globalPos) ? this.getAimlessAngle(seed, l) : this.getAngleTo(user, l, globalPos.pos());
+        if (context == null || context.getEntity() == null) return this.getAimlessAngle(seed, l);
+        GlobalPos globalPos = this.target.getPosition(world, stack, context.getEntity());
+        return !canPointTo(context.getEntity(), globalPos) ? this.getAimlessAngle(seed, l) : this.getAngleTo(context.getEntity(), l, globalPos.pos());
     }
 
     private float getAimlessAngle(int seed, long time) {
@@ -55,7 +57,7 @@ public class ExtendedCompassProperty extends NeedleAngleState implements Numeric
         float g = getBodyYaw(entity);
         float h;
         if (entity instanceof PlayerEntity playerEntity) {
-            if (playerEntity.isMainPlayer() && playerEntity.getWorld().getTickManager().shouldTick()) {
+            if (playerEntity.isMainPlayer() && playerEntity.getEntityWorld().getTickManager().shouldTick()) {
                 if (this.aimedAngler.shouldUpdate(time)) {
                     this.aimedAngler.update(time, 0.5F - (g - 0.25F));
                 }
@@ -70,7 +72,7 @@ public class ExtendedCompassProperty extends NeedleAngleState implements Numeric
     }
 
     private static boolean canPointTo(Entity entity, GlobalPos pos) {
-        return pos != null && pos.dimension() == entity.getWorld().getRegistryKey() && !(pos.pos().getSquaredDistance(entity.getPos()) < (double)1.0E-5F);
+        return pos != null && pos.dimension() == entity.getEntityWorld().getRegistryKey() && !(pos.pos().getSquaredDistance(entity.getEntityPos()) < (double)1.0E-5F);
     }
 
     private static double getAngleTo(Entity entity, BlockPos pos) {
@@ -99,7 +101,7 @@ public class ExtendedCompassProperty extends NeedleAngleState implements Numeric
         },
         NORTH_OR_SPAWN("north_or_spawn") {
             public GlobalPos getPosition(ClientWorld world, ItemStack stack, Entity holder) {
-                return Config.INSTANCE.get().navigationConfig.compassPointsNorth() ? new GlobalPos(holder.getWorld().getRegistryKey(), holder.getBlockPos().north(10000)) : GlobalPos.create(world.getRegistryKey(), world.getSpawnPos());
+                return Config.INSTANCE.get().navigationConfig.compassPointsNorth() ? new GlobalPos(holder.getEntityWorld().getRegistryKey(), holder.getBlockPos().north(10000)) : GlobalPos.create(world.getRegistryKey(), world.getSpawnPoint().getPos());
             }
         },
         RECOVERY_LOCKED("recovery_locked") {

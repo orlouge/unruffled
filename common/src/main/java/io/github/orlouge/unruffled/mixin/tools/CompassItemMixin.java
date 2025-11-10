@@ -34,7 +34,7 @@ public class CompassItemMixin extends Item {
             )
         ) {
             ItemStack buyStack = stack.copyComponentsToNewStack(Items.COMPASS, 1);
-            TradedCompasses.get(serverPlayer.getWorld().getPersistentStateManager()).addBuy(serverPlayer, buyStack);
+            TradedCompasses.get(serverPlayer.getEntityWorld().getPersistentStateManager()).addBuy(serverPlayer, buyStack);
         }
     }
 
@@ -55,7 +55,7 @@ public class CompassItemMixin extends Item {
     @Redirect(method = "useOnBlock", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerInventory;insertStack(Lnet/minecraft/item/ItemStack;)Z"))
     public boolean addBuyNewStack(PlayerInventory instance, ItemStack stack, ItemUsageContext context) {
         addBuy(context, stack);
-        return context.getWorld().isClient || instance.insertStack(stack);
+        return context.getWorld().isClient() || instance.insertStack(stack);
     }
 
     @ModifyExpressionValue(method = "useOnBlock", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;copyComponentsToNewStack(Lnet/minecraft/item/ItemConvertible;I)Lnet/minecraft/item/ItemStack;"))

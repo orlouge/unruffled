@@ -39,7 +39,7 @@ public abstract class PlayerEntityMixin extends LivingEntity {
             if (this.getEquippedStack(EquipmentSlot.OFFHAND).isOf(CustomItems.EVIL_TOTEM) && io.github.orlouge.unruffled.config.Config.INSTANCE.get().mechanicsConfig.badOmenFromEvilTotem()) {
                 unruffled_accumulatedBadOmenTicks += unruffled_lastBadOmenCheckTicks;
                 if ((Object) this instanceof ServerPlayerEntity serverPlayer) {
-                    if (serverPlayer.getWorld().getRaidAt(this.getBlockPos()) == null) {
+                    if (serverPlayer.getEntityWorld().getRaidAt(this.getBlockPos()) == null) {
                         this.addStatusEffect(new StatusEffectInstance(StatusEffects.BAD_OMEN, -1, MathHelper.clamp(unruffled_accumulatedBadOmenTicks / 6000, 0, 4), false, false, true));
                     } else {
                         this.removeStatusEffect(StatusEffects.BAD_OMEN);

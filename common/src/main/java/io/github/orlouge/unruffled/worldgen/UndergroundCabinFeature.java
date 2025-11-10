@@ -290,7 +290,7 @@ public class UndergroundCabinFeature extends Feature<DefaultFeatureConfig> {
                     ctx.world().spawnEntity(armorStand);
                 }),
                 null,
-                BlockTemplate.block(Blocks.CHAIN.getDefaultState().with(ChainBlock.AXIS, Direction.Axis.X))
+                BlockTemplate.block(Blocks.IRON_CHAIN.getDefaultState().with(ChainBlock.AXIS, Direction.Axis.X))
             },
             new BlockTemplate[] {
                 BlockTemplate.block(Blocks.CHIPPED_ANVIL.getDefaultState().with(AnvilBlock.FACING, Direction.EAST)),
@@ -315,7 +315,7 @@ public class UndergroundCabinFeature extends Feature<DefaultFeatureConfig> {
                         ctx.world().spawnEntity(itemFrame);
                     }
                 ),
-                BlockTemplate.block(Blocks.CHAIN.getDefaultState().with(ChainBlock.AXIS, Direction.Axis.X))
+                BlockTemplate.block(Blocks.IRON_CHAIN.getDefaultState().with(ChainBlock.AXIS, Direction.Axis.X))
             },
             new BlockTemplate[] {
                 BlockTemplate.block(Blocks.SMITHING_TABLE),
@@ -373,8 +373,8 @@ public class UndergroundCabinFeature extends Feature<DefaultFeatureConfig> {
             },
             new BlockTemplate[] {
                 BlockTemplate.block(Blocks.POLISHED_ANDESITE_STAIRS.getDefaultState().with(StairsBlock.FACING, Direction.EAST)),
-                BlockTemplate.block(Blocks.CHAIN.getDefaultState().with(ChainBlock.AXIS, Direction.Axis.Y)),
-                BlockTemplate.block(Blocks.CHAIN.getDefaultState().with(ChainBlock.AXIS, Direction.Axis.Y)),
+                BlockTemplate.block(Blocks.IRON_CHAIN.getDefaultState().with(ChainBlock.AXIS, Direction.Axis.Y)),
+                BlockTemplate.block(Blocks.IRON_CHAIN.getDefaultState().with(ChainBlock.AXIS, Direction.Axis.Y)),
             },
             new BlockTemplate[] {
                 BlockTemplate.block(Blocks.LODESTONE),
@@ -390,8 +390,8 @@ public class UndergroundCabinFeature extends Feature<DefaultFeatureConfig> {
             },
             new BlockTemplate[] {
                 BlockTemplate.block(Blocks.POLISHED_ANDESITE_STAIRS.getDefaultState().with(StairsBlock.FACING, Direction.WEST)),
-                BlockTemplate.block(Blocks.CHAIN.getDefaultState().with(ChainBlock.AXIS, Direction.Axis.Y)),
-                BlockTemplate.block(Blocks.CHAIN.getDefaultState().with(ChainBlock.AXIS, Direction.Axis.Y)),
+                BlockTemplate.block(Blocks.IRON_CHAIN.getDefaultState().with(ChainBlock.AXIS, Direction.Axis.Y)),
+                BlockTemplate.block(Blocks.IRON_CHAIN.getDefaultState().with(ChainBlock.AXIS, Direction.Axis.Y)),
             }
         }
     );
@@ -568,7 +568,7 @@ public class UndergroundCabinFeature extends Feature<DefaultFeatureConfig> {
                         ctx.world().spawnEntity(itemFrame);
                     }
                 ),
-                BlockTemplate.block(Blocks.CHAIN.getDefaultState().with(ChainBlock.AXIS, Direction.Axis.Y))
+                BlockTemplate.block(Blocks.IRON_CHAIN.getDefaultState().with(ChainBlock.AXIS, Direction.Axis.Y))
             },
             new BlockTemplate[] {
                 BlockTemplate.lootContainer(Blocks.BARREL.getDefaultState().with(BarrelBlock.FACING, Direction.SOUTH), Identifier.of(UnruffledMod.MOD_ID, "chests/arrows")),
@@ -587,7 +587,7 @@ public class UndergroundCabinFeature extends Feature<DefaultFeatureConfig> {
                         ctx.world().spawnEntity(itemFrame);
                     }
                 ),
-                BlockTemplate.block(Blocks.CHAIN.getDefaultState().with(ChainBlock.AXIS, Direction.Axis.Y))
+                BlockTemplate.block(Blocks.IRON_CHAIN.getDefaultState().with(ChainBlock.AXIS, Direction.Axis.Y))
             },
             new BlockTemplate[] {},
             new BlockTemplate[] {
@@ -866,10 +866,10 @@ public class UndergroundCabinFeature extends Feature<DefaultFeatureConfig> {
                 int pick = random.nextInt(codices.size() * 8 + 4);
                 boolean set = false;
                 if (pick < codices.size()) {
-                    bookshelf.inventory.set(i, AncientCodexItem.setNumber(new ItemStack(CustomItems.ANCIENT_CODEX), codices.get(pick)));
+                    bookshelf.getHeldStacks().set(i, AncientCodexItem.setNumber(new ItemStack(CustomItems.ANCIENT_CODEX), codices.get(pick)));
                     set = true;
                 } else if (pick % 5 > 1) {
-                    bookshelf.inventory.set(i, new ItemStack(Items.BOOK));
+                    bookshelf.getHeldStacks().set(i, new ItemStack(Items.BOOK));
                     set = true;
                 }
                 state = state.with(ChiseledBookshelfBlock.SLOT_OCCUPIED_PROPERTIES.get(i), set);

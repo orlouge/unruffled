@@ -50,7 +50,7 @@ public abstract class PlayerEntityMixin extends LivingEntity {
         if (this.getHungerManager() instanceof ExtendedHungerManager extendedHungerManager) {
             attackExhaustion = getAttackExhaustion((PlayerEntity) (Object) this);
             float stamina;
-            if (this.getWorld().isClient) {
+            if (this.getEntityWorld().isClient()) {
                 stamina = UnruffledModClient.stamina;
             } else {
                 stamina = extendedHungerManager.getStamina();

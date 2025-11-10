@@ -19,7 +19,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 @Mixin(ServerPlayerEntity.class)
 public abstract class ServerPlayerEntityMixin extends PlayerEntity {
 
-    @Shadow public abstract ServerWorld getWorld();
+    @Shadow public abstract ServerWorld getEntityWorld();
 
     private BlockPos lastSprintBlockPos = new BlockPos(0, 0, 0);
     private boolean isOnPath = false;
@@ -47,9 +47,9 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity {
         if (!this.lastSprintBlockPos.equals(this.getBlockPos())) {
             this.lastSprintBlockPos = this.getBlockPos();
             if (io.github.orlouge.unruffled.config.Config.INSTANCE.get().hungerConfig.steadyBlockBlacklist()) {
-                this.isOnPath = !this.getWorld().getBlockState(this.getVelocityAffectingPos()).isIn(UnruffledMod.UNSTEADY);
+                this.isOnPath = !this.getEntityWorld().getBlockState(this.getVelocityAffectingPos()).isIn(UnruffledMod.UNSTEADY);
             } else {
-                this.isOnPath = this.getWorld().getBlockState(this.getVelocityAffectingPos()).isIn(UnruffledMod.STEADY);
+                this.isOnPath = this.getEntityWorld().getBlockState(this.getVelocityAffectingPos()).isIn(UnruffledMod.STEADY);
             }
         }
         return this.isOnPath ? constant * 0.5f : constant;
