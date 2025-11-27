@@ -1,6 +1,7 @@
 package io.github.orlouge.unruffled.mixin.tools;
 
 import io.github.orlouge.unruffled.config.Config;
+import io.github.orlouge.unruffled.config.Tools;
 import net.minecraft.block.BlockState;
 import net.minecraft.component.type.ToolComponent;
 import net.minecraft.enchantment.Enchantments;
@@ -17,7 +18,7 @@ public class ToolComponentMixin {
     public void increaseMiningSpeedMultiplier(BlockState blockState, CallbackInfoReturnable<Float> cir) {
         if (Config.INSTANCE.get().enchantmentsConfig.disabledEnchantments().contains(Enchantments.EFFICIENCY)) {
             float mul = cir.getReturnValue();
-            cir.setReturnValue(Math.max(mul * mul / 2, mul));
+            cir.setReturnValue(Tools.INSTANCE.get().toolConfig.miningSpeedMultiplierCurve().compute(mul));
         }
     }
 }

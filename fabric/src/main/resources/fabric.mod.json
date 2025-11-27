@@ -11,7 +11,7 @@
     "homepage": "https://github.com/orlouge/unruffled",
     "sources": "https://github.com/orlouge/unruffled"
   },
-  "license": "Insert License Here",
+  "license": "ARR",
   "icon": "assets/unruffled/icon.png",
   "environment": "*",
   "entrypoints": {
@@ -28,6 +28,6 @@
   ],
   "depends": {
     "fabric": "*",
-    "minecraft": ">=1.21.1"
+    "minecraft": ">=1.21"
   }
 }

@@ -45,10 +45,13 @@ public interface ExtendedHungerManager {
     }
 
     default float getWearinessMalus() {
+        float environmentalMalus = Config.INSTANCE.get().hungerConfig.wearinessEnvironmentalPenalty().orElse(0.4f) > 0
+            && !(getDimension() == null || getDimension().bedWorks()) || isNight() || isUnderground()
+            ? Config.INSTANCE.get().hungerConfig.wearinessEnvironmentalPenalty().orElse(0.4f) : 0f;
         return Math.max(0f, Math.min(1f,
                1f - 1f / this.getWeight() +
                1f - Math.min(Math.min(this.getHealth(), this.getFoodLevel()) + 1f, 10f) / 10f +
-               (!(getDimension() == null || getDimension().bedWorks()) || isNight() || isUnderground() ? 0.4f : 0f)
+                   environmentalMalus
         ));
     }
 

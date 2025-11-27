@@ -11,6 +11,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Pair;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.Difficulty;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.dimension.DimensionType;
 import org.spongepowered.asm.mixin.Mixin;
@@ -20,7 +21,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(HungerManager.class)
+@Mixin(value = HungerManager.class, priority = 1)
 public abstract class HungerManagerMixin implements ExtendedHungerManager {
     @Shadow private int foodLevel;
     @Shadow private int foodTickTimer;
@@ -104,7 +105,17 @@ public abstract class HungerManagerMixin implements ExtendedHungerManager {
             this.stamina = Math.max(0f, stamina - consumedStamina);
             this.addWeariness(Math.min(0.15f, consumedStamina) * (Config.INSTANCE.get().hungerConfig.wearinessIncreaseFactor() * (0.1f + this.amortizedWeariness)));
         }
-        if (this.stamina > 0.05 && player.getHealth() < player.getMaxHealth() && player.getWorld().getGameRules().getBoolean(GameRules.NATURAL_REGENERATION)) {
+        if (this.foodLevel <= 0 && Config.INSTANCE.get().hungerConfig.starvationRate().orElse(0f) > 0f) {
+            ++this.foodTickTimer;
+            if (this.foodTickTimer >= (int) (80f / Config.INSTANCE.get().hungerConfig.starvationRate().orElse(0f))) {
+                Difficulty difficulty = player.getWorld().getDifficulty();
+                if (player.getHealth() > 10.0F || difficulty == Difficulty.HARD || player.getHealth() > 1.0F && difficulty == Difficulty.NORMAL) {
+                    player.damage(player.getDamageSources().starve(), 1.0F);
+                }
+
+                this.foodTickTimer = 0;
+            }
+        } else if (this.stamina > 0.05 && player.getHealth() < player.getMaxHealth() && player.getWorld().getGameRules().getBoolean(GameRules.NATURAL_REGENERATION)) {
             ++this.foodTickTimer;
             if (this.foodTickTimer >= 200 / Math.min(this.stamina, 0.4)) {
                 player.heal(1f);
