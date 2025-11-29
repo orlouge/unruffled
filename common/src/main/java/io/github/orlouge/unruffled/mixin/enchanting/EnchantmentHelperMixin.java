@@ -45,6 +45,7 @@ public class EnchantmentHelperMixin {
     private static void setLureIfDisabled(ServerWorld world, ItemStack stack, Entity user, CallbackInfoReturnable<Float> cir) {
         if (Config.INSTANCE.get().enchantmentsConfig.disabledEnchantments().contains(Enchantments.LURE)) {
             cir.setReturnValue(Math.max(15f, cir.getReturnValueF()));
+            cir.cancel();
         }
     }
 
