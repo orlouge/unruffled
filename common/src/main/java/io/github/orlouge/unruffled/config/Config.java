@@ -254,15 +254,16 @@ public class Config {
         ).apply(instance, PotionsConfig::new));
     }
 
-    public record WorldgenConfig(float structureSpreadFactor, float structureSpreadCorrection, boolean disableOreVeins) {
+    public record WorldgenConfig(float structureSpreadFactor, float structureSpreadCorrection, boolean disableOreVeins, float cabinRoomDensity) {
         public WorldgenConfig() {
-            this(UnruffledMod.DEFAULT_STRUCTURE_SPREAD_FACTOR, UnruffledMod.DEFAULT_STRUCTURE_SPREAD_CORRECTION, true);
+            this(UnruffledMod.DEFAULT_STRUCTURE_SPREAD_FACTOR, UnruffledMod.DEFAULT_STRUCTURE_SPREAD_CORRECTION, true, 20f);
         }
 
         public static final Codec<WorldgenConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Codec.FLOAT.fieldOf("structure_spread_factor").forGetter(config -> config.structureSpreadFactor),
             Codec.FLOAT.fieldOf("structure_spread_correction").forGetter(config -> config.structureSpreadCorrection),
-            Codec.BOOL.fieldOf("disable_large_ore_veins").forGetter(config -> config.disableOreVeins)
+            Codec.BOOL.fieldOf("disable_large_ore_veins").forGetter(config -> config.disableOreVeins),
+            Codec.FLOAT.fieldOf("cabin_room_density").forGetter(config -> config.cabinRoomDensity)
             ).apply(instance, WorldgenConfig::new));
     }
 
