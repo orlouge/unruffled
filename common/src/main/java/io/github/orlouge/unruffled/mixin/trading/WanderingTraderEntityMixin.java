@@ -16,10 +16,12 @@ import net.minecraft.item.Items;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.village.TradeOffer;
+import net.minecraft.village.TradeOfferList;
 import net.minecraft.village.TradeOffers;
 import net.minecraft.world.WanderingTraderManager;
 import net.minecraft.world.World;
 import net.minecraft.world.level.ServerWorldProperties;
+import org.apache.commons.lang3.tuple.Pair;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -93,6 +95,20 @@ public abstract class WanderingTraderEntityMixin extends MerchantEntity implemen
             );
         }
         if (!io.github.orlouge.unruffled.config.Config.INSTANCE.get().tradesConfig.wanderingTraderTrades().flatMap(Trades.ConfiguredWanderingTraderTrades::addVanilla).orElse(true)) {
+            ci.cancel();
+        }
+        boolean ignoreBuy = io.github.orlouge.unruffled.config.Config.INSTANCE.get().tradesConfig.wanderingTraderTrades().flatMap(Trades.ConfiguredWanderingTraderTrades::addVanillaIgnoreBuy).orElse(true);
+        boolean ignoreSellEnchanted = io.github.orlouge.unruffled.config.Config.INSTANCE.get().tradesConfig.wanderingTraderTrades().flatMap(Trades.ConfiguredWanderingTraderTrades::addVanillaIgnoreSellEnchanted).orElse(true);
+        if (ignoreBuy || ignoreSellEnchanted) {
+            TradeOfferList tradeOfferList = this.getOffers();
+
+            for(Pair<TradeOffers.Factory[], Integer> pair : TradeOffers.WANDERING_TRADER_TRADES) {
+                TradeOffers.Factory[] factories = Arrays.stream(pair.getLeft())
+                    .filter(f -> !((ignoreBuy && f instanceof TradeOffers.BuyItemFactory) || (ignoreSellEnchanted && f instanceof TradeOffers.SellEnchantedToolFactory)))
+                    .toArray(TradeOffers.Factory[]::new);
+                this.fillRecipesFromPool(tradeOfferList, factories, pair.getRight());
+            }
+
             ci.cancel();
         }
     }
