@@ -16,11 +16,8 @@ import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.loot.LootTable;
 import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.Lazy;
 import net.minecraft.util.dynamic.Codecs;
 
@@ -125,10 +122,10 @@ public class Config {
             float hungerDepletionRate, float staminaRegenerationRate, float inventoryWeightPenaltyFactor,
             float attackExhaustionFactor, boolean attackAlwaysAllowInTime,
             float eatCooldownFactor, float wearinessIncreaseFactor, float wearinessDecreaseFactor, float wearinessDecreaseFactorOnStillEntities,
-            boolean steadyBlockBlacklist
+            boolean steadyBlockBlacklist, Optional<Float> starvationRate, Optional<Float> wearinessEnvironmentalPenalty
     ) {
         public HungerConfig() {
-            this(0.2f, 0.003f, 2.8f, 0.2f, 0.0028f, 1f, 2f, true, 0.2f, 0.1f, 0.99975f, 0.9993f, true);
+            this(0.2f, 0.003f, 2.8f, 0.2f, 0.0028f, 1f, 2f, true, 0.2f, 0.1f, 0.99975f, 0.9993f, true, Optional.of(0f), Optional.of(0.4f));
         }
 
         public static Codec<HungerConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group(
@@ -144,7 +141,9 @@ public class Config {
             Codec.FLOAT.fieldOf("weariness_increase_factor").forGetter(HungerConfig::wearinessIncreaseFactor),
             Codec.FLOAT.fieldOf("weariness_decrease_factor").forGetter(HungerConfig::wearinessDecreaseFactor),
             Codec.FLOAT.fieldOf("weariness_decrease_factor_riding_still_entities").forGetter(HungerConfig::wearinessDecreaseFactorOnStillEntities),
-            Codec.BOOL.optionalFieldOf("steady_block_blacklist", false).forGetter(HungerConfig::steadyBlockBlacklist)
+            Codec.BOOL.optionalFieldOf("steady_block_blacklist", false).forGetter(HungerConfig::steadyBlockBlacklist),
+            Codec.FLOAT.optionalFieldOf("starvation_rate").forGetter(HungerConfig::starvationRate),
+            Codec.FLOAT.optionalFieldOf("weariness_environmental_penalty").forGetter(HungerConfig::wearinessEnvironmentalPenalty)
         ).apply(instance, HungerConfig::new));
     }
 
@@ -255,15 +254,16 @@ public class Config {
         ).apply(instance, PotionsConfig::new));
     }
 
-    public record WorldgenConfig(float structureSpreadFactor, float structureSpreadCorrection, boolean disableOreVeins) {
+    public record WorldgenConfig(float structureSpreadFactor, float structureSpreadCorrection, boolean disableOreVeins, float cabinRoomDensity) {
         public WorldgenConfig() {
-            this(UnruffledMod.DEFAULT_STRUCTURE_SPREAD_FACTOR, UnruffledMod.DEFAULT_STRUCTURE_SPREAD_CORRECTION, true);
+            this(UnruffledMod.DEFAULT_STRUCTURE_SPREAD_FACTOR, UnruffledMod.DEFAULT_STRUCTURE_SPREAD_CORRECTION, true, 20f);
         }
 
         public static final Codec<WorldgenConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Codec.FLOAT.fieldOf("structure_spread_factor").forGetter(config -> config.structureSpreadFactor),
             Codec.FLOAT.fieldOf("structure_spread_correction").forGetter(config -> config.structureSpreadCorrection),
-            Codec.BOOL.fieldOf("disable_large_ore_veins").forGetter(config -> config.disableOreVeins)
+            Codec.BOOL.fieldOf("disable_large_ore_veins").forGetter(config -> config.disableOreVeins),
+            Codec.FLOAT.fieldOf("cabin_room_density").forGetter(config -> config.cabinRoomDensity)
             ).apply(instance, WorldgenConfig::new));
     }
 
